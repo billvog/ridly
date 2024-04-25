@@ -18,6 +18,7 @@ export default function Layout() {
         headerTitleStyle: {
           fontWeight: "bold",
         },
+        headerBackVisible: false,
       }}
     />
   );

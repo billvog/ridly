@@ -9,17 +9,36 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
-import { setFormErrors } from "../../utils/apiErrors";
 
 const FormValidationSchema = z.object({
-  email: z.string({ required_error: "Email is a required field" }),
-  password: z.string({ required_error: "Password is a required field" }),
+  first_name: z
+    .string({ required_error: "First name is a required field" })
+    .regex(/^[a-z]+$/i, "Last name can only contain characters"),
+
+  last_name: z
+    .string({ required_error: "Last name is a required field" })
+    .regex(/^[a-z]+$/i, "Last name can only contain characters"),
+
+  username: z
+    .string({ required_error: "Username is a required field" })
+    .regex(
+      /^[a-z0-9](?!.*\.\.)[a-z0-9.]*[a-z0-9]$/i,
+      "A username can only contain alphanumerical and periods. It can also not start, nor end, with a period."
+    ),
+
+  email: z
+    .string({ required_error: "Email is a required field" })
+    .email("Please enter a valid email"),
+
+  password: z
+    .string({ required_error: "Password is a required field" })
+    .min(6, "Password must be at least 6 characters"),
 });
 
 type FormSchema = z.infer<typeof FormValidationSchema>;
 
 export default function Page() {
-  useSetNavigationOptions({ title: "Login" });
+  useSetNavigationOptions({ title: "Register" });
 
   const queryClient = useQueryClient();
 
@@ -27,20 +46,16 @@ export default function Page() {
     resolver: zodResolver(FormValidationSchema),
   });
 
-  const loginMutation = useMutation<APIResponse, any, FormSchema>({
-    mutationFn: (values) => api("/user/login/", "POST", values),
+  const registerMutation = useMutation<APIResponse, any, FormSchema>({
+    mutationFn: (values) => api("/user/register/", "POST", values),
   });
 
   const submitForm = formMethods.handleSubmit((data) => {
-    loginMutation.mutate(data, {
+    registerMutation.mutate(data, {
       onSuccess: async (data) => {
         if (!data.ok) {
           if (data.status === 400) {
-            if (data.data.detail) {
-              Toast.show({ type: "error", text1: data.data.detail });
-            } else {
-              setFormErrors(data, formMethods.setError);
-            }
+            Toast.show({ type: "error", text1: data.data.detail });
           } else {
             Toast.show({ type: "error", text1: "Something went wrong." });
           }
@@ -78,6 +93,21 @@ export default function Page() {
   return (
     <View className="p-6">
       <FormProvider {...formMethods}>
+        <TextInput
+          label="First name"
+          name="first_name"
+          placeholder="Enter your first name"
+        />
+        <TextInput
+          label="Last name"
+          name="last_name"
+          placeholder="Enter your last name"
+        />
+        <TextInput
+          label="Username"
+          name="username"
+          placeholder="Enter your username"
+        />
         <TextInput label="Email" name="email" placeholder="Enter your email" />
         <TextInput
           label="Password"
@@ -88,14 +118,14 @@ export default function Page() {
       </FormProvider>
       <Button
         onPress={submitForm}
-        disabled={loginMutation.isPending}
+        disabled={registerMutation.isPending}
         buttonStyle="w-full"
       >
-        Login
+        Register
       </Button>
       <View className="mt-6">
-        <Link href="/guest/register" className="text-center">
-          Don't have an account? <Text className="font-bold">Register</Text>
+        <Link href="/guest/login" className="text-center">
+          Already have an account? <Text className="font-bold">Login</Text>
         </Link>
       </View>
     </View>

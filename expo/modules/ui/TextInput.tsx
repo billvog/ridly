@@ -25,7 +25,7 @@ const ControlledInput = (props: TextInputProps) => {
   const hasError = Boolean(formState?.errors[name]);
 
   return (
-    <View className="mb-8 space-y-2.5">
+    <View className="mb-6 space-y-2.5">
       {label && <Text className="font-bold">{label}</Text>}
       <RNTextInput
         autoCapitalize="none"
