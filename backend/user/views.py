@@ -1,10 +1,14 @@
 from django.contrib.auth import authenticate
 from rest_framework import status, permissions
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, DestroyAPIView
 from rest_framework.response import Response
 
 from .serializers import UserSerializer, LoginUserSerializer, RegisterUserSerializer
-from .auth_tokens import generate_tokens_for_user, set_refresh_token_cookie
+from .auth_tokens import (
+  generate_tokens_for_user,
+  set_refresh_token_cookie,
+  clear_refresh_token_cookie,
+)
 
 
 class LoginAPIView(GenericAPIView):
@@ -61,6 +65,13 @@ class RegisterAPIView(GenericAPIView):
     response = Response(body, headers=headers, status=status.HTTP_201_CREATED)
     set_refresh_token_cookie(response, refresh_token)
 
+    return response
+
+
+class LogoutAPIView(DestroyAPIView):
+  def delete(self, request):
+    response = Response(None, status=status.HTTP_204_NO_CONTENT)
+    clear_refresh_token_cookie(response)
     return response
 
 

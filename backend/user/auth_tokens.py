@@ -38,6 +38,10 @@ def set_refresh_token_cookie(response: Response, refresh_token: str):
   )
 
 
+def clear_refresh_token_cookie(response: Response):
+  response.delete_cookie("refresh_token")
+
+
 def decode_access_token(access_token):
   return jwt.decode(
     access_token, settings.JWT_ACCESS_TOKEN_SECRET, algorithms=["HS256"]
