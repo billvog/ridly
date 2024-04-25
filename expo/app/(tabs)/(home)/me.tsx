@@ -21,8 +21,9 @@ export default function Page() {
     logoutMutation.mutate(undefined, {
       onSuccess(data) {
         if (data.ok) {
-          // Clear cache for queryClient
-          queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+          // Reset "user/me" cached query that
+          // stores logged in user.
+          queryClient.resetQueries({ queryKey: ["user", "me"] });
 
           // Clear memory stored auth tokens
           clearAuthTokens();
@@ -33,8 +34,7 @@ export default function Page() {
             text1: "Logged out",
           });
 
-          // Redirect
-          router.push({ pathname: "/guest/login" });
+          // Redirect will happen in (tabs)/_layout.tsx
 
           return;
         }
