@@ -88,7 +88,7 @@ export default function Page() {
       </FormProvider>
       <Button
         onPress={submitForm}
-        disabled={loginMutation.isPending}
+        loading={loginMutation.isPending}
         buttonStyle="w-full"
       >
         Login

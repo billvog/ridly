@@ -118,7 +118,7 @@ export default function Page() {
       </FormProvider>
       <Button
         onPress={submitForm}
-        disabled={registerMutation.isPending}
+        loading={registerMutation.isPending}
         buttonStyle="w-full"
       >
         Register

@@ -4,7 +4,6 @@ import Button from "@/modules/ui/Button";
 import { APIResponse, api } from "@/utils/api";
 import { clearAuthTokens } from "@/utils/authTokens";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { router } from "expo-router";
 import { Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -66,7 +65,11 @@ export default function Page() {
       <Text>Username: {user.username}</Text>
       <Text>Email: {user.email}</Text>
       <View className="mt-10">
-        <Button onPress={logout} buttonStyle="bg-red-500">
+        <Button
+          onPress={logout}
+          loading={logoutMutation.isPending}
+          buttonStyle="bg-red-500"
+        >
           Logout
         </Button>
       </View>

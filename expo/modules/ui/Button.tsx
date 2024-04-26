@@ -1,11 +1,18 @@
 import classNames from "classnames";
 import { styled } from "nativewind";
 import React from "react";
-import { Pressable, Text, type TextProps as RNTextProps } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  Text,
+  View,
+  type TextProps as RNTextProps,
+} from "react-native";
 
 type ButtonProps = {
   onPress: () => any;
   disabled?: boolean;
+  loading?: boolean;
   buttonStyle: RNTextProps["style"];
   children: React.ReactNode | string;
 };
@@ -13,23 +20,34 @@ type ButtonProps = {
 function Button({
   onPress,
   disabled = false,
+  loading = false,
   buttonStyle,
   children,
 }: ButtonProps) {
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled}
+      disabled={disabled || loading}
       style={buttonStyle}
       className={classNames(
-        "bg-black px-6 py-3 rounded-xl disabled:opacity-60"
+        "relative flex justify-center items-center bg-black px-6 py-3 rounded-xl",
+        {
+          "opacity-80": disabled || loading,
+        }
       )}
     >
-      {typeof children === "string" ? (
-        <Text className="text-center text-white font-bold">{children}</Text>
-      ) : (
-        children
+      {loading && (
+        <View className="absolute">
+          <ActivityIndicator size={18} />
+        </View>
       )}
+      <View className={classNames({ "opacity-0": loading })}>
+        {typeof children === "string" ? (
+          <Text className="text-center text-white font-bold">{children}</Text>
+        ) : (
+          children
+        )}
+      </View>
     </Pressable>
   );
 }

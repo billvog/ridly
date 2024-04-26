@@ -18,7 +18,7 @@ function HomeHeaderRight() {
   }
 
   return (
-    <View className="pr-4">
+    <View>
       <Link href="/me">
         <Text className="font-bold">{user.username}</Text>
       </Link>
