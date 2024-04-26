@@ -1,19 +1,21 @@
 import { TEvent } from "@/types/event";
+import { AntDesign, Entypo } from "@expo/vector-icons";
 import dayjs from "dayjs";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import React from "react";
-import { Text, View } from "react-native";
+import { ViewProps as RNViewProps, Text, View } from "react-native";
 
 export type EventCardProps = {
   event: TEvent;
+  style?: RNViewProps["style"];
 };
 
-export default function EventCard({ event }: EventCardProps) {
+export default function EventCard({ event, style }: EventCardProps) {
   return (
     <View
       className="flex flex-col relative overflow-hidden rounded-2xl"
-      style={{ width: 300 }}
+      style={style}
     >
       <Image
         // Stock image for testing.
@@ -28,18 +30,31 @@ export default function EventCard({ event }: EventCardProps) {
       <BlurView
         intensity={50}
         tint="dark"
-        className="absolute bottom-0 flex flex-col w-full px-5 py-4"
+        className="absolute bottom-0 flex flex-col w-full px-5 pt-3 pb-4"
       >
-        <Text className="text-gray-200">
-          <Text className="font-extrabold text-base">{event.name}</Text>
-          <Text className="text-sm">
-            {" ― "}
-            {dayjs(event.happening_at).fromNow()}
-          </Text>
+        <Text className="text-gray-200 font-extrabold text-lg">
+          {event.name}
         </Text>
-        <Text className="text-gray-200 font-medium text-sm">
-          {event.participant_count} joined
-        </Text>
+        <View className="flex flex-row items-center space-x-4 mt-1">
+          <View className="flex flex-row items-center">
+            <Entypo name="location-pin" size={16} color="#fb923c" />
+            <Text className="ml-1 font-bold text-gray-100 text-sm">
+              {event.location}
+            </Text>
+          </View>
+          <View className="flex flex-row items-center">
+            <Entypo name="clock" size={16} color="#fb923c" />
+            <Text className="ml-2 font-bold text-sm text-gray-100">
+              {dayjs(event.happening_at).fromNow(true)}
+            </Text>
+          </View>
+          <View className="flex flex-row items-center">
+            <AntDesign name="user" size={16} color="#fb923c" />
+            <Text className="ml-2 font-bold text-sm text-gray-100">
+              {event.participant_count}
+            </Text>
+          </View>
+        </View>
       </BlurView>
     </View>
   );

@@ -8,6 +8,7 @@ export type TEvent = {
   creator: TCreator;
   participants: TPublicUser[];
   participant_count: number;
+  location: string;
   happening_at: Date;
   created_at: Date;
 };

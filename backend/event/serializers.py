@@ -18,6 +18,7 @@ class EventSerializer(serializers.ModelSerializer):
       "creator",
       "participants",
       "participant_count",
+      "location",
       "happening_at",
       "created_at",
     ]
@@ -35,5 +36,6 @@ class PublicEventSerializer(serializers.ModelSerializer):
       "description",
       "creator",
       "participant_count",
+      "location",
       "happening_at",
     ]

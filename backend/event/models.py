@@ -15,6 +15,7 @@ class Event(models.Model):
   participants = models.ManyToManyField(User, blank=True)
   participant_count = models.PositiveIntegerField(default=0)
 
+  location = models.CharField(max_length=100)
   happening_at = models.DateTimeField()
 
   created_at = models.DateTimeField(auto_now_add=True)

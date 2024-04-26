@@ -1,9 +1,9 @@
-import EventCard from "@/modules/ui/EventCard";
+import EventScrollFeed from "@/modules/ui/EventScrollFeed";
 import { TEvent } from "@/types/event";
 import { api } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 export default function Page() {
   const eventsQuery = useQuery({
@@ -22,19 +22,7 @@ export default function Page() {
       {eventsQuery.isLoading ? (
         <Text>Loading events...</Text>
       ) : (
-        <ScrollView
-          horizontal
-          contentContainerStyle={{
-            padding: 24,
-            gap: 18,
-          }}
-          className="w-full"
-          style={{ height: 400 }}
-        >
-          {eventsData.map((e) => (
-            <EventCard key={e.id} event={e} />
-          ))}
-        </ScrollView>
+        <EventScrollFeed title="Upcoming Events" events={eventsData} />
       )}
     </View>
   );
