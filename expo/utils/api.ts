@@ -53,3 +53,12 @@ export const api = async <Data = any>(
     headers: resHeaders,
   };
 };
+
+// Fake API response used to manually store data
+// in ReactQuery's cache without making an http request.
+export const fakeAPIResponse = <Data = any>(data: Data): APIResponse<Data> => ({
+  status: 200,
+  ok: true,
+  data,
+  headers: new Headers(),
+});

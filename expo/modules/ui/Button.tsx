@@ -13,7 +13,7 @@ type ButtonProps = {
   onPress: () => any;
   disabled?: boolean;
   loading?: boolean;
-  buttonStyle: RNTextProps["style"];
+  buttonStyle?: RNTextProps["style"];
   children: React.ReactNode | string;
 };
 
@@ -30,7 +30,7 @@ function Button({
       disabled={disabled || loading}
       style={buttonStyle}
       className={classNames(
-        "relative flex justify-center items-center bg-black px-6 py-3 rounded-xl",
+        "relative flex justify-center items-center bg-black px-6 py-3 rounded-xl active:opacity-80",
         {
           "opacity-80": disabled || loading,
         }

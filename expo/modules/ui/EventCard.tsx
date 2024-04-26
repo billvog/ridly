@@ -1,10 +1,18 @@
 import { TEvent } from "@/types/event";
+import { fakeAPIResponse } from "@/utils/api";
 import { AntDesign, Entypo } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import React from "react";
-import { ViewProps as RNViewProps, Text, View } from "react-native";
+import {
+  ViewProps as RNViewProps,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export type EventCardProps = {
   event: TEvent;
@@ -12,10 +20,20 @@ export type EventCardProps = {
 };
 
 export default function EventCard({ event, style }: EventCardProps) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  function onPress() {
+    queryClient.setQueryData(["event", event.id], fakeAPIResponse(event));
+    router.push({ pathname: "/event/[id]", params: { id: event.id } });
+  }
+
   return (
-    <View
+    <TouchableOpacity
       className="flex flex-col relative overflow-hidden rounded-2xl"
       style={style}
+      activeOpacity={0.8}
+      onPress={onPress}
     >
       <Image
         // Stock image for testing.
@@ -56,6 +74,6 @@ export default function EventCard({ event, style }: EventCardProps) {
           </View>
         </View>
       </BlurView>
-    </View>
+    </TouchableOpacity>
   );
 }
