@@ -5,8 +5,22 @@ import { Text, View } from "react-native";
 
 export default function Layout() {
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ headerRight: HomeHeaderRight }} />
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "#f4511e",
+        },
+        headerTintColor: "#fff",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+      }}
+    >
+      <Stack.Screen
+        name="index"
+        options={{ title: "Home", headerRight: HomeHeaderRight }}
+      />
+      <Stack.Screen name="me" options={{ title: "My Account" }} />
     </Stack>
   );
 }
@@ -20,7 +34,7 @@ function HomeHeaderRight() {
   return (
     <View>
       <Link href="/me">
-        <Text className="font-bold">{user.username}</Text>
+        <Text className="font-bold text-white">{user.username}</Text>
       </Link>
     </View>
   );

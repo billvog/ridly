@@ -1,4 +1,3 @@
-import { useSetNavigationOptions } from "@/hooks/useSetNavigationOptions";
 import { useUser } from "@/hooks/useUser";
 import Button from "@/modules/ui/Button";
 import { APIResponse, api } from "@/utils/api";
@@ -8,7 +7,6 @@ import { Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 
 export default function Page() {
-  useSetNavigationOptions({ title: "My Account" });
   const user = useUser();
 
   const queryClient = useQueryClient();
@@ -64,11 +62,11 @@ export default function Page() {
       <Text>Full name: {user.first_name + " " + user.last_name}</Text>
       <Text>Username: {user.username}</Text>
       <Text>Email: {user.email}</Text>
-      <View className="mt-10">
+      <View className="pt-4">
         <Button
           onPress={logout}
           loading={logoutMutation.isPending}
-          buttonStyle="bg-red-500"
+          buttonStyle="bg-red-500 mr-auto"
         >
           Logout
         </Button>
