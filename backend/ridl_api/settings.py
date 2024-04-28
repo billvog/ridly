@@ -147,15 +147,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 JWT_ACCESS_TOKEN_SECRET = os.environ.get("JWT_ACCESS_TOKEN_SECRET")
 JWT_REFRESH_TOKEN_SECRET = os.environ.get("JWT_REFRESH_TOKEN_SECRET")
 
-# Python Socialite Providers
-SOCIALITE_OAUTH_PROVIDERS = {
-  "google": {
-    "client_id": os.environ.get("OAUTH_GOOGLE_CLIENT_ID"),
-    "client_secret": os.environ.get("OAUTH_GOOGLE_CLIENT_SECRET"),
-    "redirect_url": os.environ.get("OAUTH_GOOGLE_REDIRECT_URL"),
-  },
-}
-
 # Configure Cors
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
 CORS_ALLOW_CREDENTIALS = True

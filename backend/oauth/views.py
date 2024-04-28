@@ -1,50 +1,58 @@
-from django import forms
-from django.conf import settings
-from django.http import JsonResponse
-from django.views import View
-from django.shortcuts import redirect
+from rest_framework import serializers, status
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
 
-from python_socialite.python_socialite import OAuthProvider
-from python_socialite.exceptions import BadVerification
-
-# Load python-socialite config from settings.py
-SocialiteConfig = settings.SOCIALITE_OAUTH_PROVIDERS
+from .providers.google import GoogleOAuthProvider
+from user.models import User
+from user.serializers import UserSerializer
+from user.auth_tokens import generate_tokens_for_user, set_refresh_token_cookie
 
 
-class RedirectToOAuthProviderView(View):
-  def get(self, request, provider_id):
-    provider = OAuthProvider(provider_id, SocialiteConfig)
-    redirect_url = provider.get_auth_url()
+class OAuthLoginAPIView(GenericAPIView):
+  class LoginSerializer(serializers.Serializer):
+    token = serializers.CharField(required=True)
 
-    return redirect(redirect_url)
+  serializer_class = LoginSerializer
 
+  @staticmethod
+  def create_user_from_raw_user(raw_user):
+    # Fix! sketchy way to set username because google doesn't provide one.
+    username = raw_user.get("email").split("@")[0]
 
-class OAuthProviderCallbackView(View):
-  class InputValidationForm(forms.Form):
-    code = forms.CharField(required=True)
-    error = forms.CharField(required=False, empty_value=None)
+    user = User.objects.create(
+      username=username,
+      email=raw_user.get("email"),
+      first_name=raw_user.get("first_name"),
+      last_name=raw_user.get("last_name"),
+    )
+    user.save()
+    return user
 
-  def get(self, request, provider_id):
-    input_form = self.InputValidationForm(data=request.GET)
+  def post(self, request):
+    serializer = self.get_serializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    token = serializer.validated_data["token"]
 
-    if not input_form.is_valid():
-      return JsonResponse({"ok": False}, status=500)
+    raw_user = GoogleOAuthProvider.get_user(access_token=token)
+    if raw_user is None:
+      return Response({"ok": False}, status=status.HTTP_400_BAD_REQUEST)
 
-    code, error = input_form.cleaned_data.values()
-
-    if error is not None:
-      return JsonResponse({"error": error}, status=400)
-
-    provider = OAuthProvider(provider_id, SocialiteConfig)
-
+    # Find or create user
+    user = None
     try:
-      token = provider.get_token(code)
-      user = provider.get_user(token["access_token"])
+      user = User.objects.get(email=raw_user.get("email"))
+    except User.DoesNotExist:
+      user = self.create_user_from_raw_user(raw_user)
 
-      # do things with user
-      print(user)
+    (access_token, refresh_token) = generate_tokens_for_user(user)
 
-    except BadVerification:
-      return JsonResponse({"ok": False, "error": "Invalid code given."}, status=500)
+    body = {"user": UserSerializer(user, context=self.get_serializer_context()).data}
 
-    return JsonResponse({"ok": True}, status=200)
+    headers = {
+      "x-access-token": access_token,
+    }
+
+    response = Response(body, headers=headers, status=status.HTTP_200_OK)
+    set_refresh_token_cookie(response, refresh_token)
+
+    return response
