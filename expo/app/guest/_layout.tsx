@@ -11,15 +11,10 @@ export default function Layout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: {
-          backgroundColor: "#f4511e",
-        },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontWeight: "bold",
-        },
-        headerBackVisible: false,
+        headerShown: false,
       }}
-    />
+    >
+      <Stack.Screen name="login" />
+    </Stack>
   );
 }
