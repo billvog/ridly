@@ -4,10 +4,11 @@ export type TUser = {
   last_name: string;
   username: string;
   email: string;
+  avatar_url: string;
   created_at: string;
 };
 
 export type TPublicUser = Pick<
   TUser,
-  "id" | "first_name" | "last_name" | "username"
+  "id" | "first_name" | "last_name" | "username" | "avatar_url"
 >;

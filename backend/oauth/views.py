@@ -24,6 +24,7 @@ class OAuthLoginAPIView(GenericAPIView):
       email=raw_user.get("email"),
       first_name=raw_user.get("first_name"),
       last_name=raw_user.get("last_name"),
+      avatar_url=raw_user.get("avatar"),
     )
     user.save()
     return user
@@ -41,6 +42,10 @@ class OAuthLoginAPIView(GenericAPIView):
     user = None
     try:
       user = User.objects.get(email=raw_user.get("email"))
+
+      # Update avatar
+      user.avatar_url = raw_user.get("avatar")
+      user.save()
     except User.DoesNotExist:
       user = self.create_user_from_raw_user(raw_user)
 

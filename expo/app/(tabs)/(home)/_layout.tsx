@@ -1,7 +1,8 @@
 import { useUser } from "@/hooks/useUser";
-import { Link, Stack } from "expo-router";
+import { Image } from "expo-image";
+import { Stack, router } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 export default function Layout() {
   return (
@@ -32,10 +33,16 @@ function HomeHeaderRight() {
   }
 
   return (
-    <View>
-      <Link href="/me">
-        <Text className="font-bold text-white">{user.username}</Text>
-      </Link>
-    </View>
+    <TouchableOpacity onPress={() => router.push("/me")}>
+      <Image
+        source={user.avatar_url}
+        contentFit="cover"
+        className="flex-1 rounded-xl"
+        style={{
+          width: 32,
+          height: 32,
+        }}
+      />
+    </TouchableOpacity>
   );
 }
