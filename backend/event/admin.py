@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from creator.models import Creator
+from .models import Event
 
 
-admin.site.register(Creator)
+admin.site.register(Event)
