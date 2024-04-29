@@ -3,7 +3,7 @@ import FullscreenError from "@/modules/ui/FullscreenError";
 import { TEvent } from "@/types/event";
 import { APIResponse, api } from "@/utils/api";
 import { AntDesign, Entypo } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useNavigation } from "expo-router";
@@ -15,10 +15,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
+
+type JoinEventResponse = {
+  has_joined: boolean;
+  participant_count: number;
+};
 
 export default function Page() {
   const { id: eventId } = useLocalSearchParams();
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
 
   const eventQuery = useQuery<APIResponse<TEvent>>({
     queryKey: ["event", eventId],
@@ -28,6 +35,11 @@ export default function Page() {
   });
 
   const [event, setEvent] = useState<TEvent | null>();
+
+  const joinEventMutation = useMutation<APIResponse<JoinEventResponse>>({
+    mutationKey: ["event", eventId, "join"],
+    mutationFn: () => api("/event/" + eventId + "/join/", "POST"),
+  });
 
   // Get event from eventQuery
   useEffect(() => {
@@ -45,8 +57,73 @@ export default function Page() {
     });
   }, [navigation, event]);
 
+  // Called from RefreshControl
   function refreshEvent() {
     eventQuery.refetch();
+  }
+
+  function JoinEvent() {
+    if (!event) return;
+
+    const wantsToLeave = event?.has_joined;
+    const errorMessage = wantsToLeave
+      ? "Couldn't unjoin event."
+      : "Couldn't join event";
+
+    joinEventMutation.mutate(undefined, {
+      onSuccess(data) {
+        if (data.ok) {
+          // Extract new has_joined from response.
+          const { has_joined, participant_count } = data.data;
+
+          // Update cache.
+          queryClient.setQueryData<APIResponse<TEvent>>(
+            ["event", eventId],
+            (event) =>
+              event && {
+                ...event,
+                data: { ...event.data, participant_count, has_joined },
+              }
+          );
+
+          // Display toast to inform user it went ok.
+          if (has_joined) {
+            Toast.show({
+              type: "success",
+              text1: "Joined event!",
+              text1Style: {
+                fontSize: 16,
+              },
+              text2: event
+                ? `${event.name} in ${dayjs(event.happening_at).fromNow(true)}`
+                : undefined,
+              text2Style: {
+                fontSize: 12,
+              },
+            });
+          } else {
+            Toast.show({
+              type: "success",
+              text1: "Unjoined event :^(",
+            });
+          }
+        } else {
+          // Show error toast.
+          Toast.show({
+            type: "error",
+            text1: errorMessage,
+          });
+        }
+      },
+      onError(error) {
+        // Print error and show error toast.
+        console.error(error);
+        Toast.show({
+          type: "error",
+          text1: errorMessage,
+        });
+      },
+    });
   }
 
   if (!eventId || !event) {
@@ -119,7 +196,9 @@ export default function Page() {
           )}
         </View>
         <View>
-          <Button onPress={() => {}}>Join</Button>
+          <Button onPress={JoinEvent} loading={joinEventMutation.isPending}>
+            {event.has_joined ? "Unjoin" : "Join"}
+          </Button>
         </View>
         <Text>{event.description}</Text>
       </View>

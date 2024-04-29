@@ -10,5 +10,6 @@ export type TEvent = {
   participant_count: number;
   location: string;
   happening_at: Date;
+  has_joined: boolean;
   created_at: Date;
 };
