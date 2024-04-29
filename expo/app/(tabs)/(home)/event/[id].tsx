@@ -1,9 +1,9 @@
 import Button from "@/modules/ui/Button";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import { TEvent } from "@/types/event";
-import { APIResponse } from "@/utils/api";
+import { APIResponse, api } from "@/utils/api";
 import { AntDesign, Entypo } from "@expo/vector-icons";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useNavigation } from "expo-router";
@@ -18,24 +18,25 @@ import {
 
 export default function Page() {
   const { id: eventId } = useLocalSearchParams();
-  const queryClient = useQueryClient();
   const navigation = useNavigation();
 
-  const [event, setEvent] = useState<TEvent>();
+  const eventQuery = useQuery<APIResponse<TEvent>>({
+    queryKey: ["event", eventId],
+    queryFn: () => api("/event/" + eventId),
+    // If no eventId is provided don't bother making a request.
+    enabled: typeof eventId === "string",
+  });
 
-  if (!eventId) {
-    console.error("id for event not set.");
-  }
+  const [event, setEvent] = useState<TEvent | null>();
 
-  // Get event from cache
+  // Get event from eventQuery
   useEffect(() => {
-    const queryData = queryClient.getQueryData<APIResponse<TEvent>>([
-      "event",
-      eventId,
-    ]);
-
-    setEvent(queryData?.data);
-  }, []);
+    if (!eventQuery.data) {
+      setEvent(null);
+    } else if (eventQuery.data.ok) {
+      setEvent(eventQuery.data.data);
+    }
+  }, [eventQuery.data]);
 
   // Set event's name as our header title.
   useEffect(() => {
@@ -44,12 +45,23 @@ export default function Page() {
     });
   }, [navigation, event]);
 
+  function refreshEvent() {
+    eventQuery.refetch();
+  }
+
   if (!eventId || !event) {
     return <FullscreenError>Couldn't find event.</FullscreenError>;
   }
 
   return (
-    <ScrollView refreshControl={<RefreshControl refreshing={false} />}>
+    <ScrollView
+      refreshControl={
+        <RefreshControl
+          refreshing={eventQuery.isLoading}
+          onRefresh={refreshEvent}
+        />
+      }
+    >
       <Image
         // Stock image for testing.
         source="https://fastly.picsum.photos/id/281/200/200.jpg?hmac=5FvZ-Y5zbbpS3-mJ_mp6-eH61MkwhUJi9qnhscegqkY"

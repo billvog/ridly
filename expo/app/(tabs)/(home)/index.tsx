@@ -3,7 +3,7 @@ import { TEvent } from "@/types/event";
 import { api } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
 
 export default function Page() {
   const eventsQuery = useQuery({
@@ -17,13 +17,24 @@ export default function Page() {
     setEventsData(eventsQuery.data?.data || []);
   }, [eventsQuery.data]);
 
+  function refreshEvents() {
+    eventsQuery.refetch();
+  }
+
   return (
-    <View>
+    <ScrollView
+      refreshControl={
+        <RefreshControl
+          refreshing={eventsQuery.isLoading}
+          onRefresh={refreshEvents}
+        />
+      }
+    >
       {eventsQuery.isLoading ? (
         <Text>Loading events...</Text>
       ) : (
         <EventScrollFeed title="Upcoming Events" events={eventsData} />
       )}
-    </View>
+    </ScrollView>
   );
 }
