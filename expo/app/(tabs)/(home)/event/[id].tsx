@@ -9,6 +9,7 @@ import { Image } from "expo-image";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   RefreshControl,
   ScrollView,
   Text,
@@ -16,6 +17,7 @@ import {
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
+import { boolean } from "zod";
 
 type JoinEventResponse = {
   has_joined: boolean;
@@ -62,13 +64,31 @@ export default function Page() {
     eventQuery.refetch();
   }
 
-  function JoinEvent() {
+  // Handle join/unjoin event
+  async function JoinEvent() {
     if (!event) return;
 
     const wantsToLeave = event?.has_joined;
     const errorMessage = wantsToLeave
       ? "Couldn't unjoin event."
       : "Couldn't join event";
+
+    if (wantsToLeave) {
+      const shouldContinue = await new Promise<boolean>((resolve) => {
+        Alert.alert("Confirm", "Do you ridly.. want to leave?", [
+          {
+            text: "Yeah",
+            style: "destructive",
+            onPress: () => resolve(true),
+          },
+          { text: "God no!", onPress: () => resolve(false) },
+        ]);
+      });
+
+      if (!shouldContinue) {
+        return;
+      }
+    }
 
     joinEventMutation.mutate(undefined, {
       onSuccess(data) {
@@ -196,7 +216,11 @@ export default function Page() {
           )}
         </View>
         <View>
-          <Button onPress={JoinEvent} loading={joinEventMutation.isPending}>
+          <Button
+            onPress={JoinEvent}
+            loading={joinEventMutation.isPending}
+            buttonStyle={event.has_joined ? "bg-red-600" : "bg-black"}
+          >
             {event.has_joined ? "Unjoin" : "Join"}
           </Button>
         </View>
