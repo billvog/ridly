@@ -14,6 +14,7 @@ type ButtonProps = {
   disabled?: boolean;
   loading?: boolean;
   buttonStyle?: RNTextProps["style"];
+  textStyle?: RNTextProps["style"];
   children: React.ReactNode | string;
 };
 
@@ -22,6 +23,7 @@ function Button({
   disabled = false,
   loading = false,
   buttonStyle,
+  textStyle,
   children,
 }: ButtonProps) {
   return (
@@ -43,7 +45,9 @@ function Button({
       )}
       <View className={classNames({ "opacity-0": loading })}>
         {typeof children === "string" ? (
-          <Text className="text-center text-white font-bold">{children}</Text>
+          <Text className="text-center text-white font-bold" style={textStyle}>
+            {children}
+          </Text>
         ) : (
           children
         )}
@@ -55,5 +59,6 @@ function Button({
 export default styled(Button, {
   props: {
     buttonStyle: true,
+    textStyle: true,
   },
 });
