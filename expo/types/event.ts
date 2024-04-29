@@ -1,12 +1,14 @@
 import { TPublicUser } from "@/types/user";
 import { TCreator } from "@/types/creator";
 
+export type TEventParticipant = Pick<TPublicUser, "avatar_url">;
+
 export type TEvent = {
   id: string;
   name: string;
   description: string;
   creator: TCreator;
-  participants: TPublicUser[];
+  participants: TEventParticipant[];
   participant_count: number;
   location: string;
   happening_at: Date;

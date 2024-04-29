@@ -213,9 +213,9 @@ function EventParticipantsAvatars({
 }) {
   return (
     <View className="flex flex-row items-center ml-1">
-      {participants.slice(0, 3).map((p, index) => (
+      {participants.map((p, index) => (
         <Image
-          key={p.id}
+          key={index}
           source={p.avatar_url || "https://placehold.co/20/000/FFF"}
           className="rounded-full border border-white"
           style={{

@@ -1,13 +1,19 @@
 from rest_framework import serializers
 
+from user.models import User
 from .models import Event
 from creator.serializers import CreatorSerializer
-from user.serializers import PublicUserSerializer
+
+
+class EventParticipantSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = User
+    fields = ["avatar_url"]
 
 
 class EventSerializer(serializers.ModelSerializer):
   creator = CreatorSerializer()
-  participants = PublicUserSerializer(many=True)
+  participants = serializers.SerializerMethodField()
   has_joined = serializers.SerializerMethodField()
 
   class Meta:
@@ -25,32 +31,15 @@ class EventSerializer(serializers.ModelSerializer):
       "has_joined",
     ]
 
-  def get_has_joined(self, obj):
+  # Get 3 first participants, always ignoring logged in user.
+  def get_participants(self, obj):
     request = self.context.get("request")
     user = request.user
-    if user is None:
-      return False
-    else:
-      return obj.participants.contains(user)
 
+    participants = obj.participants.all().exclude(id=user.id)[:3]
+    serializer = EventParticipantSerializer(participants, many=True)
 
-class PublicEventSerializer(serializers.ModelSerializer):
-  creator = CreatorSerializer()
-  participants = PublicUserSerializer(many=True)
-  has_joined = serializers.SerializerMethodField()
-
-  class Meta:
-    model = Event
-    fields = [
-      "id",
-      "name",
-      "description",
-      "creator",
-      "participant_count",
-      "location",
-      "happening_at",
-      "has_joined",
-    ]
+    return serializer.data
 
   def get_has_joined(self, obj):
     request = self.context.get("request")
