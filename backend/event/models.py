@@ -12,6 +12,9 @@ class Event(models.Model):
 
   creator = models.ForeignKey(Creator, on_delete=models.CASCADE)
 
+  # We keep the number of participants in a field
+  # so we don't have to calculate it every time we
+  # make a request to get an event.
   participants = models.ManyToManyField(User, blank=True)
   participant_count = models.PositiveIntegerField(default=0)
 
