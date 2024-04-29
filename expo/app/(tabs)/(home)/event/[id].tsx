@@ -88,13 +88,23 @@ export default function Page() {
               </Text>
             </Text>
           </View>
-          <View className="flex flex-row space-x-1">
-            <AntDesign name="user" size={16} color="#fb923c" />
-            <Text>
-              Who? <Text className="font-bold">{event.participant_count}</Text>{" "}
-              joined
-            </Text>
-          </View>
+          {event.participant_count > 0 ? (
+            <View className="flex flex-row items-center space-x-1">
+              <AntDesign name="user" size={16} color="#fb923c" />
+              <Text>Who?</Text>
+              <EventParticipantsAvatars participants={event.participants} />
+              <Text>
+                <Text className="font-bold">{event.participant_count}</Text>{" "}
+                joined
+              </Text>
+            </View>
+          ) : (
+            <View>
+              <Text className="font-medium">
+                No attendees yet. Be the first!
+              </Text>
+            </View>
+          )}
         </View>
         <View>
           <Button onPress={() => {}}>Join</Button>
@@ -102,5 +112,28 @@ export default function Page() {
         <Text>{event.description}</Text>
       </View>
     </ScrollView>
+  );
+}
+
+function EventParticipantsAvatars({
+  participants,
+}: {
+  participants: TEvent["participants"];
+}) {
+  return (
+    <View className="flex flex-row items-center ml-1">
+      {participants.slice(0, 3).map((p, index) => (
+        <Image
+          key={p.id}
+          source={p.avatar_url || "https://placehold.co/20/000/FFF"}
+          className="rounded-full border border-white"
+          style={{
+            width: 20,
+            height: 20,
+            marginLeft: index > 0 ? -8 : 0,
+          }}
+        />
+      ))}
+    </View>
   );
 }
