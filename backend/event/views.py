@@ -18,6 +18,14 @@ class RetrieveEventAPIView(RetrieveAPIView):
   serializer_class = EventSerializer
 
 
+class ListJoinedEventsAPIView(ListAPIView):
+  serializer_class = EventSerializer
+  permission_classes = [permissions.IsAuthenticated]
+
+  def get_queryset(self):
+    return self.request.user.event_set.all()
+
+
 class JoinEventAPIView(APIView):
   permission_classes = [permissions.IsAuthenticated]
 
