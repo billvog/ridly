@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
+import FullscreenMessage from "@/modules/ui/FullscreenMessage";
 
 type FullscreenError = {
   children: string | React.ReactNode;
@@ -8,7 +9,7 @@ type FullscreenError = {
 
 export default function FullscreenError({ children }: FullscreenError) {
   return (
-    <View className="w-full h-full flex-1 flex justify-center items-center">
+    <FullscreenMessage>
       <MaterialIcons name="error-outline" size={32} color="red" />
       <View className="mt-4">
         {typeof children === "string" ? (
@@ -19,6 +20,6 @@ export default function FullscreenError({ children }: FullscreenError) {
           children
         )}
       </View>
-    </View>
+    </FullscreenMessage>
   );
 }

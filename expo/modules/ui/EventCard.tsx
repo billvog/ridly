@@ -25,7 +25,10 @@ export default function EventCard({ event, style }: EventCardProps) {
 
   function onPress() {
     queryClient.setQueryData(["event", event.id], fakeAPIResponse(event));
-    router.push({ pathname: "/event/[id]", params: { id: event.id } });
+    router.push({
+      pathname: `/event/[id]`,
+      params: { id: event.id },
+    });
   }
 
   return (
