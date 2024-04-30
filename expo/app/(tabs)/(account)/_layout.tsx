@@ -5,6 +5,7 @@ export default function Layout() {
   return (
     <Stack
       screenOptions={{
+        headerBackTitleVisible: false,
         headerStyle: {
           backgroundColor: "#f4511e",
         },
@@ -15,6 +16,10 @@ export default function Layout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: "My Account" }} />
+      <Stack.Screen
+        name="accountInfo"
+        options={{ title: "Account Information" }}
+      />
     </Stack>
   );
 }
