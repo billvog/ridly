@@ -13,6 +13,7 @@ export default function Layout() {
 
   return (
     <Tabs
+      initialRouteName="(home)"
       screenOptions={{
         tabBarActiveTintColor: "#f4511e",
         headerShown: false,
@@ -28,7 +29,7 @@ export default function Layout() {
         }}
       />
       <Tabs.Screen
-        name="(my_events)"
+        name="(my-events)"
         options={{
           title: "My Events",
           tabBarIcon: ({ color }) => (

@@ -59,7 +59,7 @@ export default function Page() {
   // Navigate to event detail screen.
   function onEventPressed(eventId: string) {
     router.push({
-      pathname: "/(my_events)/[event]",
+      pathname: "/(my-events)/[event]",
       params: {
         event: eventId,
       },
@@ -124,14 +124,14 @@ export default function Page() {
     );
   }
 
-  // Query failed.
-  if (events == null || eventsQuery.isError) {
-    return <FullscreenError>Something went wrong.</FullscreenError>;
-  }
-
   // Initial fetching.
   if (eventsQuery.isFetching && !eventsQuery.isRefetching) {
     return <FullscreenSpinner />;
+  }
+
+  // Query failed.
+  if (events == null || eventsQuery.isError) {
+    return <FullscreenError>Something went wrong.</FullscreenError>;
   }
 
   // No joined events.
