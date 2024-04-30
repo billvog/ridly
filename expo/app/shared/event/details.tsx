@@ -23,8 +23,8 @@ type JoinEventResponse = {
   participant_count: number;
 };
 
-export default function Page() {
-  const { id: eventId } = useLocalSearchParams();
+export default function EventDetails() {
+  const { event: eventId } = useLocalSearchParams();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
 

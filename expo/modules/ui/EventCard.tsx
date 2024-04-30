@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import React from "react";
 import {
   ViewProps as RNViewProps,
@@ -21,13 +21,14 @@ export type EventCardProps = {
 
 export default function EventCard({ event, style }: EventCardProps) {
   const router = useRouter();
+  const segments = useSegments();
   const queryClient = useQueryClient();
 
   function onPress() {
     queryClient.setQueryData(["event", event.id], fakeAPIResponse(event));
     router.push({
-      pathname: `/event/[id]`,
-      params: { id: event.id },
+      pathname: `/(tabs)/${segments[1]}/[event]`,
+      params: { event: event.id },
     });
   }
 
