@@ -20,7 +20,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
-    command: sh -c "./entrypoint.sh"
+    command: /bin/sh -c "while sleep 1000; do :; done"
     volumes:
       - .:/app
     ports:
