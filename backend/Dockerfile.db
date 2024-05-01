@@ -1,0 +1,16 @@
+# syntax=docker/dockerfile:1
+# Copied from https://github.com/postgis/docker-postgis/blob/master/16-3.4/Dockerfile
+
+FROM postgres:16.2-bullseye
+
+ENV POSTGIS_MAJOR 3
+ENV POSTGIS_VERSION 3.4.2+dfsg-1.pgdg110+1
+
+RUN apt-get update \
+  && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
+  && apt-get install -y --no-install-recommends \
+  ca-certificates \
+  \
+  postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR=$POSTGIS_VERSION \
+  postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
+  && rm -rf /var/lib/apt/lists/*
