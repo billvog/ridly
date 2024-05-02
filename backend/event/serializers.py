@@ -25,7 +25,7 @@ class EventSerializer(serializers.ModelSerializer):
       "creator",
       "participants",
       "participant_count",
-      "location",
+      "location_name",
       "happening_at",
       "created_at",
       "has_joined",
