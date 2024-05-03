@@ -3,16 +3,23 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from .models import TreasureHunt
+from event.models import Event
 
 
 @database_sync_to_async
 def get_hunt(pk):
-  return TreasureHunt.objects.get(pk=pk)
+  try:
+    return TreasureHunt.objects.get(pk=pk)
+  except TreasureHunt.DoesNotExist:
+    return None
 
 
 @database_sync_to_async
 def get_hunt_event(hunt):
-  return hunt.event
+  try:
+    return hunt.event
+  except Event.DoesNotExist:
+    return None
 
 
 class HuntConsumer(AsyncWebsocketConsumer):
@@ -20,18 +27,25 @@ class HuntConsumer(AsyncWebsocketConsumer):
     # Get user, if any, from scope
     self.user = self.scope["user"] if "user" in self.scope else None
 
-    # Close connection if not authenticated.
+    # Reject connection if not authenticated
     if (self.user is None) or (not self.user.is_authenticated):
-      print("Not Authenticated")
       return
 
     # Get hunt id from params
     self.hunt_pk = self.scope["url_route"]["kwargs"]["hunt_pk"]
-    self.room_group_name = f"hunt_{self.hunt_pk}"  # used for layers
 
-    # Get hunt and event from database
+    # Get hunt from database, if not found reject connection
     self.hunt = await get_hunt(pk=self.hunt_pk)
+    if self.hunt is None:
+      return
+
+    # Get associated event from database, if not found reject
     self.event = await get_hunt_event(self.hunt)
+    if self.event is None:
+      return
+
+    # Create room group name for channel layers
+    self.room_group_name = f"hunt_{self.hunt_pk}"
 
     # Join room for that hunt
     await self.channel_layer.group_add(self.room_group_name, self.channel_name)
