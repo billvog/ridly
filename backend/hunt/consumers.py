@@ -1,8 +1,9 @@
 import json
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
+from geopy.distance import distance as geopy_distance
 
-from .models import TreasureHunt
+from .models import TreasureHunt, TreasureHuntClue
 from event.models import Event
 
 
@@ -19,6 +20,16 @@ def get_hunt_event(hunt):
   try:
     return hunt.event
   except Event.DoesNotExist:
+    return None
+
+
+@database_sync_to_async
+def get_current_hunt_clue(hunt, user):
+  try:
+    # For now, get first clue for hunt. Later on, when we
+    # we figure out clue tracking use user to find current clue.
+    return hunt.clues.first()
+  except TreasureHuntClue.DoesNotExist:
     return None
 
 
@@ -62,16 +73,27 @@ class HuntConsumer(AsyncWebsocketConsumer):
       await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
   # Receive messages from clients.
-  # Just echo back to the room whatever we receive for now.
   async def receive(self, text_data):
-    text_data_json = json.loads(text_data)
-    location = text_data_json.get("location")
+    data = json.loads(text_data)
 
-    await self.channel_layer.group_send(
-      self.room_group_name, {"type": "hunt.location_check", "location": location}
-    )
+    if data.get("type") == "location.check":
+      location = data.get("location")
+      await self._handle_location_check(location)
 
-  # Handles location checking events
-  async def hunt_location_check(self, event):
-    location = event.get("location")
-    await self.send(text_data=json.dumps({"location": location}))
+  # Check location delta with objective
+  async def _handle_location_check(self, location):
+    # Get current clue
+    clue = await get_current_hunt_clue(self.hunt, self.user)
+    if clue is None:
+      return
+
+    # Calculate distance between input and clue coordinates in meters
+    input_coordinates = (location.get("lat"), location.get("long"))
+    clue_coordinates = tuple(reversed(clue.location_point.coords))
+
+    distance = geopy_distance(input_coordinates, clue_coordinates).meters
+
+    # Check if player is near, by comparing distance to clue's location threshold.
+    is_near = distance < clue.location_threshold
+
+    await self.send(text_data=json.dumps({"near": is_near}))

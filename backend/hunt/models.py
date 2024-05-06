@@ -28,6 +28,10 @@ class TreasureHuntClue(models.Model):
 
   location_point = models.PointField(spatial_index=True)
 
+  # A distance in meters, from the location_point, within which
+  # the player will get notified that is near the clue.
+  location_threshold = models.FloatField(default=50)
+
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
 
