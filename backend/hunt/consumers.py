@@ -75,13 +75,21 @@ class HuntConsumer(AsyncWebsocketConsumer):
   # Receive messages from clients.
   async def receive(self, text_data):
     data = json.loads(text_data)
+    req_type = data.get("type")
 
-    if data.get("type") == "location.check":
-      location = data.get("location")
+    if req_type == "loc.check":
+      location = data.get("loc")
       await self._handle_location_check(location)
+    elif req_type == "cl.unlock":
+      location = data.get("loc")
+      await self._handle_clue_unlock(location)
 
   # Check location delta with objective
   async def _handle_location_check(self, location):
+    # Check if location is valid
+    if location is None:
+      return
+
     # Get current clue
     clue = await get_current_hunt_clue(self.hunt, self.user)
     if clue is None:
@@ -106,3 +114,29 @@ class HuntConsumer(AsyncWebsocketConsumer):
       response = {"near": False}
 
     await self.send(text_data=json.dumps(response))
+
+  async def _handle_clue_unlock(self, clue_location):
+    # Check if location is valid
+    if clue_location is None:
+      return
+
+    # Get current clue
+    clue = await get_current_hunt_clue(self.hunt, self.user)
+    if clue is None:
+      return
+
+    # Construct tuple that looks like Point.coords
+    clue_location_coords = (clue_location.get("long"), clue_location.get("lat"))
+
+    # In this case, the player is prolly cheating, OR our code is bad.
+    # The client should ONLY know the exact location of the clue, if
+    # they've sent a location that's near the clue to "loc.check".
+    # Otherwise, they're trying to brute force it (?)
+    # TODO: Update clue's tries left. Each user should have 2.
+    if clue.location_point.coords != clue_location_coords:
+      await self.send(json.dumps({"unlocked": False}))
+      return
+
+    # TODO: Mark clue as unlocked
+
+    await self.send(json.dumps({"unlocked": True}))
