@@ -3,12 +3,12 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from geopy.distance import distance as geopy_distance
 
-from .models import TreasureHunt, TreasureHuntClue
+from .models import TreasureHunt, TreasureHuntClue, TreasureHuntClueStat
 from event.models import Event
 
 
 @database_sync_to_async
-def get_hunt(pk):
+def db_get_hunt(pk):
   try:
     return TreasureHunt.objects.get(pk=pk)
   except TreasureHunt.DoesNotExist:
@@ -16,7 +16,7 @@ def get_hunt(pk):
 
 
 @database_sync_to_async
-def get_hunt_event(hunt):
+def db_get_hunt_event(hunt):
   try:
     return hunt.event
   except Event.DoesNotExist:
@@ -24,13 +24,36 @@ def get_hunt_event(hunt):
 
 
 @database_sync_to_async
-def get_current_hunt_clue(hunt, user):
-  try:
-    # For now, get first clue for hunt. Later on, when we
-    # we figure out clue tracking use user to find current clue.
-    return hunt.clues.first()
-  except TreasureHuntClue.DoesNotExist:
-    return None
+def db_get_current_clue(hunt, user):
+  clue_stat = (
+    TreasureHuntClueStat.objects.filter(clue__hunt=hunt, user=user)
+    .order_by("clue__order")
+    .last()
+  )
+
+  if clue_stat is None:
+    first_clue = hunt.clues.order_by("order").first()
+    clue_stat = TreasureHuntClueStat.objects.create(clue=first_clue, user=user)
+
+  return clue_stat.clue, clue_stat
+
+
+@database_sync_to_async
+def db_unlock_clue(clue_stat):
+  # Set ClueStat as unlocked
+  clue_stat.unlocked = True
+  clue_stat.save()
+
+  # If this clue is the last one, return True
+  if clue_stat.clue.is_last:
+    return True
+
+  # Else, move to next one
+  clue = clue_stat.clue
+  next_clue = TreasureHuntClue.objects.get(order=(clue.order + 1))
+  TreasureHuntClueStat.objects.create(clue=next_clue, user=clue_stat.user)
+
+  return False
 
 
 class HuntConsumer(AsyncWebsocketConsumer):
@@ -46,12 +69,12 @@ class HuntConsumer(AsyncWebsocketConsumer):
     self.hunt_pk = self.scope["url_route"]["kwargs"]["hunt_pk"]
 
     # Get hunt from database, if not found reject connection
-    self.hunt = await get_hunt(pk=self.hunt_pk)
+    self.hunt = await db_get_hunt(pk=self.hunt_pk)
     if self.hunt is None:
       return
 
     # Get associated event from database, if not found reject
-    self.event = await get_hunt_event(self.hunt)
+    self.event = await db_get_hunt_event(self.hunt)
     if self.event is None:
       return
 
@@ -90,8 +113,10 @@ class HuntConsumer(AsyncWebsocketConsumer):
     if location is None:
       return
 
-    # Get current clue
-    clue = await get_current_hunt_clue(self.hunt, self.user)
+    # Get current clue.
+    # Ideally store the current clue each user in cache, so we don't
+    # have to make queries to postgres every time a players checks their location.
+    clue, _ = await db_get_current_clue(self.hunt, self.user)
     if clue is None:
       return
 
@@ -121,8 +146,8 @@ class HuntConsumer(AsyncWebsocketConsumer):
       return
 
     # Get current clue
-    clue = await get_current_hunt_clue(self.hunt, self.user)
-    if clue is None:
+    clue, clue_stat = await db_get_current_clue(self.hunt, self.user)
+    if clue is None or clue_stat is None:
       return
 
     # Construct tuple that looks like Point.coords
@@ -137,6 +162,7 @@ class HuntConsumer(AsyncWebsocketConsumer):
       await self.send(json.dumps({"unlocked": False}))
       return
 
-    # TODO: Mark clue as unlocked
+    # Handle game over
+    is_over = await db_unlock_clue(clue_stat)
 
     await self.send(json.dumps({"unlocked": True}))
