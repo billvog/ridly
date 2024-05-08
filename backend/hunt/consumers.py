@@ -96,4 +96,13 @@ class HuntConsumer(AsyncWebsocketConsumer):
     # Check if player is near, by comparing distance to clue's location threshold.
     is_near = distance < clue.location_threshold
 
-    await self.send(text_data=json.dumps({"near": is_near}))
+    # If near, return the exact location of the clue
+    if is_near:
+      response = {
+        "near": True,
+        "clue_location": {"lat": clue_coordinates[0], "long": clue_coordinates[1]},
+      }
+    else:
+      response = {"near": False}
+
+    await self.send(text_data=json.dumps(response))
