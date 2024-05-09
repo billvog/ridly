@@ -13,5 +13,6 @@ export type TEvent = {
   location_name: string;
   happening_at: Date;
   has_joined: boolean;
+  hunt_id?: string;
   created_at: Date;
 };

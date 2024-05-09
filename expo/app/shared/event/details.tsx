@@ -9,7 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -34,6 +34,7 @@ export default function EventDetails() {
 
   const { event: eventId } = useLocalSearchParams();
   const navigation = useNavigation();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const eventQuery = useQuery<APIResponse<TEvent>>({
@@ -153,6 +154,18 @@ export default function EventDetails() {
     });
   }
 
+  // Handle join event game
+  function JoinHunt() {
+    if (!event || !event.hunt_id) return;
+
+    router.push({
+      pathname: "/game/hunt/[hunt]",
+      params: {
+        hunt: event.hunt_id,
+      },
+    });
+  }
+
   if (!eventId || !event) {
     return <FullscreenError>Couldn't find event.</FullscreenError>;
   }
@@ -188,6 +201,25 @@ export default function EventDetails() {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* 
+          Temporary "Join hunt" button.
+          That should be visible only if the event is live.
+        */}
+        {event.hunt_id && (
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={JoinHunt}
+            className="p-4 bg-orange-200 flex flex-row items-center"
+          >
+            <AntDesign name="exclamationcircleo" size={24} color="#eba40c" />
+            <View className="ml-4 flex">
+              <Text className="">This event is happening now!</Text>
+              <Text className="font-bold text-xs">Tap to join the hunt.</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
         <View className="space-y-3">
           <View className="flex flex-row space-x-1">
             <Entypo name="location-pin" size={16} color="#fb923c" />

@@ -15,6 +15,7 @@ class EventSerializer(serializers.ModelSerializer):
   creator = CreatorSerializer()
   participants = serializers.SerializerMethodField()
   has_joined = serializers.SerializerMethodField()
+  hunt_id = serializers.SerializerMethodField()
 
   class Meta:
     model = Event
@@ -25,10 +26,11 @@ class EventSerializer(serializers.ModelSerializer):
       "creator",
       "participants",
       "participant_count",
+      "has_joined",
       "location_name",
       "happening_at",
+      "hunt_id",
       "created_at",
-      "has_joined",
     ]
 
   # Get 3 first participants, always ignoring logged in user.
@@ -48,3 +50,7 @@ class EventSerializer(serializers.ModelSerializer):
       return False
     else:
       return obj.participants.contains(user)
+
+  def get_hunt_id(self, obj):
+    hunt = obj.hunt.first()
+    return hunt.id if hunt else None

@@ -10,7 +10,7 @@ User = get_user_model()
 class Hunt(models.Model):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-  event = models.ForeignKey(Event, on_delete=models.CASCADE)
+  event = models.ForeignKey(Event, related_name="hunt", on_delete=models.CASCADE)
 
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
