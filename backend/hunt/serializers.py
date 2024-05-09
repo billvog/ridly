@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from .models import Hunt, HuntClue
+from ridl_api.serializers import PointSerializer
 from event.models import Event
+from .models import Hunt, HuntClue
 
 
 # Django Channel related serializers
@@ -28,9 +29,11 @@ class ClueUnlockSerializer(serializers.Serializer):
 
 
 class HuntEventSerializer(serializers.ModelSerializer):
+  location_coordinates = PointSerializer()
+
   class Meta:
     model = Event
-    fields = ["name"]
+    fields = ["name", "location_name", "location_coordinates"]
 
 
 class HuntSerializer(serializers.ModelSerializer):

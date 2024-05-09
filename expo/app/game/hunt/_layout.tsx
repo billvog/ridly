@@ -1,5 +1,5 @@
-import { Redirect, Stack } from "expo-router";
 import { useUser } from "@/hooks/useUser";
+import { Redirect, Stack } from "expo-router";
 
 export default function Layout() {
   const user = useUser();

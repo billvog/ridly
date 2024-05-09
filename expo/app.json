@@ -16,7 +16,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ridly.ridly"
+      "bundleIdentifier": "com.ridly.ridly",
+      "config": {
+        "googleMapsApiKey": "AIzaSyCDrSfhI2jIq6s-XeTnnNTpwhnDSjO_BcA"
+      }
     },
     "android": {
       "adaptiveIcon": {
