@@ -103,7 +103,11 @@ class HuntConsumer(AsyncWebsocketConsumer):
 
   # Receive messages from clients.
   async def receive(self, text_data):
-    data = json.loads(text_data)
+    try:
+      data = json.loads(text_data)
+    except json.JSONDecodeError:
+      print("Failed to decode input json")
+      return
 
     request_serializer = AbstractRequestSerializer(data=data)
     if not request_serializer.is_valid():
