@@ -44,7 +44,7 @@ class EventSerializer(serializers.ModelSerializer):
   def get_has_joined(self, obj):
     request = self.context.get("request")
     user = request.user
-    if user is None:
+    if user is None or user.is_authenticated is False:
       return False
     else:
       return obj.participants.contains(user)

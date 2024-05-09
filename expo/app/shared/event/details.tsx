@@ -192,7 +192,7 @@ export default function EventDetails() {
           <View className="flex flex-row space-x-1">
             <Entypo name="location-pin" size={16} color="#fb923c" />
             <Text>
-              Where? <Text className="font-bold">{event.location}</Text>
+              Where? <Text className="font-bold">{event.location_name}</Text>
             </Text>
           </View>
           <View className="flex flex-row space-x-1">
