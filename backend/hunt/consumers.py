@@ -120,6 +120,8 @@ class HuntConsumer(AsyncWebsocketConsumer):
       await self._handle_location_check(data)
     elif request_type == "cl.unlock":
       await self._handle_clue_unlock(data)
+    elif request_type == "cl.current":
+      await self._handle_current_clue()
 
   # Check location delta with objective
   async def _handle_location_check(self, data):
@@ -161,7 +163,7 @@ class HuntConsumer(AsyncWebsocketConsumer):
 
   async def _handle_clue_unlock(self, data):
     # Validate input data
-    serializer = ClueUnlockSerializer(data)
+    serializer = ClueUnlockSerializer(data=data)
     if not serializer.is_valid():
       print("Invalid request data")
       return
@@ -192,9 +194,19 @@ class HuntConsumer(AsyncWebsocketConsumer):
     if is_over:
       response = {"unlocked": True, "won": True}
     else:
-      # If not over, send next clue
-      next_clue, _ = await db_get_current_clue(self.hunt, self.user)
-      serialized_next_clue = HuntClueSerializer(next_clue).data
-      response = {"unlocked": True, "next_clue": serialized_next_clue}
+      response = {"unlocked": True}
 
     await self.send(json.dumps(response))
+
+  # Send back current clue
+  async def _handle_current_clue(self):
+    # Get current clue from db
+    clue, _ = await db_get_current_clue(self.hunt, self.user)
+    if clue is None:
+      return
+
+    # Serialize it
+    serialized_clue = HuntClueSerializer(clue).data
+
+    # Send it back
+    await self.send(json.dumps({"clue": serialized_clue}))
