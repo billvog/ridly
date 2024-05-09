@@ -4,7 +4,12 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from geopy.distance import distance as geopy_distance
 
 from .models import Hunt, HuntClue, HuntClueStat
-from .serializers import HuntClueSerializer
+from .serializers import (
+  AbstractRequestSerializer,
+  LocationCheckSerializer,
+  ClueUnlockSerializer,
+  HuntClueSerializer,
+)
 from event.models import Event
 
 
@@ -99,20 +104,29 @@ class HuntConsumer(AsyncWebsocketConsumer):
   # Receive messages from clients.
   async def receive(self, text_data):
     data = json.loads(text_data)
-    req_type = data.get("type")
 
-    if req_type == "loc.check":
-      location = data.get("loc")
-      await self._handle_location_check(location)
-    elif req_type == "cl.unlock":
-      location = data.get("loc")
-      await self._handle_clue_unlock(location)
+    request_serializer = AbstractRequestSerializer(data=data)
+    if not request_serializer.is_valid():
+      print("Invalid request")
+      return
+
+    request_type = request_serializer.validated_data["type"]
+
+    if request_type == "loc.check":
+      await self._handle_location_check(data)
+    elif request_type == "cl.unlock":
+      await self._handle_clue_unlock(data)
 
   # Check location delta with objective
-  async def _handle_location_check(self, location):
-    # Check if location is valid
-    if location is None:
+  async def _handle_location_check(self, data):
+    # Validate input data
+    serializer = LocationCheckSerializer(data=data)
+    if not serializer.is_valid():
+      print("Invalid request data")
       return
+
+    # Get location from input
+    location = serializer.validated_data["location"]
 
     # Get current clue.
     # Ideally store the current clue each user in cache, so we don't
@@ -122,7 +136,7 @@ class HuntConsumer(AsyncWebsocketConsumer):
       return
 
     # Calculate distance between input and clue coordinates in meters
-    input_coordinates = (location.get("lat"), location.get("long"))
+    input_coordinates = (location["lat"], location["long"])
     clue_coordinates = tuple(reversed(clue.location_point.coords))
 
     distance = geopy_distance(input_coordinates, clue_coordinates).meters
@@ -141,10 +155,15 @@ class HuntConsumer(AsyncWebsocketConsumer):
 
     await self.send(text_data=json.dumps(response))
 
-  async def _handle_clue_unlock(self, clue_location):
-    # Check if location is valid
-    if clue_location is None:
+  async def _handle_clue_unlock(self, data):
+    # Validate input data
+    serializer = ClueUnlockSerializer(data)
+    if not serializer.is_valid():
+      print("Invalid request data")
       return
+
+    # Get location from input
+    clue_location = serializer.validated_data["location"]
 
     # Get current clue
     clue, clue_stat = await db_get_current_clue(self.hunt, self.user)
@@ -152,7 +171,7 @@ class HuntConsumer(AsyncWebsocketConsumer):
       return
 
     # Construct tuple that looks like Point.coords
-    clue_location_coords = (clue_location.get("long"), clue_location.get("lat"))
+    clue_location_coords = (clue_location["long"], clue_location["lat"])
 
     # In this case, the player is prolly cheating, OR our code is bad.
     # The client should ONLY know the exact location of the clue, if

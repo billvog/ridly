@@ -4,6 +4,29 @@ from .models import Hunt, HuntClue
 from event.models import Event
 
 
+# Django Channel related serializers
+
+
+class AbstractRequestSerializer(serializers.Serializer):
+  type = serializers.CharField()
+
+
+class LocationSerializer(serializers.Serializer):
+  lat = serializers.FloatField()
+  long = serializers.FloatField()
+
+
+class LocationCheckSerializer(serializers.Serializer):
+  loc = LocationSerializer(source="location")
+
+
+class ClueUnlockSerializer(serializers.Serializer):
+  loc = LocationSerializer(source="location")
+
+
+# General serializers
+
+
 class HuntEventSerializer(serializers.ModelSerializer):
   class Meta:
     model = Event
