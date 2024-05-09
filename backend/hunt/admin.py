@@ -6,6 +6,7 @@ from .models import Hunt, HuntClue
 class TreasureHuntClueInline(admin.StackedInline):
   extra = 0
   model = HuntClue
+  ordering = ("order",)
 
 
 class TreasureHuntAdmin(admin.ModelAdmin):
