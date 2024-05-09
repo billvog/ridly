@@ -1,28 +1,51 @@
 from rest_framework import serializers
 
-from .models import TreasureHunt, TreasureHuntClue
+from .models import Hunt, HuntClue
 from event.models import Event
 
 
-class THuntEventSerializer(serializers.ModelSerializer):
+# Django Channel related serializers
+
+
+class AbstractRequestSerializer(serializers.Serializer):
+  type = serializers.CharField()
+
+
+class LocationSerializer(serializers.Serializer):
+  lat = serializers.FloatField()
+  long = serializers.FloatField()
+
+
+class LocationCheckSerializer(serializers.Serializer):
+  loc = LocationSerializer(source="location")
+
+
+class ClueUnlockSerializer(serializers.Serializer):
+  loc = LocationSerializer(source="location")
+
+
+# General serializers
+
+
+class HuntEventSerializer(serializers.ModelSerializer):
   class Meta:
     model = Event
     fields = ["name"]
 
 
-class THuntSerializer(serializers.ModelSerializer):
-  event = THuntEventSerializer()
+class HuntSerializer(serializers.ModelSerializer):
+  event = HuntEventSerializer()
   clue_count = serializers.SerializerMethodField()
 
   class Meta:
-    model = TreasureHunt
+    model = Hunt
     fields = ["id", "event", "clue_count"]
 
   def get_clue_count(self, obj):
     return obj.clues.count()
 
 
-class THuntClueSerializer(serializers.ModelSerializer):
+class HuntClueSerializer(serializers.ModelSerializer):
   class Meta:
-    model = TreasureHuntClue
+    model = HuntClue
     fields = ["id", "riddle", "order"]

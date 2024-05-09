@@ -38,6 +38,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+  "daphne",
   "corsheaders",
   "django.contrib.admin",
   "django.contrib.auth",
@@ -87,6 +88,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "ridl_api.wsgi.application"
+ASGI_APPLICATION = "ridl_api.asgi.application"
 
 
 # Database
@@ -101,6 +103,17 @@ DATABASES = {
     "HOST": "db",
     "PORT": "5432",
   }
+}
+
+# Channels Redis setup
+
+CHANNEL_LAYERS = {
+  "default": {
+    "BACKEND": "channels_redis.core.RedisChannelLayer",
+    "CONFIG": {
+      "hosts": [("redis", 6379)],
+    },
+  },
 }
 
 
