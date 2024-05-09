@@ -61,7 +61,7 @@ export default function EventCard({ event, style }: EventCardProps) {
           <View className="flex flex-row items-center">
             <Entypo name="location-pin" size={16} color="#fb923c" />
             <Text className="ml-1 font-bold text-gray-100 text-sm">
-              {event.location}
+              {event.location_name}
             </Text>
           </View>
           <View className="flex flex-row items-center">

@@ -64,11 +64,12 @@ function PreferencesList({ options }: { options: OptionGroup[] }) {
   return (
     <View>
       {options.map((group) => (
-        <View>
+        <View key={group.name}>
           <Text className="px-4 py-4 text-xl font-extrabold">{group.name}</Text>
           <View>
             {group.options.map((option) => (
               <TouchableOpacity
+                key={option.name}
                 className="flex flex-row items-center bg-gray-200 border-t-2 border-b-2 border-gray-300 p-4"
                 onPress={() => router.push(option.href)}
               >

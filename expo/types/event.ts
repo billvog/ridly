@@ -10,7 +10,7 @@ export type TEvent = {
   creator: TCreator;
   participants: TEventParticipant[];
   participant_count: number;
-  location: string;
+  location_name: string;
   happening_at: Date;
   has_joined: boolean;
   created_at: Date;
