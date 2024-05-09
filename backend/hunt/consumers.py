@@ -4,6 +4,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from geopy.distance import distance as geopy_distance
 
 from .models import Hunt, HuntClue, HuntClueStat
+from .serializers import HuntClueSerializer
 from event.models import Event
 
 
@@ -162,7 +163,15 @@ class HuntConsumer(AsyncWebsocketConsumer):
       await self.send(json.dumps({"unlocked": False}))
       return
 
-    # Handle game over
+    # Set clue stat as unlocked on database
     is_over = await db_unlock_clue(clue_stat)
 
-    await self.send(json.dumps({"unlocked": True}))
+    if is_over:
+      response = {"unlocked": True, "won": True}
+    else:
+      # If not over, send next clue
+      next_clue, _ = await db_get_current_clue(self.hunt, self.user)
+      serialized_next_clue = HuntClueSerializer(next_clue).data
+      response = {"unlocked": True, "next_clue": serialized_next_clue}
+
+    await self.send(json.dumps(response))
