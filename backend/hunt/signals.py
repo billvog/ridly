@@ -1,9 +1,9 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import TreasureHuntClue
+from .models import HuntClue
 
 
-@receiver(post_save, sender=TreasureHuntClue)
+@receiver(post_save, sender=HuntClue)
 def update_is_last_clue(sender, instance, update_fields, **kwargs):
   # Check if "is_last" is in update_fields
   # to prevent infinite recursion.
@@ -11,7 +11,7 @@ def update_is_last_clue(sender, instance, update_fields, **kwargs):
     return
 
   # Get all clues for hunt
-  clues = TreasureHuntClue.objects.filter(hunt=instance.hunt)
+  clues = HuntClue.objects.filter(hunt=instance.hunt)
 
   # Get last clue, based on order
   last_clue = clues.order_by("order").last()

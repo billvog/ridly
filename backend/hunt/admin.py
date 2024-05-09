@@ -1,11 +1,11 @@
 from django.contrib import admin
 
-from .models import TreasureHunt, TreasureHuntClue
+from .models import Hunt, HuntClue
 
 
 class TreasureHuntClueInline(admin.StackedInline):
   extra = 0
-  model = TreasureHuntClue
+  model = HuntClue
 
 
 class TreasureHuntAdmin(admin.ModelAdmin):
@@ -14,5 +14,5 @@ class TreasureHuntAdmin(admin.ModelAdmin):
   ]
 
 
-admin.site.register(TreasureHunt, TreasureHuntAdmin)
-admin.site.register(TreasureHuntClue)
+admin.site.register(Hunt, TreasureHuntAdmin)
+admin.site.register(HuntClue)

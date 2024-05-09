@@ -3,15 +3,15 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from geopy.distance import distance as geopy_distance
 
-from .models import TreasureHunt, TreasureHuntClue, TreasureHuntClueStat
+from .models import Hunt, HuntClue, HuntClueStat
 from event.models import Event
 
 
 @database_sync_to_async
 def db_get_hunt(pk):
   try:
-    return TreasureHunt.objects.get(pk=pk)
-  except TreasureHunt.DoesNotExist:
+    return Hunt.objects.get(pk=pk)
+  except Hunt.DoesNotExist:
     return None
 
 
@@ -26,14 +26,14 @@ def db_get_hunt_event(hunt):
 @database_sync_to_async
 def db_get_current_clue(hunt, user):
   clue_stat = (
-    TreasureHuntClueStat.objects.filter(clue__hunt=hunt, user=user)
+    HuntClueStat.objects.filter(clue__hunt=hunt, user=user)
     .order_by("clue__order")
     .last()
   )
 
   if clue_stat is None:
     first_clue = hunt.clues.order_by("order").first()
-    clue_stat = TreasureHuntClueStat.objects.create(clue=first_clue, user=user)
+    clue_stat = HuntClueStat.objects.create(clue=first_clue, user=user)
 
   return clue_stat.clue, clue_stat
 
@@ -50,8 +50,8 @@ def db_unlock_clue(clue_stat):
 
   # Else, move to next one
   clue = clue_stat.clue
-  next_clue = TreasureHuntClue.objects.get(order=(clue.order + 1))
-  TreasureHuntClueStat.objects.create(clue=next_clue, user=clue_stat.user)
+  next_clue = HuntClue.objects.get(order=(clue.order + 1))
+  HuntClueStat.objects.create(clue=next_clue, user=clue_stat.user)
 
   return False
 
