@@ -1,17 +1,18 @@
+import { useOnWebSocket } from "@/hooks/useOnWebSocket";
+import { useWebSocket } from "@/hooks/useWebSocket";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
-import { THunt } from "@/types/hunt";
+import { THunt, THuntClue } from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { SafeAreaView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 
 export default function Page() {
   const { hunt: huntId } = useLocalSearchParams();
-  const navigation = useNavigation();
 
   const huntQuery = useQuery<APIResponse<THunt>>({
     queryKey: ["hunt", huntId],
@@ -21,6 +22,7 @@ export default function Page() {
   });
 
   const [hunt, setHunt] = useState<THunt | null>();
+  const [clue, setClue] = useState<THuntClue>();
 
   // Get event from eventQuery
   useEffect(() => {
@@ -31,16 +33,29 @@ export default function Page() {
     }
   }, [huntQuery.data]);
 
-  useEffect(() => {
-    if (hunt?.event) {
-      navigation.setOptions({ headerTitle: hunt.event.name });
-    }
-  }, [hunt]);
+  // Connect to WebSocket
+  const socket = useWebSocket(hunt?.id);
 
+  // Ask for current clue on mount
+  useEffect(() => {
+    if (socket) {
+      socket.send(JSON.stringify({ type: "cl.current" }));
+    }
+  }, [socket]);
+
+  // Handle socket messages
+  useOnWebSocket(socket, (e) => {
+    if (e.type === "cl.current") {
+      setClue(e.clue);
+    }
+  });
+
+  // Display loading spinner if we're fetching
   if (huntQuery.isLoading || huntQuery.isFetching) {
     return <FullscreenSpinner />;
   }
 
+  // Show error message if we hit an error
   if (!huntId || !hunt) {
     return <FullscreenError>Couldn't find hunt.</FullscreenError>;
   }
@@ -62,23 +77,23 @@ export default function Page() {
             : undefined
         }
       />
-      <View className="absolute bottom-12 w-full flex items-center">
-        <CurrentClue />
-      </View>
+      {clue && (
+        <View className="absolute bottom-12 w-full flex items-center">
+          <CurrentClue clue={clue} />
+        </View>
+      )}
     </View>
   );
 }
 
-function CurrentClue() {
+function CurrentClue({ clue }: { clue: THuntClue }) {
   return (
     <BlurView
       tint="dark"
       intensity={40}
       className="overflow-hidden rounded-2xl px-10 py-5"
     >
-      <Text className="text-white text-base font-extrabold">
-        What is this and that?
-      </Text>
+      <Text className="text-white text-base font-extrabold">{clue.riddle}</Text>
     </BlurView>
   );
 }
