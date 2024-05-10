@@ -1,4 +1,5 @@
 import jwt
+from urllib.parse import parse_qs
 from django.http import HttpRequest
 from rest_framework import authentication
 from channels.db import database_sync_to_async
@@ -49,11 +50,13 @@ class JWTWebSocketAuthentication:
     self.app = app
 
   async def __call__(self, scope, receive, send):
-    # Convert headers to dict for easier access
-    headers = dict(scope["headers"])
+    # Parse query string
+    raw_query = scope["query_string"]
+    params = parse_qs(raw_query)
 
-    # Get access token from headers
-    access_token = headers[b"x-access-token"] if b"x-access-token" in headers else None
+    # Get access token from query params
+    if b"accessToken" in params:
+      access_token = params[b"accessToken"][0]
 
     # If there is an access token, try decode it
     if access_token is not None:

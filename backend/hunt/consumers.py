@@ -153,11 +153,12 @@ class HuntConsumer(AsyncWebsocketConsumer):
     # If near, return the exact location of the clue
     if is_near:
       response = {
+        "type": "loc.check",
         "near": True,
         "clue_location": {"lat": clue_coordinates[0], "long": clue_coordinates[1]},
       }
     else:
-      response = {"near": False}
+      response = {"type": "loc.check", "near": False}
 
     await self.send(text_data=json.dumps(response))
 
@@ -192,9 +193,9 @@ class HuntConsumer(AsyncWebsocketConsumer):
     is_over = await db_unlock_clue(clue_stat)
 
     if is_over:
-      response = {"unlocked": True, "won": True}
+      response = {"type": "cl.unlock", "unlocked": True, "won": True}
     else:
-      response = {"unlocked": True}
+      response = {"type": "cl.unlock", "unlocked": True}
 
     await self.send(json.dumps(response))
 
@@ -203,10 +204,11 @@ class HuntConsumer(AsyncWebsocketConsumer):
     # Get current clue from db
     clue, _ = await db_get_current_clue(self.hunt, self.user)
     if clue is None:
+      print("Clue not found in db")
       return
 
     # Serialize it
     serialized_clue = HuntClueSerializer(clue).data
 
     # Send it back
-    await self.send(json.dumps({"clue": serialized_clue}))
+    await self.send(json.dumps({"type": "cl.current", "clue": serialized_clue}))
