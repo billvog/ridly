@@ -5,7 +5,7 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 type WsFn = (e: THuntSocketResponse) => void;
 
 export const useOnWebSocket = (
-  socket: ReconnectingWebSocket | undefined,
+  socket: ReconnectingWebSocket | null,
   fn: WsFn
 ) => {
   const _fn = useRef<WsFn>(() => {});

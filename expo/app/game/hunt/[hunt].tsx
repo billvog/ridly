@@ -34,7 +34,7 @@ export default function Page() {
   }, [huntQuery.data]);
 
   // Connect to WebSocket
-  const socket = useWebSocket(hunt?.id);
+  const socket = useWebSocket(hunt ? `/hunt/${hunt.id}` : null);
 
   // Ask for current clue on mount
   useEffect(() => {

@@ -1,19 +1,26 @@
 import ReconnectingWebSocket from "reconnecting-websocket";
 import { getAccessToken } from "@/utils/authTokens";
 
+const BASE_SOCKET_URL = "ws://localhost:8000/ws";
+
 let socket: ReconnectingWebSocket | null = null;
 
-export function useWebSocket(huntId?: string) {
-  if (!huntId) {
-    return;
+function constructWebSocketUrl(path: string) {
+  return `${BASE_SOCKET_URL}${path}/?accessToken=${getAccessToken()}`;
+}
+
+export function useWebSocket(path: string | null) {
+  if (!path) {
+    return null;
   }
+
+  const url = constructWebSocketUrl(path);
 
   if (socket) {
-    return socket;
+    if (socket.url !== url) socket.close();
   }
 
-  let url = `ws://localhost:8000/ws/hunt/${huntId}/?accessToken=${getAccessToken()}`;
-  socket = new ReconnectingWebSocket(url);
+  socket = socket || new ReconnectingWebSocket(url);
 
   return socket;
 }
