@@ -18,6 +18,7 @@ import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import Toast from "react-native-toast-message";
 
 const LOCATION_TRACKING_TASK = "hunt/location-track";
+const CAPTURE_CLUE_NOTIFICATION_ID = "hunt/capture-clue-notification";
 
 export default function Page() {
   const { hunt: huntId } = useLocalSearchParams();
@@ -94,19 +95,33 @@ export default function Page() {
         onPress: () => captureClue(),
       });
     } else {
-      // TODO: When user presses this notification and gets
-      //       navigated to this screen, autocall captureClue()
-
       // Else, send notification
       Notifications.scheduleNotificationAsync({
         content: {
           title: notificationTitle,
           body: notificationBody,
         },
+        identifier: CAPTURE_CLUE_NOTIFICATION_ID,
         trigger: null,
       });
     }
   }, [hasReachedClue]);
+
+  // Register notification handler on mount
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (event) => {
+        if (event.notification.request.identifier === CAPTURE_CLUE_NOTIFICATION_ID) {
+          captureClue();
+        }
+      }
+    );
+
+    // And remove it on unmount, to prevent leaks
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   // TODO: Implement
   function captureClue() {}
