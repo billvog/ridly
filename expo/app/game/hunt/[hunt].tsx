@@ -9,11 +9,13 @@ import { THunt, THuntClue } from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
+import * as Notifications from "expo-notifications";
 import { useLocalSearchParams } from "expo-router";
 import * as TaskManager from "expo-task-manager";
 import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import Toast from "react-native-toast-message";
 
 const LOCATION_TRACKING_TASK = "hunt/location-track";
 
@@ -76,12 +78,38 @@ export default function Page() {
 
   // Notify user that they've reached the clue.
   useEffect(() => {
+    if (!hasReachedClue) return;
+
+    const notificationTitle = "You're getting close!";
+    const notificationBody = "The clue is very close to you! Tap to capture it!";
+
     if (appState === "active") {
-      // Notify user with some sort of message
+      // If user is in the app display a toast to notify them
+      Toast.show({
+        type: "info",
+        position: "top",
+        topOffset: 70,
+        text1: notificationTitle,
+        text2: notificationBody,
+        onPress: () => captureClue(),
+      });
     } else {
-      // Send notification to user
+      // TODO: When user presses this notification and gets
+      //       navigated to this screen, autocall captureClue()
+
+      // Else, send notification
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: notificationTitle,
+          body: notificationBody,
+        },
+        trigger: null,
+      });
     }
   }, [hasReachedClue]);
+
+  // TODO: Implement
+  function captureClue() {}
 
   // Display loading spinner if we're fetching
   if (huntQuery.isLoading || huntQuery.isFetching || !locationPermission.determined) {
@@ -123,7 +151,7 @@ export default function Page() {
           <CurrentClue
             clue={clue}
             hasReached={hasReachedClue}
-            onCapturePressed={() => {}}
+            onCapturePressed={captureClue}
           />
         </View>
       )}
