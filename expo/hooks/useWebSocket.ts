@@ -9,6 +9,10 @@ function constructWebSocketUrl(path: string) {
   return `${BASE_SOCKET_URL}${path}/?accessToken=${getAccessToken()}`;
 }
 
+export function getWebSocket() {
+  return socket;
+}
+
 export function useWebSocket(path: string | null) {
   if (!path) {
     return null;
