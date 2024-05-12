@@ -8,16 +8,17 @@ import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
 import { LocationPoint } from "@/types/general";
 import { THunt, THuntClue } from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
+import { Entypo } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
 import * as Notifications from "expo-notifications";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as TaskManager from "expo-task-manager";
 import { useEffect, useRef, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import Toast from "react-native-toast-message";
-import InaccurateCircle from "../../../modules/ui/map/InaccurateCircle";
+import InaccurateCircle from "@/modules/ui/map/InaccurateCircle";
 
 const LOCATION_TRACKING_TASK = "hunt/location-track";
 const CAPTURE_CLUE_NOTIFICATION_ID = "hunt/capture-clue-notification";
@@ -28,6 +29,7 @@ function getMapDeltas() {
 }
 
 export default function Page() {
+  const router = useRouter();
   const { hunt: huntId } = useLocalSearchParams();
 
   const locationPermission = useLocationPermission();
@@ -100,8 +102,7 @@ export default function Page() {
       // If user is in the app display a toast to notify them
       Toast.show({
         type: "info",
-        position: "top",
-        topOffset: 70,
+        bottomOffset: 140,
         text1: notificationTitle,
         text2: notificationBody,
         onPress: () => captureClue(),
@@ -171,9 +172,10 @@ export default function Page() {
 
   return (
     <View className="flex-1">
+      {/* Map */}
       <MapView
         ref={mapRef}
-        className="w-full h-full"
+        className="absolute w-full h-full"
         mapType="hybrid"
         provider={PROVIDER_GOOGLE}
         initialRegion={
@@ -193,6 +195,24 @@ export default function Page() {
           />
         )}
       </MapView>
+
+      {/* Header */}
+      <SafeAreaView>
+        <BlurView
+          tint="dark"
+          className="mx-4 my-2 px-6 py-4 rounded-xl overflow-hidden flex flex-row items-center"
+        >
+          {/* If we can go back, display back button */}
+          {router.canGoBack() && (
+            <TouchableOpacity onPress={() => router.back()} className="mr-4">
+              <Entypo name="chevron-left" size={20} color="white" />
+            </TouchableOpacity>
+          )}
+          <Text className="font-extrabold text-xl text-white">{hunt.event.name}</Text>
+        </BlurView>
+      </SafeAreaView>
+
+      {/* Display current clue, if any */}
       {clue && (
         <View className="absolute bottom-0 w-full">
           <CurrentClue
