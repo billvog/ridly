@@ -5,6 +5,7 @@ import { useOnWebSocket } from "@/hooks/useOnWebSocket";
 import { getWebSocket, useWebSocket } from "@/hooks/useWebSocket";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
+import { LocationPoint } from "@/types/general";
 import { THunt, THuntClue } from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
@@ -12,13 +13,19 @@ import { BlurView } from "expo-blur";
 import * as Notifications from "expo-notifications";
 import { useLocalSearchParams } from "expo-router";
 import * as TaskManager from "expo-task-manager";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import Toast from "react-native-toast-message";
+import InaccurateCircle from "../../../modules/ui/map/InaccurateCircle";
 
 const LOCATION_TRACKING_TASK = "hunt/location-track";
 const CAPTURE_CLUE_NOTIFICATION_ID = "hunt/capture-clue-notification";
+
+// Provide coordinate deltas, required from MapView to set region
+function getMapDeltas() {
+  return { latitudeDelta: 0.0092, longitudeDelta: 0.0092 };
+}
 
 export default function Page() {
   const { hunt: huntId } = useLocalSearchParams();
@@ -40,7 +47,11 @@ export default function Page() {
 
   const [hunt, setHunt] = useState<THunt | null>();
   const [clue, setClue] = useState<THuntClue>();
+  const [clueLocation, setClueLocation] = useState<LocationPoint>();
   const [hasReachedClue, setHasReachedClue] = useState(false);
+
+  // Holds a reference to the MapView
+  const mapRef = useRef<MapView>(null);
 
   // Get event from eventQuery
   useEffect(() => {
@@ -68,6 +79,7 @@ export default function Page() {
     } else if (e.type === "loc.check") {
       // Update state
       setHasReachedClue(e.near);
+      setClueLocation(e.near ? e.clue_location : undefined);
 
       // Get clue's location out of the response
       // Use secure store, to save the clue's location coordinates
@@ -106,6 +118,19 @@ export default function Page() {
       });
     }
   }, [hasReachedClue]);
+
+  // Animate map to an approximation of clue's location if we've reached.
+  useEffect(() => {
+    if (!clueLocation || !mapRef.current) return;
+    mapRef.current.animateToRegion(
+      {
+        latitude: clueLocation.lat,
+        longitude: clueLocation.long,
+        ...getMapDeltas(),
+      },
+      2
+    );
+  }, [clueLocation]);
 
   // Register notification handler on mount
   useEffect(() => {
@@ -147,6 +172,7 @@ export default function Page() {
   return (
     <View className="flex-1">
       <MapView
+        ref={mapRef}
         className="w-full h-full"
         mapType="hybrid"
         provider={PROVIDER_GOOGLE}
@@ -155,12 +181,18 @@ export default function Page() {
             ? {
                 latitude: hunt.event.location_coordinates.lat,
                 longitude: hunt.event.location_coordinates.long,
-                latitudeDelta: 0.0092,
-                longitudeDelta: 0.0092,
+                ...getMapDeltas(),
               }
             : undefined
         }
-      />
+      >
+        {/* If we've reached clue, and clue's location is set, draw a circle around its approximate location. */}
+        {hasReachedClue && clueLocation && (
+          <InaccurateCircle
+            center={{ latitude: clueLocation.lat, longitude: clueLocation.long }}
+          />
+        )}
+      </MapView>
       {clue && (
         <View className="absolute bottom-0 w-full">
           <CurrentClue
@@ -209,6 +241,11 @@ TaskManager.defineTask(LOCATION_TRACKING_TASK, async ({ data, error }: any) => {
   if (!data) {
     return;
   }
+
+  // TODO:
+  // Use redux to store current location, so we can then retrieve it from within
+  // our reactive component and show user's location as they move, because
+  // showUserLocation prop on MapView messes this location tracking.
 
   const { locations } = data;
   let lat = locations[0].coords.latitude;
