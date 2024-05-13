@@ -35,25 +35,60 @@ function getMapDeltas() {
 }
 
 function Page() {
-  // Routing hooks
+  /*
+   *
+   * Routing
+   *
+   */
+
   const router = useRouter();
   const { hunt: huntId } = useLocalSearchParams();
 
+  /*
+   *
+   * AppState
+   *
+   */
+
   const appState = useAppState();
 
-  // Holds user's live location. Gets updated from background tracking task.
-  const userLocation = useLocationSelector((state) => state.location);
+  /*
+   *
+   * Modal
+   *
+   */
 
-  // Location tracking
+  const modal = useModal();
+
+  /*
+   *
+   * MapView
+   *
+   */
+
+  const mapRef = useRef<MapView>(null);
+
+  /*
+   *
+   * Location Tracking
+   *
+   */
+
   const locationPermission = useLocationPermission();
   useLocationTracking(
     LOCATION_TRACKING_TASK,
     locationPermission.determined && locationPermission.foreground
   );
 
-  const modal = useModal();
+  // Holds user's live location. Gets updated from background tracking task.
+  const userLocation = useLocationSelector((state) => state.location);
 
-  // API Queries
+  /*
+   *
+   * Fetch Hunt
+   *
+   */
+
   const huntQuery = useQuery<APIResponse<THunt>>({
     queryKey: ["hunt", huntId],
     queryFn: () => api("/hunt/" + huntId),
@@ -63,19 +98,7 @@ function Page() {
 
   const [hunt, setHunt] = useState<THunt | null>();
 
-  const [clue, setClue] = useState<THuntClue>();
-  const [clueLocation, setClueLocation] = useState<LocationPoint>();
-  const [hasReachedClue, setHasReachedClue] = useState(false);
-
-  const [capturedClues, setCapturedClues] = usePersistentState<TCapturedHuntClue[]>(
-    [],
-    hunt ? CAPTURED_CLUES_STORAGE_ID + hunt.id : ""
-  );
-
-  // Holds a reference to the MapView
-  const mapRef = useRef<MapView>(null);
-
-  // Get event from eventQuery
+  // Get hunt from huntQuery
   useEffect(() => {
     if (!huntQuery.data) {
       setHunt(null);
@@ -83,6 +106,82 @@ function Page() {
       setHunt(huntQuery.data.data);
     }
   }, [huntQuery.data]);
+
+  /*
+   *
+   * Clue State
+   *
+   */
+
+  const [clue, setClue] = useState<THuntClue>();
+
+  const [clueState, setClueState] = useState<{
+    near: boolean;
+    location: LocationPoint | undefined;
+  }>({ near: false, location: undefined });
+
+  const [capturedClues, setCapturedClues] = usePersistentState<TCapturedHuntClue[]>(
+    [],
+    hunt ? CAPTURED_CLUES_STORAGE_ID + hunt.id : ""
+  );
+
+  // Notify user that they've reached the clue.
+  useEffect(() => {
+    if (!clueState.near) return;
+
+    const notificationTitle = "You're getting close!";
+    const notificationBody = "The clue is very close to you! Tap to capture it!";
+
+    if (appState === "active") {
+      // If user is in the app display a toast to notify them
+      Toast.show({
+        type: "info",
+        bottomOffset: 140,
+        text1: notificationTitle,
+        text2: notificationBody,
+        onPress: () => captureClue(),
+      });
+    } else {
+      // Else, send notification
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: notificationTitle,
+          body: notificationBody,
+        },
+        identifier: CAPTURE_CLUE_NOTIFICATION_ID,
+        trigger: null,
+      });
+    }
+  }, [clueState.near]);
+
+  // Animate map to an approximation of clue's location if we've reached.
+  useEffect(() => {
+    if (!clueState.location || !mapRef.current) return;
+    mapRef.current.animateToRegion(
+      {
+        latitude: clueState.location.lat,
+        longitude: clueState.location.long,
+        ...getMapDeltas(),
+      },
+      2
+    );
+  }, [clueState.location]);
+
+  // Called when we capture a clue
+  function onClueCaptured() {
+    // Add clue to captured clues
+    if (clue && clueState.location) {
+      setCapturedClues((c) => [...c, { ...clue, location_point: clueState.location! }]);
+    }
+
+    // Update state, and ask for next clue from socket
+    setClueState({ near: false, location: undefined });
+    askForCurrentClue();
+  }
+
+  /*
+   * WebSocket
+   */
 
   // Connect to WebSocket
   const socket = useWebSocket(hunt ? `/hunt/${hunt.id}` : null);
@@ -98,8 +197,10 @@ function Page() {
       setClue(e.clue);
     } else if (e.type === "loc.check") {
       // Update state
-      setHasReachedClue(e.near);
-      setClueLocation(e.near ? e.clue_location : undefined);
+      setClueState({
+        near: e.near,
+        location: e.near ? e.clue_location : undefined,
+      });
 
       // Get clue's location out of the response
       // Use secure store, to save the clue's location coordinates
@@ -145,47 +246,23 @@ function Page() {
     }
   });
 
-  // Notify user that they've reached the clue.
-  useEffect(() => {
-    if (!hasReachedClue) return;
+  // Send message to socket to send us back the current clue
+  function askForCurrentClue() {
+    if (!socket) return;
+    socket.send(JSON.stringify({ type: "cl.current" }));
+  }
 
-    const notificationTitle = "You're getting close!";
-    const notificationBody = "The clue is very close to you! Tap to capture it!";
+  // TODO: Implement. For now just unlock the clue.
+  function captureClue() {
+    if (!socket) return;
+    socket.send(JSON.stringify({ type: "cl.unlock", loc: clueState.location }));
+  }
 
-    if (appState === "active") {
-      // If user is in the app display a toast to notify them
-      Toast.show({
-        type: "info",
-        bottomOffset: 140,
-        text1: notificationTitle,
-        text2: notificationBody,
-        onPress: () => captureClue(),
-      });
-    } else {
-      // Else, send notification
-      Notifications.scheduleNotificationAsync({
-        content: {
-          title: notificationTitle,
-          body: notificationBody,
-        },
-        identifier: CAPTURE_CLUE_NOTIFICATION_ID,
-        trigger: null,
-      });
-    }
-  }, [hasReachedClue]);
-
-  // Animate map to an approximation of clue's location if we've reached.
-  useEffect(() => {
-    if (!clueLocation || !mapRef.current) return;
-    mapRef.current.animateToRegion(
-      {
-        latitude: clueLocation.lat,
-        longitude: clueLocation.long,
-        ...getMapDeltas(),
-      },
-      2
-    );
-  }, [clueLocation]);
+  /*
+   *
+   * Notifications
+   *
+   */
 
   // Register notification handler on mount
   useEffect(() => {
@@ -203,29 +280,11 @@ function Page() {
     };
   }, []);
 
-  // Send message to socket to send us back the current clue
-  function askForCurrentClue() {
-    if (!socket) return;
-    socket.send(JSON.stringify({ type: "cl.current" }));
-  }
-
-  // Called when we capture a clue
-  function onClueCaptured() {
-    // Add clue to captured clues
-    if (clue && clueLocation) {
-      setCapturedClues((c) => [...c, { ...clue, location_point: clueLocation }]);
-    }
-
-    setHasReachedClue(false);
-    setClueLocation(undefined);
-    askForCurrentClue();
-  }
-
-  // TODO: Implement. For now just unlock the clue.
-  function captureClue() {
-    if (!socket) return;
-    socket.send(JSON.stringify({ type: "cl.unlock", loc: clueLocation }));
-  }
+  /*
+   *
+   * Render
+   *
+   */
 
   // Display loading spinner if we're fetching
   if (huntQuery.isLoading || huntQuery.isFetching || !locationPermission.determined) {
@@ -254,10 +313,9 @@ function Page() {
         mapType="hybrid"
         provider={PROVIDER_GOOGLE}
         initialRegion={
-          hunt.event.location_coordinates
+          userLocation
             ? {
-                latitude: hunt.event.location_coordinates.lat,
-                longitude: hunt.event.location_coordinates.long,
+                ...userLocation,
                 ...getMapDeltas(),
               }
             : undefined
@@ -284,9 +342,12 @@ function Page() {
         ))}
 
         {/* If we've reached clue, and clue's location is set, draw a circle around its approximate location. */}
-        {hasReachedClue && clueLocation && (
+        {clueState.near && clueState.location && (
           <InaccurateCircle
-            center={{ latitude: clueLocation.lat, longitude: clueLocation.long }}
+            center={{
+              latitude: clueState.location.lat,
+              longitude: clueState.location.long,
+            }}
           />
         )}
       </MapView>
@@ -312,7 +373,7 @@ function Page() {
         <View className="absolute bottom-0 w-full">
           <CurrentClue
             clue={clue}
-            hasReached={hasReachedClue}
+            hasReached={clueState.near}
             onCapturePressed={captureClue}
           />
         </View>
