@@ -4,6 +4,10 @@ import { Image } from "expo-image";
 import { Redirect, Tabs } from "expo-router";
 import { View } from "react-native";
 
+export const unstable_settings = {
+  initialRouteName: "(home)/index",
+};
+
 export default function Layout() {
   const user = useUser();
 
@@ -13,7 +17,6 @@ export default function Layout() {
 
   return (
     <Tabs
-      initialRouteName="(home)"
       screenOptions={{
         tabBarActiveTintColor: "#f4511e",
         headerShown: false,
@@ -23,9 +26,7 @@ export default function Layout() {
         name="(home)"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => (
-            <Entypo size={28} name="home" color={color} />
-          ),
+          tabBarIcon: ({ color }) => <Entypo size={28} name="home" color={color} />,
         }}
       />
       <Tabs.Screen
