@@ -3,6 +3,7 @@ import { useLocationPermission } from "@/hooks/useLocationPermission";
 import { useLocationTracking } from "@/hooks/useLocationTracking";
 import { useOnWebSocket } from "@/hooks/useOnWebSocket";
 import { getWebSocket, useWebSocket } from "@/hooks/useWebSocket";
+import { useModal } from "@/modules/ModalContext";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
 import CurrentClue from "@/modules/ui/hunt/CurrentClue";
@@ -48,6 +49,8 @@ function Page() {
     locationPermission.determined && locationPermission.foreground
   );
 
+  const modal = useModal();
+
   // API Queries
   const huntQuery = useQuery<APIResponse<THunt>>({
     queryKey: ["hunt", huntId],
@@ -78,9 +81,7 @@ function Page() {
 
   // Ask for current clue on mount
   useEffect(() => {
-    if (socket) {
-      socket.send(JSON.stringify({ type: "cl.current" }));
-    }
+    askForCurrentClue();
   }, [socket]);
 
   // Handle socket messages
@@ -96,6 +97,42 @@ function Page() {
       // Use secure store, to save the clue's location coordinates
       if (e.near) {
         console.log("Received loc.check -> clue's location:", e.clue_location);
+      }
+    } else if (e.type === "cl.unlock") {
+      // TOOD: Figure out how to handle that.
+      if (!e.unlocked) {
+        return;
+      }
+
+      // Display modal, informing the user for the state of the game
+      if (e.won) {
+        modal.open({
+          title: "You Won!",
+          body: "Congratulations! You completed that Ridl!",
+          buttons: [
+            {
+              text: "Continue",
+              onPress() {
+                // TODO: Navigate to another screen to display stats.
+              },
+            },
+          ],
+        });
+      } else {
+        modal.open({
+          title: "Congrats!",
+          body: "You just captured your first clue!",
+          buttons: [
+            {
+              text: "Continue",
+              closeOnPress: true,
+            },
+          ],
+          // On close, call onClueCaptured to update state
+          onClose() {
+            onClueCaptured();
+          },
+        });
       }
     }
   });
@@ -158,8 +195,24 @@ function Page() {
     };
   }, []);
 
-  // TODO: Implement
-  function captureClue() {}
+  // Send message to socket to send us back the current clue
+  function askForCurrentClue() {
+    if (!socket) return;
+    socket.send(JSON.stringify({ type: "cl.current" }));
+  }
+
+  // Called when we capture a clue
+  function onClueCaptured() {
+    setHasReachedClue(false);
+    setClueLocation(undefined);
+    askForCurrentClue();
+  }
+
+  // TODO: Implement. For now just unlock the clue.
+  function captureClue() {
+    if (!socket) return;
+    socket.send(JSON.stringify({ type: "cl.unlock", loc: clueLocation }));
+  }
 
   // Display loading spinner if we're fetching
   if (huntQuery.isLoading || huntQuery.isFetching || !locationPermission.determined) {
