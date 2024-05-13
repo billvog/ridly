@@ -10,9 +10,9 @@ import CurrentClue from "@/modules/ui/hunt/CurrentClue";
 import InaccurateCircle from "@/modules/ui/map/InaccurateCircle";
 import { LocationActions, LocationStore, useLocationSelector } from "@/redux/location";
 import { LocationPoint } from "@/types/general";
-import { THunt, THuntClue } from "@/types/hunt";
+import { TCapturedHuntClue, THunt, THuntClue } from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
 import * as Notifications from "expo-notifications";
@@ -23,9 +23,11 @@ import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import Toast from "react-native-toast-message";
 import { Provider } from "react-redux";
+import { usePersistentState } from "@/hooks/usePersistentState";
 
 const LOCATION_TRACKING_TASK = "hunt/location-track";
 const CAPTURE_CLUE_NOTIFICATION_ID = "hunt/capture-clue-notification";
+const CAPTURED_CLUES_STORAGE_ID = "hunt/captured-clues/";
 
 // Provide coordinate deltas, required from MapView to set region
 function getMapDeltas() {
@@ -60,9 +62,15 @@ function Page() {
   });
 
   const [hunt, setHunt] = useState<THunt | null>();
+
   const [clue, setClue] = useState<THuntClue>();
   const [clueLocation, setClueLocation] = useState<LocationPoint>();
   const [hasReachedClue, setHasReachedClue] = useState(false);
+
+  const [capturedClues, setCapturedClues] = usePersistentState<TCapturedHuntClue[]>(
+    [],
+    hunt ? CAPTURED_CLUES_STORAGE_ID + hunt.id : ""
+  );
 
   // Holds a reference to the MapView
   const mapRef = useRef<MapView>(null);
@@ -203,6 +211,11 @@ function Page() {
 
   // Called when we capture a clue
   function onClueCaptured() {
+    // Add clue to captured clues
+    if (clue && clueLocation) {
+      setCapturedClues((c) => [...c, { ...clue, location_point: clueLocation }]);
+    }
+
     setHasReachedClue(false);
     setClueLocation(undefined);
     askForCurrentClue();
@@ -251,9 +264,24 @@ function Page() {
         }
       >
         {/* Draw marker on user's location */}
-        <Marker coordinate={userLocation}>
+        <Marker coordinate={userLocation} zIndex={20}>
           <View className="w-4 h-4 rounded-full bg-orange-400" />
         </Marker>
+
+        {/* Draw a marker for each clue we've captured */}
+        {capturedClues.map((clue) => (
+          <Marker
+            zIndex={10}
+            key={clue.id}
+            coordinate={{
+              latitude: clue.location_point.lat,
+              longitude: clue.location_point.long,
+            }}
+            onPress={() => console.log("Marker pressed")}
+          >
+            <Entypo name="location-pin" size={40} color="black" />
+          </Marker>
+        ))}
 
         {/* If we've reached clue, and clue's location is set, draw a circle around its approximate location. */}
         {hasReachedClue && clueLocation && (
