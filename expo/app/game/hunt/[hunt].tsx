@@ -5,6 +5,9 @@ import { useOnWebSocket } from "@/hooks/useOnWebSocket";
 import { getWebSocket, useWebSocket } from "@/hooks/useWebSocket";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
+import CurrentClue from "@/modules/ui/hunt/CurrentClue";
+import InaccurateCircle from "@/modules/ui/map/InaccurateCircle";
+import { LocationActions, LocationStore, useLocationSelector } from "@/redux/location";
 import { LocationPoint } from "@/types/general";
 import { THunt, THuntClue } from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
@@ -16,9 +19,9 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import * as TaskManager from "expo-task-manager";
 import { useEffect, useRef, useState } from "react";
 import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
-import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import Toast from "react-native-toast-message";
-import InaccurateCircle from "@/modules/ui/map/InaccurateCircle";
+import { Provider } from "react-redux";
 
 const LOCATION_TRACKING_TASK = "hunt/location-track";
 const CAPTURE_CLUE_NOTIFICATION_ID = "hunt/capture-clue-notification";
@@ -28,18 +31,24 @@ function getMapDeltas() {
   return { latitudeDelta: 0.0092, longitudeDelta: 0.0092 };
 }
 
-export default function Page() {
+function Page() {
+  // Routing hooks
   const router = useRouter();
   const { hunt: huntId } = useLocalSearchParams();
 
+  const appState = useAppState();
+
+  // Holds user's live location. Gets updated from background tracking task.
+  const userLocation = useLocationSelector((state) => state.location);
+
+  // Location tracking
   const locationPermission = useLocationPermission();
   useLocationTracking(
     LOCATION_TRACKING_TASK,
     locationPermission.determined && locationPermission.foreground
   );
 
-  const appState = useAppState();
-
+  // API Queries
   const huntQuery = useQuery<APIResponse<THunt>>({
     queryKey: ["hunt", huntId],
     queryFn: () => api("/hunt/" + huntId),
@@ -188,6 +197,11 @@ export default function Page() {
             : undefined
         }
       >
+        {/* Draw marker on user's location */}
+        <Marker coordinate={userLocation}>
+          <View className="w-4 h-4 rounded-full bg-orange-400" />
+        </Marker>
+
         {/* If we've reached clue, and clue's location is set, draw a circle around its approximate location. */}
         {hasReachedClue && clueLocation && (
           <InaccurateCircle
@@ -226,28 +240,12 @@ export default function Page() {
   );
 }
 
-type CurrentClueProps = {
-  clue: THuntClue;
-  hasReached: boolean;
-  onCapturePressed: () => any;
-};
-
-function CurrentClue({ clue, hasReached, onCapturePressed }: CurrentClueProps) {
+// Wrap our _Page component with redux LocationStore.
+export default function () {
   return (
-    <BlurView tint="dark" intensity={40} className="w-full px-10 pt-4 pb-10">
-      <Text className="text-center text-white text-base font-extrabold">
-        {clue.riddle}
-      </Text>
-      {hasReached && (
-        <TouchableOpacity
-          activeOpacity={0.5}
-          className="mx-auto mt-2 px-4 py-2 bg-black rounded-xl"
-          onPress={onCapturePressed}
-        >
-          <Text className="text-white font-bold text-xs">Tap to Capture Clue</Text>
-        </TouchableOpacity>
-      )}
-    </BlurView>
+    <Provider store={LocationStore}>
+      <Page />
+    </Provider>
   );
 }
 
@@ -262,22 +260,20 @@ TaskManager.defineTask(LOCATION_TRACKING_TASK, async ({ data, error }: any) => {
     return;
   }
 
-  // TODO:
-  // Use redux to store current location, so we can then retrieve it from within
-  // our reactive component and show user's location as they move, because
-  // showUserLocation prop on MapView messes this location tracking.
-
+  // Extract location coordinates from data
   const { locations } = data;
   let lat = locations[0].coords.latitude;
   let long = locations[0].coords.longitude;
 
+  // Update our Redux store
+  LocationStore.dispatch(LocationActions.setLocation({ latitude: lat, longitude: long }));
+
+  // Get WebSocket instance, if null, return.
   let socket = getWebSocket();
   if (!socket) {
     return;
   }
 
+  // Send our location to backend through socket
   socket.send(JSON.stringify({ type: "loc.check", loc: { lat, long } }));
-  console.log(
-    `Sent loc.check @ ${new Date(Date.now()).toLocaleString()}: ${lat},${long}`
-  );
 });
