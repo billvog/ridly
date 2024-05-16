@@ -7,6 +7,7 @@ import { getWebSocket, useWebSocket } from "@/hooks/useWebSocket";
 import { useModal } from "@/modules/ModalContext";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
+import ClueMapMarker from "@/modules/ui/hunt/ClueMapMarker";
 import CurrentClue from "@/modules/ui/hunt/CurrentClue";
 import HuntHeader from "@/modules/ui/hunt/Header";
 import HuntMap from "@/modules/ui/hunt/Map";
@@ -15,14 +16,13 @@ import { LocationActions, LocationStore, useLocationSelector } from "@/redux/loc
 import { LocationPoint } from "@/types/general";
 import { TCapturedHuntClue, THunt, THuntClue } from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
-import { Entypo } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import * as Notifications from "expo-notifications";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as TaskManager from "expo-task-manager";
 import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView from "react-native-maps";
 import Toast from "react-native-toast-message";
 import { Provider } from "react-redux";
 
@@ -312,17 +312,7 @@ function Page() {
         <HuntMap mapRef={mapRef} userLocation={userLocation}>
           {/* Draw a marker for each clue we've captured */}
           {capturedClues.map((clue) => (
-            <Marker
-              zIndex={10}
-              key={clue.id}
-              coordinate={{
-                latitude: clue.location_point.lat,
-                longitude: clue.location_point.long,
-              }}
-              onPress={() => console.log("Marker pressed")}
-            >
-              <Entypo name="location-pin" size={40} color="black" />
-            </Marker>
+            <ClueMapMarker key={clue.id} clue={clue} />
           ))}
 
           {/* If we've reached clue, and clue's location is set, draw a circle around its approximate location. */}
