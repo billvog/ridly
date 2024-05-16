@@ -40,7 +40,7 @@ export default function EventDetails() {
 
   const eventQuery = useQuery<APIResponse<TEvent>>({
     queryKey: ["event", eventId],
-    queryFn: () => api("/event/" + eventId),
+    queryFn: () => api("/event/" + eventId + "/"),
     // If no eventId is provided don't bother making a request.
     enabled: typeof eventId === "string",
   });

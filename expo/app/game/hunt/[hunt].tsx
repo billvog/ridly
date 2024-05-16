@@ -92,7 +92,7 @@ function Page() {
 
   const huntQuery = useQuery<APIResponse<THunt>>({
     queryKey: ["hunt", huntId],
-    queryFn: () => api("/hunt/" + huntId),
+    queryFn: () => api("/hunt/" + huntId + "/"),
     // If no eventId is provided don't bother making a request.
     enabled: typeof huntId === "string",
   });

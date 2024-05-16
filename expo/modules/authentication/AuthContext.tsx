@@ -25,7 +25,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const meQuery = useQuery({
     queryKey: ["user", "me"],
-    queryFn: () => api("/user/me"),
+    queryFn: () => api("/user/me/"),
   });
 
   useEffect(() => {
