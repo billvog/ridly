@@ -9,7 +9,6 @@ export function useAppState() {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       appState.current = nextAppState;
       setAppStateVisible(appState.current);
-      console.log("AppState", appState.current);
     });
 
     return () => {
