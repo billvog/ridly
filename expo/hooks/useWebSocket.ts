@@ -21,10 +21,16 @@ export function useWebSocket(path: string | null) {
   const url = constructWebSocketUrl(path);
 
   if (socket) {
-    if (socket.url !== url) socket.close();
+    if (socket.url !== url) {
+      socket.close();
+      socket = null;
+    }
   }
 
-  socket = socket || new ReconnectingWebSocket(url);
+  socket = socket ? socket : new ReconnectingWebSocket(url);
+  if (socket.readyState === socket.CLOSED) {
+    socket.reconnect();
+  }
 
   return socket;
 }

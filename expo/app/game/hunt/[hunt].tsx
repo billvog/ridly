@@ -2,28 +2,29 @@ import { useAppState } from "@/hooks/useAppState";
 import { useLocationPermission } from "@/hooks/useLocationPermission";
 import { useLocationTracking } from "@/hooks/useLocationTracking";
 import { useOnWebSocket } from "@/hooks/useOnWebSocket";
+import { usePersistentState } from "@/hooks/usePersistentState";
 import { getWebSocket, useWebSocket } from "@/hooks/useWebSocket";
 import { useModal } from "@/modules/ModalContext";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
 import CurrentClue from "@/modules/ui/hunt/CurrentClue";
+import HuntHeader from "@/modules/ui/hunt/Header";
+import HuntMap from "@/modules/ui/hunt/Map";
 import InaccurateCircle from "@/modules/ui/map/InaccurateCircle";
 import { LocationActions, LocationStore, useLocationSelector } from "@/redux/location";
 import { LocationPoint } from "@/types/general";
 import { TCapturedHuntClue, THunt, THuntClue } from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { BlurView } from "expo-blur";
 import * as Notifications from "expo-notifications";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as TaskManager from "expo-task-manager";
 import { useEffect, useRef, useState } from "react";
-import { SafeAreaView, Text, TouchableOpacity, View } from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { View } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 import Toast from "react-native-toast-message";
 import { Provider } from "react-redux";
-import { usePersistentState } from "@/hooks/usePersistentState";
 
 const LOCATION_TRACKING_TASK = "hunt/location-track";
 const CAPTURE_CLUE_NOTIFICATION_ID = "hunt/capture-clue-notification";
@@ -306,78 +307,41 @@ function Page() {
 
   return (
     <View className="flex-1">
-      {/* Map */}
-      <MapView
-        ref={mapRef}
-        className="absolute w-full h-full"
-        mapType="hybrid"
-        provider={PROVIDER_GOOGLE}
-        initialRegion={
-          userLocation
-            ? {
-                ...userLocation,
-                ...getMapDeltas(),
-              }
-            : undefined
-        }
-      >
-        {/* Draw marker on user's location */}
-        <Marker coordinate={userLocation} zIndex={20}>
-          <View className="w-4 h-4 rounded-full bg-orange-400" />
-        </Marker>
+      <View className="w-full h-full flex-col">
+        {/* Map */}
+        <HuntMap mapRef={mapRef} userLocation={userLocation}>
+          {/* Draw a marker for each clue we've captured */}
+          {capturedClues.map((clue) => (
+            <Marker
+              zIndex={10}
+              key={clue.id}
+              coordinate={{
+                latitude: clue.location_point.lat,
+                longitude: clue.location_point.long,
+              }}
+              onPress={() => console.log("Marker pressed")}
+            >
+              <Entypo name="location-pin" size={40} color="black" />
+            </Marker>
+          ))}
 
-        {/* Draw a marker for each clue we've captured */}
-        {capturedClues.map((clue) => (
-          <Marker
-            zIndex={10}
-            key={clue.id}
-            coordinate={{
-              latitude: clue.location_point.lat,
-              longitude: clue.location_point.long,
-            }}
-            onPress={() => console.log("Marker pressed")}
-          >
-            <Entypo name="location-pin" size={40} color="black" />
-          </Marker>
-        ))}
+          {/* If we've reached clue, and clue's location is set, draw a circle around its approximate location. */}
+          {clueState.near && clueState.location && (
+            <InaccurateCircle
+              center={{
+                latitude: clueState.location.lat,
+                longitude: clueState.location.long,
+              }}
+            />
+          )}
+        </HuntMap>
 
-        {/* If we've reached clue, and clue's location is set, draw a circle around its approximate location. */}
-        {clueState.near && clueState.location && (
-          <InaccurateCircle
-            center={{
-              latitude: clueState.location.lat,
-              longitude: clueState.location.long,
-            }}
-          />
-        )}
-      </MapView>
+        {/* Clue Information */}
+        <CurrentClue clue={clue} isNear={clueState.near} onCapturePressed={captureClue} />
+      </View>
 
       {/* Header */}
-      <SafeAreaView>
-        <BlurView
-          tint="dark"
-          className="mx-4 my-2 px-6 py-4 rounded-xl overflow-hidden flex flex-row items-center"
-        >
-          {/* If we can go back, display back button */}
-          {router.canGoBack() && (
-            <TouchableOpacity onPress={() => router.back()} className="mr-4">
-              <Entypo name="chevron-left" size={20} color="white" />
-            </TouchableOpacity>
-          )}
-          <Text className="font-extrabold text-xl text-white">{hunt.event.name}</Text>
-        </BlurView>
-      </SafeAreaView>
-
-      {/* Display current clue, if any */}
-      {clue && (
-        <View className="absolute bottom-0 w-full">
-          <CurrentClue
-            clue={clue}
-            hasReached={clueState.near}
-            onCapturePressed={captureClue}
-          />
-        </View>
-      )}
+      <HuntHeader title={hunt.event.name} />
     </View>
   );
 }

@@ -1,32 +1,49 @@
 import { THuntClue } from "@/types/hunt";
-import { BlurView } from "expo-blur";
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 type CurrentClueProps = {
-  clue: THuntClue;
-  hasReached: boolean;
+  clue?: THuntClue;
+  isNear: boolean;
   onCapturePressed: () => any;
 };
 
 export default function CurrentClue({
   clue,
-  hasReached,
+  isNear,
   onCapturePressed,
 }: CurrentClueProps) {
   return (
-    <BlurView tint="dark" intensity={40} className="w-full px-10 pt-4 pb-10">
-      <Text className="text-center text-white text-base font-extrabold">
-        {clue.riddle}
-      </Text>
-      {hasReached && (
-        <TouchableOpacity
-          activeOpacity={0.5}
-          className="mx-auto mt-2 px-4 py-2 bg-black rounded-xl"
-          onPress={onCapturePressed}
-        >
-          <Text className="text-white font-bold text-xs">Tap to Capture Clue</Text>
-        </TouchableOpacity>
+    <View className="bg-orange-100 h-[22%] p-6 space-y-4">
+      {clue ? (
+        <View>
+          <Text className="text-sm text-orange-400 font-bold">Clue #{clue.order}</Text>
+          <Text className="text-lg font-bold">{clue.riddle}</Text>
+        </View>
+      ) : (
+        <View>
+          <Text className="font-bold text-orange-400 text-base">
+            Loading current clue...
+          </Text>
+        </View>
       )}
-    </BlurView>
+
+      {isNear ? (
+        <View>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            className="mr-auto px-4 py-2 bg-black rounded-xl"
+            onPress={onCapturePressed}
+          >
+            <Text className="font-extrabold text-base text-orange-50">Capture Clue!</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View>
+          <Text className="font-medium text-base">
+            Get near the clue to be able to capture it!
+          </Text>
+        </View>
+      )}
+    </View>
   );
 }
