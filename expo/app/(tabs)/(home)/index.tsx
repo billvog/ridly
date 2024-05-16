@@ -1,9 +1,10 @@
+import { useIsRefreshing } from "@/hooks/useIsRefreshing";
 import EventScrollFeed from "@/modules/ui/EventScrollFeed";
 import { TEvent } from "@/types/event";
 import { api } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { RefreshControl, ScrollView, Text } from "react-native";
 
 export default function Page() {
   const eventsQuery = useQuery({
@@ -11,23 +12,18 @@ export default function Page() {
     queryFn: () => api("/event/"),
   });
 
+  const [refreshEvents, areEventsRefreshing] = useIsRefreshing(eventsQuery.refetch);
+
   const [eventsData, setEventsData] = useState<TEvent[]>([]);
 
   useEffect(() => {
     setEventsData(eventsQuery.data?.data || []);
   }, [eventsQuery.data]);
 
-  function refreshEvents() {
-    eventsQuery.refetch();
-  }
-
   return (
     <ScrollView
       refreshControl={
-        <RefreshControl
-          refreshing={eventsQuery.isLoading}
-          onRefresh={refreshEvents}
-        />
+        <RefreshControl refreshing={areEventsRefreshing} onRefresh={refreshEvents} />
       }
     >
       {eventsQuery.isLoading ? (

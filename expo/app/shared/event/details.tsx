@@ -1,3 +1,4 @@
+import { useIsRefreshing } from "@/hooks/useIsRefreshing";
 import { useSetNavigationOptions } from "@/hooks/useSetNavigationOptions";
 import Button from "@/modules/ui/Button";
 import FullscreenError from "@/modules/ui/FullscreenError";
@@ -44,6 +45,8 @@ export default function EventDetails() {
     enabled: typeof eventId === "string",
   });
 
+  const [refreshEvent, isEventRefreshing] = useIsRefreshing(eventQuery.refetch);
+
   const [event, setEvent] = useState<TEvent | null>();
 
   const joinEventMutation = useMutation<APIResponse<JoinEventResponse>>({
@@ -67,19 +70,12 @@ export default function EventDetails() {
     });
   }, [navigation, event]);
 
-  // Called from RefreshControl
-  function refreshEvent() {
-    eventQuery.refetch();
-  }
-
   // Handle join/unjoin event
   async function JoinEvent() {
     if (!event) return;
 
     const wantsToLeave = event?.has_joined;
-    const errorMessage = wantsToLeave
-      ? "Couldn't unjoin event."
-      : "Couldn't join event";
+    const errorMessage = wantsToLeave ? "Couldn't unjoin event." : "Couldn't join event";
 
     if (wantsToLeave) {
       const shouldContinue = await new Promise<boolean>((resolve) => {
@@ -173,10 +169,7 @@ export default function EventDetails() {
   return (
     <ScrollView
       refreshControl={
-        <RefreshControl
-          refreshing={eventQuery.isLoading}
-          onRefresh={refreshEvent}
-        />
+        <RefreshControl refreshing={isEventRefreshing} onRefresh={refreshEvent} />
       }
     >
       <Image
@@ -231,9 +224,7 @@ export default function EventDetails() {
             <Entypo name="clock" size={16} color="#fb923c" />
             <Text>
               When?{" "}
-              <Text className="font-bold">
-                {dayjs(event.happening_at).format("LLL")}
-              </Text>
+              <Text className="font-bold">{dayjs(event.happening_at).format("LLL")}</Text>
             </Text>
           </View>
           {event.participant_count > 0 ? (
@@ -242,15 +233,12 @@ export default function EventDetails() {
               <Text>Who?</Text>
               <EventParticipantsAvatars participants={event.participants} />
               <Text>
-                <Text className="font-bold">{event.participant_count}</Text>{" "}
-                joined
+                <Text className="font-bold">{event.participant_count}</Text> joined
               </Text>
             </View>
           ) : (
             <View>
-              <Text className="font-medium">
-                No attendees yet. Be the first!
-              </Text>
+              <Text className="font-medium">No attendees yet. Be the first!</Text>
             </View>
           )}
         </View>

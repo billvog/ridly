@@ -1,3 +1,4 @@
+import { useIsRefreshing } from "@/hooks/useIsRefreshing";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenMessage from "@/modules/ui/FullscreenMessage";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
@@ -8,13 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Agenda, AgendaEntry, AgendaSchedule } from "react-native-calendars";
 
 export default function Page() {
@@ -24,6 +19,8 @@ export default function Page() {
     queryKey: ["event", "joined"],
     queryFn: () => api("/event/joined/"),
   });
+
+  const [refreshEvents, areEventsRefreshing] = useIsRefreshing(eventsQuery.refetch);
 
   const [events, setEvents] = useState<TEvent[] | null>([]);
   const [agendaSchedule, setAgendaSchedule] = useState<AgendaSchedule>({});
@@ -51,11 +48,6 @@ export default function Page() {
     setAgendaSchedule(schedule);
   }, [events]);
 
-  // Called from RefreshControl to refresh query.
-  function refreshEvents() {
-    eventsQuery.refetch();
-  }
-
   // Navigate to event detail screen.
   function onEventPressed(eventId: string) {
     router.push({
@@ -67,12 +59,7 @@ export default function Page() {
   }
 
   function AgendaRefreshControl() {
-    return (
-      <RefreshControl
-        refreshing={eventsQuery.isLoading}
-        onRefresh={refreshEvents}
-      />
-    );
+    return <RefreshControl refreshing={areEventsRefreshing} onRefresh={refreshEvents} />;
   }
 
   function RenderAgendaDay(day?: Date) {
@@ -96,9 +83,7 @@ export default function Page() {
         activeOpacity={0.5}
         className="flex-1 flex justify-center bg-white rounded-xl p-6 mt-4 mr-4"
       >
-        <Text className="font-extrabold text-xl leading-loose">
-          {event.name}
-        </Text>
+        <Text className="font-extrabold text-xl leading-loose">{event.name}</Text>
         <View className="flex flex-row items-center gap-2">
           <Entypo name="clock" size={14} color="#fb923c" />
           <Text>{dayjs(event.happening_at).format("LT")}</Text>
@@ -117,9 +102,7 @@ export default function Page() {
           alignItems: "center",
         }}
       >
-        <Text className="text-2xl font-extrabold text-gray-500">
-          Nothing planned.
-        </Text>
+        <Text className="text-2xl font-extrabold text-gray-500">Nothing planned.</Text>
       </ScrollView>
     );
   }
