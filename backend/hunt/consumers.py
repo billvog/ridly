@@ -1,30 +1,13 @@
 import orjson
 
 from websockets import ConnectionClosed
-from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
-from hunt.models import Hunt
+from hunt.service import get_hunt
 from hunt.modules.hunt import HuntModule
 from hunt.exceptions import ConsumerException
 
-from event.models import Event
-
-
-@database_sync_to_async
-def db_get_hunt(pk):
-  try:
-    return Hunt.objects.get(pk=pk)
-  except Hunt.DoesNotExist:
-    return None
-
-
-@database_sync_to_async
-def db_get_hunt_event(hunt):
-  try:
-    return hunt.event
-  except Event.DoesNotExist:
-    return None
+from event.service import get_event_from_hunt
 
 
 class HuntConsumer(AsyncJsonWebsocketConsumer):
@@ -57,13 +40,13 @@ class HuntConsumer(AsyncJsonWebsocketConsumer):
     self.hunt_pk = self.scope["url_route"]["kwargs"]["hunt_pk"]
 
     # Get hunt from database, if not found reject connection
-    self.hunt = await db_get_hunt(pk=self.hunt_pk)
+    self.hunt = await get_hunt(pk=self.hunt_pk)
     if self.hunt is None:
       await self.send_error(0, "Hunt not found", close=True)
       return
 
     # Get associated event from database, if not found reject
-    self.event = await db_get_hunt_event(self.hunt)
+    self.event = await get_event_from_hunt(self.hunt)
     if self.event is None:
       await self.send_error(0, "Event not found", close=True)
       return
@@ -77,7 +60,7 @@ class HuntConsumer(AsyncJsonWebsocketConsumer):
     # Initialize our components
     self.components = {"hunt": HuntModule(self)}
 
-  async def disconnect(self, code):
+  async def disconnect(self, _):
     # Leave room, if joined (in case of early reject, like when not authenticated)
     if hasattr(self, "room_group_name"):
       await self.channel_layer.group_discard(self.room_group_name, self.channel_name)

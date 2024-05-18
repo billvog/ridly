@@ -1,65 +1,13 @@
-from channels.db import database_sync_to_async
 from geopy.distance import distance as geopy_distance
 
 from hunt.decorators import command
 from hunt.modules.base import BaseModule
-from hunt.models import Hunt, HuntClue, HuntClueStat
+from hunt.service import get_hunt_current_clue, hunt_unlock_clue
 from hunt.serializers import (
   HuntClueSerializer,
   LocationCheckSerializer,
   ClueUnlockSerializer,
 )
-
-from event.models import Event
-
-
-@database_sync_to_async
-def db_get_hunt(pk):
-  try:
-    return Hunt.objects.get(pk=pk)
-  except Hunt.DoesNotExist:
-    return None
-
-
-@database_sync_to_async
-def db_get_hunt_event(hunt):
-  try:
-    return hunt.event
-  except Event.DoesNotExist:
-    return None
-
-
-@database_sync_to_async
-def db_get_current_clue(hunt, user):
-  clue_stat = (
-    HuntClueStat.objects.filter(clue__hunt=hunt, user=user)
-    .order_by("clue__order")
-    .last()
-  )
-
-  if clue_stat is None:
-    first_clue = hunt.clues.order_by("order").first()
-    clue_stat = HuntClueStat.objects.create(clue=first_clue, user=user)
-
-  return clue_stat.clue, clue_stat
-
-
-@database_sync_to_async
-def db_unlock_clue(clue_stat):
-  # Set ClueStat as unlocked
-  clue_stat.unlocked = True
-  clue_stat.save()
-
-  # If this clue is the last one, return True
-  if clue_stat.clue.is_last:
-    return True
-
-  # Else, move to next one
-  clue = clue_stat.clue
-  next_clue = HuntClue.objects.get(order=(clue.order + 1))
-  HuntClueStat.objects.create(clue=next_clue, user=clue_stat.user)
-
-  return False
 
 
 class HuntModule(BaseModule):
@@ -67,7 +15,7 @@ class HuntModule(BaseModule):
 
   @command("cl.current")
   async def get_current_clue(self, _):
-    clue, _ = await db_get_current_clue(self.consumer.hunt, self.consumer.user)
+    clue, _ = await get_hunt_current_clue(self.consumer.hunt, self.consumer.user)
     if clue is None:
       await self.consumer.send_error("clue_404")
       return
@@ -89,7 +37,7 @@ class HuntModule(BaseModule):
     # Get current clue.
     # Ideally store the current clue each user in cache, so we don't
     # have to make queries to postgres every time a players checks their location.
-    clue, _ = await db_get_current_clue(self.consumer.hunt, self.consumer.user)
+    clue, _ = await get_hunt_current_clue(self.consumer.hunt, self.consumer.user)
     if clue is None:
       await self.consumer.send_error("clue_404")
       return
@@ -126,7 +74,9 @@ class HuntModule(BaseModule):
     clue_location = serializer.validated_data["location"]
 
     # Get current clue
-    clue, clue_stat = await db_get_current_clue(self.consumer.hunt, self.consumer.user)
+    clue, clue_stat = await get_hunt_current_clue(
+      self.consumer.hunt, self.consumer.user
+    )
     if clue is None or clue_stat is None:
       await self.consumer.send_error("clue_404")
       return
@@ -144,7 +94,7 @@ class HuntModule(BaseModule):
       return
 
     # Set clue stat as unlocked on database
-    is_over = await db_unlock_clue(clue_stat)
+    is_over = await hunt_unlock_clue(clue_stat)
 
     response = {"unlocked": True}
     if is_over:
