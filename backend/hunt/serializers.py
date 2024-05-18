@@ -8,10 +8,6 @@ from .models import Hunt, HuntClue
 # Django Channel related serializers
 
 
-class AbstractRequestSerializer(serializers.Serializer):
-  type = serializers.CharField()
-
-
 class LocationSerializer(serializers.Serializer):
   lat = serializers.FloatField()
   long = serializers.FloatField()
