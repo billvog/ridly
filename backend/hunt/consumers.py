@@ -1,6 +1,7 @@
-import json
+import orjson
+from websockets import ConnectionClosed
 from channels.db import database_sync_to_async
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from geopy.distance import distance as geopy_distance
 
 from .models import Hunt, HuntClue, HuntClueStat
@@ -62,13 +63,19 @@ def db_unlock_clue(clue_stat):
   return False
 
 
-class HuntConsumer(AsyncWebsocketConsumer):
+class HuntConsumer(AsyncJsonWebsocketConsumer):
   async def connect(self):
+    self.content = []
+
+    # Accept early, so we can send detailed errors on why connection fails, if it does.
+    await self.accept()
+
     # Get user, if any, from scope
     self.user = self.scope["user"] if "user" in self.scope else None
 
     # Reject connection if not authenticated
     if (self.user is None) or (not self.user.is_authenticated):
+      await self.send_error(0, "Not authenticated", close=True)
       return
 
     # Get hunt id from params
@@ -77,11 +84,13 @@ class HuntConsumer(AsyncWebsocketConsumer):
     # Get hunt from database, if not found reject connection
     self.hunt = await db_get_hunt(pk=self.hunt_pk)
     if self.hunt is None:
+      await self.send_error(0, "Hunt not found", close=True)
       return
 
     # Get associated event from database, if not found reject
     self.event = await db_get_hunt_event(self.hunt)
     if self.event is None:
+      await self.send_error(0, "Event not found", close=True)
       return
 
     # Create room group name for channel layers
@@ -93,33 +102,26 @@ class HuntConsumer(AsyncWebsocketConsumer):
     # Debug message
     print("Joined channel for hunt: %s" % (self.event.name))
 
-    # Accept connection
-    await self.accept()
-
   async def disconnect(self, code):
     # Leave room, if joined (in case of early reject, like when not authenticated)
     if hasattr(self, "room_group_name"):
       await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
-  # Receive messages from clients.
-  async def receive(self, text_data):
-    try:
-      data = json.loads(text_data)
-    except json.JSONDecodeError:
-      print("Failed to decode input json")
-      return
+  # Receive message from client
+  async def receive_json(self, content, **kwargs):
+    self.content = content
 
-    request_serializer = AbstractRequestSerializer(data=data)
+    request_serializer = AbstractRequestSerializer(data=content)
     if not request_serializer.is_valid():
-      print("Invalid request")
+      await self.send_error(0, message="Invalid request")
       return
 
     request_type = request_serializer.validated_data["type"]
 
     if request_type == "loc.check":
-      await self._handle_location_check(data)
+      await self._handle_location_check(content)
     elif request_type == "cl.unlock":
-      await self._handle_clue_unlock(data)
+      await self._handle_clue_unlock(content)
     elif request_type == "cl.current":
       await self._handle_current_clue()
 
@@ -128,7 +130,7 @@ class HuntConsumer(AsyncWebsocketConsumer):
     # Validate input data
     serializer = LocationCheckSerializer(data=data)
     if not serializer.is_valid():
-      print("Invalid request data")
+      await self.send_error(0, message="Invalid request data")
       return
 
     # Get location from input
@@ -139,6 +141,7 @@ class HuntConsumer(AsyncWebsocketConsumer):
     # have to make queries to postgres every time a players checks their location.
     clue, _ = await db_get_current_clue(self.hunt, self.user)
     if clue is None:
+      await self.send_error(0, message="Something went wrong")
       return
 
     # Calculate distance between input and clue coordinates in meters
@@ -160,13 +163,13 @@ class HuntConsumer(AsyncWebsocketConsumer):
     else:
       response = {"type": "loc.check", "near": False}
 
-    await self.send(text_data=json.dumps(response))
+    await self.send_success(response)
 
   async def _handle_clue_unlock(self, data):
     # Validate input data
     serializer = ClueUnlockSerializer(data=data)
     if not serializer.is_valid():
-      print("Invalid request data")
+      await self.send_error(0, message="Invalid request data")
       return
 
     # Get location from input
@@ -175,6 +178,7 @@ class HuntConsumer(AsyncWebsocketConsumer):
     # Get current clue
     clue, clue_stat = await db_get_current_clue(self.hunt, self.user)
     if clue is None or clue_stat is None:
+      await self.send_error(0, message="Something went wrong")
       return
 
     # Construct tuple that looks like Point.coords
@@ -186,7 +190,7 @@ class HuntConsumer(AsyncWebsocketConsumer):
     # Otherwise, they're trying to brute force it (?)
     # TODO: Update clue's tries left. Each user should have 2.
     if clue.location_point.coords != clue_location_coords:
-      await self.send(json.dumps({"unlocked": False}))
+      await self.send_error(0, message="Failed to unlock clue")
       return
 
     # Set clue stat as unlocked on database
@@ -197,18 +201,55 @@ class HuntConsumer(AsyncWebsocketConsumer):
     else:
       response = {"type": "cl.unlock", "unlocked": True}
 
-    await self.send(json.dumps(response))
+    await self.send_success(response)
 
   # Send back current clue
   async def _handle_current_clue(self):
     # Get current clue from db
     clue, _ = await db_get_current_clue(self.hunt, self.user)
     if clue is None:
-      print("Clue not found in db")
+      await self.send_error(0, message="Something went wrong")
       return
 
     # Serialize it
     serialized_clue = HuntClueSerializer(clue).data
 
     # Send it back
-    await self.send(json.dumps({"type": "cl.current", "clue": serialized_clue}))
+    await self.send_success({"type": "cl.current", "clue": serialized_clue})
+
+  # Helpers to send responses back
+
+  def build_response(self, status, data):
+    if data is None:
+      data = {}
+    # response = [status]
+    # if len(self.content) == 3:
+    #   response.append(self.content[1])  # Add code to response
+    # response.append(data)
+    # return response
+    response = {"status": status, "data": data}
+    return response
+
+  async def send_error(self, code, message=None, close=False, details=None):
+    data = {"code": code}
+    if message:
+      data["message"] = message
+    if details:
+      data["details"] = details
+    await self.send_json(self.build_response("error", data), close)
+
+  async def send_success(self, data, close=False):
+    await self.send_json(self.build_response("success", data), close=close)
+
+  # Override send and receive methods to use orjson and less function calls
+
+  async def send_json(self, content, close=False):
+    try:
+      await super().send(text_data=orjson.dumps(content).decode(), close=close)
+    except (RuntimeError, ConnectionClosed):
+      # socket has been closed in the meantime
+      pass
+
+  @classmethod
+  async def decode_json(cls, text_data):
+    return orjson.loads(text_data)
