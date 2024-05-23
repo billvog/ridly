@@ -1,41 +1,51 @@
 import { THuntClue } from "@/types/hunt";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
+import Button from "@/modules/ui/Button";
 
 type CurrentClueProps = {
   clue?: THuntClue;
+  isClueLoading: boolean;
   isNear: boolean;
   onCapturePressed: () => any;
+  isCaptureClueLoading: boolean;
 };
 
 export default function CurrentClue({
   clue,
+  isClueLoading,
   isNear,
   onCapturePressed,
+  isCaptureClueLoading,
 }: CurrentClueProps) {
   return (
     <View className="bg-orange-100 h-[22%] p-6 space-y-4">
-      {clue ? (
-        <View>
-          <Text className="text-sm text-orange-400 font-bold">Clue #{clue.order}</Text>
-          <Text className="text-lg font-bold">{clue.riddle}</Text>
-        </View>
-      ) : (
-        <View>
+      <View>
+        {isClueLoading ? (
           <Text className="font-bold text-orange-400 text-base">
             Loading current clue...
           </Text>
-        </View>
-      )}
+        ) : clue ? (
+          <>
+            <Text className="text-sm text-orange-400 font-bold">Clue #{clue.order}</Text>
+            <Text className="text-lg font-bold">{clue.riddle}</Text>
+          </>
+        ) : (
+          <Text className="font-bold text-red-500 text-base">
+            Something went wrong fetching the clue. Please try again.
+          </Text>
+        )}
+      </View>
 
       {isNear ? (
         <View>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            className="mr-auto px-4 py-2 bg-black rounded-xl"
+          <Button
             onPress={onCapturePressed}
+            loading={isCaptureClueLoading}
+            buttonStyle="mr-auto"
+            textStyle="font-extrabold"
           >
-            <Text className="font-extrabold text-base text-orange-50">Capture Clue!</Text>
-          </TouchableOpacity>
+            Capture Clue!
+          </Button>
         </View>
       ) : (
         <View>

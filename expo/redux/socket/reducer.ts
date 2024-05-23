@@ -1,5 +1,5 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { THuntSocketCommand } from "@/types/hunt";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 type SentSocketMessage = {
   id: string;
@@ -24,7 +24,21 @@ const socketSlice = createSlice({
       };
     },
     resolveMessage(state, action: PayloadAction<Pick<SentSocketMessage, "id">>) {
-      return { sent: state.sent.filter((v) => v.id !== action.payload.id) };
+      return {
+        sent: state.sent.map((v) =>
+          v.id === action.payload.id ? { ...v, resolved: true } : v
+        ),
+      };
+    },
+    removeMessage(state, action: PayloadAction<Pick<SentSocketMessage, "id">>) {
+      return {
+        sent: state.sent.filter((v) => v.id !== action.payload.id),
+      };
+    },
+    clearMessages(state) {
+      return {
+        sent: [],
+      };
     },
   },
 });

@@ -2,6 +2,7 @@ import { useLocationPermission } from "@/hooks/useLocationPermission";
 import { useLocationTracking } from "@/hooks/useLocationTracking";
 import { useOnWebSocket } from "@/hooks/useOnWebSocket";
 import { usePersistentState } from "@/hooks/usePersistentState";
+import { useSocketSend } from "@/hooks/useSocketSend";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useModal } from "@/modules/ModalContext";
 import FullscreenError from "@/modules/ui/FullscreenError";
@@ -12,8 +13,15 @@ import HuntHeader from "@/modules/ui/hunt/Header";
 import HuntMap from "@/modules/ui/hunt/Map";
 import InaccurateCircle from "@/modules/ui/map/InaccurateCircle";
 import { useStoreDispatch } from "@/redux/hooks";
+import { SocketActions } from "@/redux/socket/reducer";
 import { LocationPoint } from "@/types/general";
-import { TCapturedHuntClue, THunt, THuntClue, THuntSocketResult } from "@/types/hunt";
+import {
+  TCapturedHuntClue,
+  THunt,
+  THuntClue,
+  THuntSocketCommand,
+  THuntSocketResult,
+} from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
@@ -72,6 +80,14 @@ export default function Page() {
   );
 
   const [userLocation, setUserLocation] = useState<LatLng | null>(null);
+
+  /*
+   *
+   * Redux
+   *
+   */
+
+  const dispatch = useStoreDispatch();
 
   /*
    *
@@ -146,6 +162,12 @@ export default function Page() {
   function onClueCaptured() {
     // Add clue to captured clues
     if (clue && clueState.location) {
+      // Return if clue is already in captured clues
+      // that way we don't add duplicates
+      if (typeof capturedClues.find((c) => c.id === clue.id) !== "undefined") {
+        return;
+      }
+
       setCapturedClues((c) => [...c, { ...clue, location_point: clueState.location! }]);
     }
 
@@ -160,6 +182,16 @@ export default function Page() {
 
   // Connect to WebSocket
   const { socket, send: socketSend } = useWebSocket(hunt ? `/hunt/${hunt.id}` : null);
+
+  const currentClueRequest = useSocketSend<THuntSocketCommand>(
+    "hunt.cl.current",
+    socketSend
+  );
+
+  const captureClueRequest = useSocketSend<THuntSocketCommand>(
+    "hunt.cl.current",
+    socketSend
+  );
 
   // Ask for current clue on mount
   useEffect(() => {
@@ -233,12 +265,12 @@ export default function Page() {
 
   // Send message to socket to send us back the current clue
   function askForCurrentClue() {
-    socketSend("hunt.cl.current", {});
+    currentClueRequest.send({});
   }
 
   // TODO: Implement. For now just unlock the clue.
   function captureClue() {
-    socketSend("hunt.cl.unlock", { loc: clueState.location });
+    captureClueRequest.send({ loc: clueState.location });
   }
 
   useEffect(() => {
@@ -260,6 +292,12 @@ export default function Page() {
       eventEmmiter.off("location:update", locationUpdate);
     };
   }, [socket]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(SocketActions.clearMessages());
+    };
+  }, []);
 
   /*
    *
@@ -307,7 +345,13 @@ export default function Page() {
         </HuntMap>
 
         {/* Clue Information */}
-        <CurrentClue clue={clue} isNear={clueState.near} onCapturePressed={captureClue} />
+        <CurrentClue
+          clue={clue}
+          isClueLoading={currentClueRequest.loading}
+          isNear={clueState.near}
+          onCapturePressed={captureClue}
+          isCaptureClueLoading={captureClueRequest.loading}
+        />
       </View>
 
       {/* Header */}

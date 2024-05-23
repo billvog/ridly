@@ -26,7 +26,7 @@ export const useOnWebSocket = <TResult = TSocketResult>(
     }
 
     // Resolve message from state
-    console.log("Received", sentMessage);
+    console.log("Received", sentMessage, response);
     dispatch(SocketActions.resolveMessage({ id: sentMessage.id }));
 
     // TODO: handle error
