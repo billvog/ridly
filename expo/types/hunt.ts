@@ -19,18 +19,25 @@ export type TCapturedHuntClue = THuntClue & {
   location_point: LocationPoint;
 };
 
-export type THuntSocketResponse =
+export type THuntSocketCommand = "hunt.cl.current" | "hunt.cl.unlock" | "hunt.loc.check";
+
+export type THuntSocketResult =
   | {
-      type: "loc.check";
-      near: false;
-    }
-  | { type: "loc.check"; near: true; clue_location: LocationPoint }
-  | {
-      type: "cl.unlock";
-      unlocked: boolean;
-      won?: boolean;
+      command: "hunt.cl.current";
+      payload: THuntClue;
     }
   | {
-      type: "cl.current";
-      clue: THuntClue;
+      command: "hunt.cl.unlock";
+      payload: {
+        unlocked: boolean;
+        won?: boolean;
+      };
+    }
+  | {
+      command: "hunt.loc.check";
+      payload:
+        | {
+            near: false;
+          }
+        | { near: true; clue_location: LocationPoint };
     };

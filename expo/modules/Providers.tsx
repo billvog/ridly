@@ -1,10 +1,12 @@
 import { ModalProvider } from "@/modules/ModalContext";
 import { AuthProvider } from "@/modules/authentication/AuthContext";
+import { Store } from "@/redux/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Notifications from "expo-notifications";
 import { useSegments } from "expo-router";
 import React, { useEffect } from "react";
 import Toast from "react-native-toast-message";
+import { Provider as ReduxProvider } from "react-redux";
 
 const queryClient = new QueryClient();
 
@@ -33,9 +35,11 @@ export const Providers: React.FC<ProvidersProps> = ({ children }) => {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ModalProvider>{children}</ModalProvider>
-        </AuthProvider>
+        <ReduxProvider store={Store}>
+          <AuthProvider>
+            <ModalProvider>{children}</ModalProvider>
+          </AuthProvider>
+        </ReduxProvider>
       </QueryClientProvider>
       <Toast position="bottom" bottomOffset={isInTabs ? 90 : 60} />
     </>

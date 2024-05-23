@@ -43,6 +43,7 @@
     "react-native-toast-message": "^2.2.0",
     "react-redux": "^9.1.2",
     "reconnecting-websocket": "^4.4.0",
+    "tiny-emitter": "^2.1.0",
     "zod": "^3.23.4"
   },
   "devDependencies": {

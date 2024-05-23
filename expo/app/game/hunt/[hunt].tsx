@@ -1,9 +1,8 @@
-import { useAppState } from "@/hooks/useAppState";
 import { useLocationPermission } from "@/hooks/useLocationPermission";
 import { useLocationTracking } from "@/hooks/useLocationTracking";
 import { useOnWebSocket } from "@/hooks/useOnWebSocket";
 import { usePersistentState } from "@/hooks/usePersistentState";
-import { getWebSocket, useWebSocket } from "@/hooks/useWebSocket";
+import { useWebSocket } from "@/hooks/useWebSocket";
 import { useModal } from "@/modules/ModalContext";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
@@ -12,46 +11,37 @@ import CurrentClue from "@/modules/ui/hunt/CurrentClue";
 import HuntHeader from "@/modules/ui/hunt/Header";
 import HuntMap from "@/modules/ui/hunt/Map";
 import InaccurateCircle from "@/modules/ui/map/InaccurateCircle";
-import { LocationActions, LocationStore, useLocationSelector } from "@/redux/location";
+import { useStoreDispatch } from "@/redux/hooks";
 import { LocationPoint } from "@/types/general";
-import { TCapturedHuntClue, THunt, THuntClue } from "@/types/hunt";
+import { TCapturedHuntClue, THunt, THuntClue, THuntSocketResult } from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
-import * as Notifications from "expo-notifications";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import * as TaskManager from "expo-task-manager";
 import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import MapView from "react-native-maps";
+import MapView, { LatLng } from "react-native-maps";
 import Toast from "react-native-toast-message";
-import { Provider } from "react-redux";
+import { TinyEmitter } from "tiny-emitter";
 
 const LOCATION_TRACKING_TASK = "hunt/location-track";
-const CAPTURE_CLUE_NOTIFICATION_ID = "hunt/capture-clue-notification";
 const CAPTURED_CLUES_STORAGE_ID = "hunt/captured-clues/";
+
+const eventEmmiter = new TinyEmitter();
 
 // Provide coordinate deltas, required from MapView to set region
 function getMapDeltas() {
   return { latitudeDelta: 0.0092, longitudeDelta: 0.0092 };
 }
 
-function Page() {
+export default function Page() {
   /*
    *
    * Routing
    *
    */
 
-  const router = useRouter();
   const { hunt: huntId } = useLocalSearchParams();
-
-  /*
-   *
-   * AppState
-   *
-   */
-
-  const appState = useAppState();
 
   /*
    *
@@ -81,8 +71,7 @@ function Page() {
     locationPermission.determined && locationPermission.foreground
   );
 
-  // Holds user's live location. Gets updated from background tracking task.
-  const userLocation = useLocationSelector((state) => state.location);
+  const [userLocation, setUserLocation] = useState<LatLng | null>(null);
 
   /*
    *
@@ -130,29 +119,14 @@ function Page() {
   useEffect(() => {
     if (!clueState.near) return;
 
-    const notificationTitle = "You're getting close!";
-    const notificationBody = "The clue is very close to you! Tap to capture it!";
-
-    if (appState === "active") {
-      // If user is in the app display a toast to notify them
-      Toast.show({
-        type: "info",
-        bottomOffset: 140,
-        text1: notificationTitle,
-        text2: notificationBody,
-        onPress: () => captureClue(),
-      });
-    } else {
-      // Else, send notification
-      Notifications.scheduleNotificationAsync({
-        content: {
-          title: notificationTitle,
-          body: notificationBody,
-        },
-        identifier: CAPTURE_CLUE_NOTIFICATION_ID,
-        trigger: null,
-      });
-    }
+    // If user is in the app display a toast to notify them
+    Toast.show({
+      type: "info",
+      bottomOffset: 140,
+      text1: "You're getting close!",
+      text2: "The clue is very close to you! Tap to capture it!",
+      onPress: () => captureClue(),
+    });
   }, [clueState.near]);
 
   // Animate map to an approximation of clue's location if we've reached.
@@ -185,37 +159,47 @@ function Page() {
    */
 
   // Connect to WebSocket
-  const socket = useWebSocket(hunt ? `/hunt/${hunt.id}` : null);
+  const { socket, send: socketSend } = useWebSocket(hunt ? `/hunt/${hunt.id}` : null);
 
   // Ask for current clue on mount
   useEffect(() => {
-    askForCurrentClue();
-  }, [socket]);
+    if (!socket) return;
+
+    function onOpen() {
+      askForCurrentClue();
+    }
+
+    socket.addEventListener("open", onOpen);
+
+    return () => {
+      socket.removeEventListener("open", onOpen);
+    };
+  }, [socket, clue]);
 
   // Handle socket messages
-  useOnWebSocket(socket, (e) => {
-    if (e.type === "cl.current") {
-      setClue(e.clue);
-    } else if (e.type === "loc.check") {
+  useOnWebSocket<THuntSocketResult>(socket, (res) => {
+    if (res.command === "hunt.cl.current") {
+      setClue(res.payload);
+    } else if (res.command === "hunt.loc.check") {
       // Update state
       setClueState({
-        near: e.near,
-        location: e.near ? e.clue_location : undefined,
+        near: res.payload.near,
+        location: res.payload.near ? res.payload.clue_location : undefined,
       });
 
       // Get clue's location out of the response
       // Use secure store, to save the clue's location coordinates
-      if (e.near) {
-        console.log("Received loc.check -> clue's location:", e.clue_location);
+      if (res.payload.near) {
+        console.log("Received loc.check -> clue's location:", res.payload.clue_location);
       }
-    } else if (e.type === "cl.unlock") {
+    } else if (res.command === "hunt.cl.unlock") {
       // TOOD: Figure out how to handle that.
-      if (!e.unlocked) {
+      if (!res.payload.unlocked) {
         return;
       }
 
       // Display modal, informing the user for the state of the game
-      if (e.won) {
+      if (res.payload.won) {
         modal.open({
           title: "You Won!",
           body: "Congratulations! You completed that Ridl!",
@@ -249,37 +233,33 @@ function Page() {
 
   // Send message to socket to send us back the current clue
   function askForCurrentClue() {
-    if (!socket) return;
-    socket.send(JSON.stringify({ type: "cl.current" }));
+    socketSend("hunt.cl.current", {});
   }
 
   // TODO: Implement. For now just unlock the clue.
   function captureClue() {
-    if (!socket) return;
-    socket.send(JSON.stringify({ type: "cl.unlock", loc: clueState.location }));
+    socketSend("hunt.cl.unlock", { loc: clueState.location });
   }
 
-  /*
-   *
-   * Notifications
-   *
-   */
-
-  // Register notification handler on mount
   useEffect(() => {
-    const subscription = Notifications.addNotificationResponseReceivedListener(
-      (event) => {
-        if (event.notification.request.identifier === CAPTURE_CLUE_NOTIFICATION_ID) {
-          captureClue();
-        }
-      }
-    );
+    function locationUpdate(location: LatLng) {
+      console.log("Location update", location);
 
-    // And remove it on unmount, to prevent leaks
+      // Update our store
+      setUserLocation(location);
+
+      // Send update to socket
+      socketSend("hunt.loc.check", {
+        loc: { lat: location.latitude, long: location.longitude },
+      });
+    }
+
+    eventEmmiter.on("location:update", locationUpdate);
+
     return () => {
-      subscription.remove();
+      eventEmmiter.off("location:update", locationUpdate);
     };
-  }, []);
+  }, [socket]);
 
   /*
    *
@@ -336,15 +316,6 @@ function Page() {
   );
 }
 
-// Wrap our _Page component with redux LocationStore.
-export default function () {
-  return (
-    <Provider store={LocationStore}>
-      <Page />
-    </Provider>
-  );
-}
-
 // Gets called when location updates
 TaskManager.defineTask(LOCATION_TRACKING_TASK, async ({ data, error }: any) => {
   if (error) {
@@ -361,15 +332,6 @@ TaskManager.defineTask(LOCATION_TRACKING_TASK, async ({ data, error }: any) => {
   let lat = locations[0].coords.latitude;
   let long = locations[0].coords.longitude;
 
-  // Update our Redux store
-  LocationStore.dispatch(LocationActions.setLocation({ latitude: lat, longitude: long }));
-
-  // Get WebSocket instance, if null, return.
-  let socket = getWebSocket();
-  if (!socket) {
-    return;
-  }
-
-  // Send our location to backend through socket
-  socket.send(JSON.stringify({ type: "loc.check", loc: { lat, long } }));
+  // Emit message, that's handled from within the component.
+  eventEmmiter.emit("location:update", { latitude: lat, longitude: long });
 });
