@@ -28,7 +28,7 @@ class HuntModule(BaseModule):
     # Validate input data
     serializer = LocationCheckSerializer(data=body)
     if not serializer.is_valid():
-      await self.consumer.send_error("invalid_format")
+      await self.consumer.send_error("validation_error")
       return
 
     # Get location from input

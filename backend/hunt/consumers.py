@@ -1,4 +1,5 @@
 import orjson
+import asyncio
 
 from websockets import ConnectionClosed
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
@@ -68,6 +69,9 @@ class HuntConsumer(AsyncJsonWebsocketConsumer):
   # Receive message from client
   async def receive_json(self, content, **kwargs):
     self.content = content
+
+    # Simulate slow connection, by sleeping for 2s
+    await asyncio.sleep(2)
 
     namespace = content[0].split(".")[0]
     component = self.components.get(namespace)
