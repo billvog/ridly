@@ -1,9 +1,12 @@
+import FullscreenError from "@/modules/ui/FullscreenError";
+import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
 import { TUser } from "@/types/user";
 import { api } from "@/utils/api";
 import { clearAuthTokens } from "@/utils/authTokens";
 import { useQuery } from "@tanstack/react-query";
 import React, { useContext, useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Text } from "react-native";
+import Button from "../ui/Button";
 
 type AuthContextType = {
   user: TUser | null;
@@ -43,20 +46,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setInitializing(false);
   }, [meQuery.data]);
 
+  function retryFailure() {
+    meQuery.refetch();
+  }
+
   if (meQuery.isError) {
     return (
-      <View>
-        <Text>server error (500)</Text>
-      </View>
+      <FullscreenError>
+        <Text className="font-extrabold text-red-500 text-2xl text-center">{`Something went wrong.\nPlease try again later.`}</Text>
+        <Button
+          buttonStyle="mt-8 mx-auto"
+          textStyle="font-extrabold"
+          onPress={retryFailure}
+        >
+          Retry
+        </Button>
+      </FullscreenError>
     );
   }
 
   if (meQuery.isLoading) {
-    return (
-      <View>
-        <Text>loading...</Text>
-      </View>
-    );
+    return <FullscreenSpinner />;
   }
 
   return (
