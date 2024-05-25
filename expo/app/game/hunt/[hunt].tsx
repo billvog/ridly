@@ -138,7 +138,6 @@ export default function Page() {
     // If user is in the app display a toast to notify them
     Toast.show({
       type: "info",
-      bottomOffset: 140,
       text1: "You're getting close!",
       text2: "The clue is very close to you! Tap to capture it!",
       onPress: () => captureClue(),
@@ -218,12 +217,6 @@ export default function Page() {
         near: res.payload.near,
         location: res.payload.near ? res.payload.clue_location : undefined,
       });
-
-      // Get clue's location out of the response
-      // Use secure store, to save the clue's location coordinates
-      if (res.payload.near) {
-        console.log("Received loc.check -> clue's location:", res.payload.clue_location);
-      }
     } else if (res.command === "hunt.cl.unlock") {
       // TOOD: Figure out how to handle that.
       if (!res.payload.unlocked) {
@@ -305,22 +298,28 @@ export default function Page() {
    *
    */
 
-  // Display loading spinner if we're fetching
-  if (huntQuery.isLoading || huntQuery.isFetching || !locationPermission.determined) {
-    return <FullscreenSpinner />;
-  }
-
-  // Show error message if we hit an error
-  if (!huntId || !hunt) {
-    return <FullscreenError>Couldn't find hunt.</FullscreenError>;
-  }
-
   if (locationPermission.determined && !locationPermission.foreground) {
     return (
       <FullscreenError>
         In order to join the hunt, you need to have location services enabled.
       </FullscreenError>
     );
+  }
+
+  // Display loading spinner if we're either fetching
+  // hunt, or user's location hasn't been determined yet.
+  if (
+    typeof hunt === "undefined" ||
+    huntQuery.isLoading ||
+    !userLocation ||
+    !locationPermission.determined
+  ) {
+    return <FullscreenSpinner />;
+  }
+
+  // Show error message if we hit an error
+  if (!huntId || hunt === null) {
+    return <FullscreenError>Couldn't find hunt.</FullscreenError>;
   }
 
   return (
@@ -348,6 +347,7 @@ export default function Page() {
         <CurrentClue
           clue={clue}
           isClueLoading={currentClueRequest.loading}
+          onRetryFetchCluePressed={askForCurrentClue}
           isNear={clueState.near}
           onCapturePressed={captureClue}
           isCaptureClueLoading={captureClueRequest.loading}

@@ -1,9 +1,11 @@
 import { useStoreSelector } from "@/redux/hooks";
 import { SocketActions } from "@/redux/socket/reducer";
-import { TSocketResponse, TSocketResult } from "@/types/general";
+import { TSocketResponse, TSocketResult } from "@/types/socket";
 import { useEffect, useRef } from "react";
+import Toast from "react-native-toast-message";
 import { useDispatch } from "react-redux";
 import ReconnectingWebSocket from "reconnecting-websocket";
+import { socketErrorToMessage } from "../utils/socketErrorToMessage";
 
 type WsFn<TResponse> = (e: TResponse) => void;
 
@@ -29,9 +31,18 @@ export const useOnWebSocket = <TResult = TSocketResult>(
     console.log("Received", sentMessage, response);
     dispatch(SocketActions.resolveMessage({ id: sentMessage.id }));
 
-    // TODO: handle error
+    // On error, show a toast
     if (status === "error") {
-      console.error("Request failed", sentMessage, response);
+      const errorMessage = socketErrorToMessage(response[2].code);
+
+      Toast.show({
+        type: "error",
+        text1: "Error!",
+        text1Style: { fontWeight: "bold", fontSize: 16 },
+        text2: errorMessage,
+        text2Style: { fontSize: 12 },
+      });
+
       return;
     }
 
