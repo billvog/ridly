@@ -155,7 +155,7 @@ export default function EventDetails() {
     if (!event || !event.hunt_id) return;
 
     router.push({
-      pathname: "/game/hunt/[hunt]",
+      pathname: "/game/[hunt]",
       params: {
         hunt: event.hunt_id,
       },

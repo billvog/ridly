@@ -14,7 +14,7 @@ export default function Layout() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="[hunt]" />
+      <Stack.Screen name="index" />
     </Stack>
   );
 }
