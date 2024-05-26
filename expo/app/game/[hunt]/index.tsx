@@ -6,7 +6,9 @@ import { useSocketSend } from "@/hooks/useSocketSend";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useModal } from "@/modules/ModalContext";
 import FullscreenError from "@/modules/ui/FullscreenError";
+import FullscreenMessage from "@/modules/ui/FullscreenMessage";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
+import CaptureClueARScene from "@/modules/ui/hunt/CaptureClueARScene";
 import ClueMapMarker from "@/modules/ui/hunt/ClueMapMarker";
 import CurrentClue from "@/modules/ui/hunt/CurrentClue";
 import HuntHeader from "@/modules/ui/hunt/Header";
@@ -24,23 +26,21 @@ import {
 } from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
+import * as Location from "expo-location";
 import { useLocalSearchParams } from "expo-router";
 import * as TaskManager from "expo-task-manager";
 import { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import MapView, { LatLng } from "react-native-maps";
 import Toast from "react-native-toast-message";
 import { TinyEmitter } from "tiny-emitter";
+import Button from "@/modules/ui/Button";
+import { Entypo } from "@expo/vector-icons";
 
 const LOCATION_TRACKING_TASK = "hunt/location-track";
 const CAPTURED_CLUES_STORAGE_ID = "hunt/captured-clues/";
 
 const eventEmmiter = new TinyEmitter();
-
-// Provide coordinate deltas, required from MapView to set region
-function getMapDeltas() {
-  return { latitudeDelta: 0.0092, longitudeDelta: 0.0092 };
-}
 
 export default function Page() {
   /*
@@ -79,7 +79,7 @@ export default function Page() {
     locationPermission.determined && locationPermission.foreground
   );
 
-  const [userLocation, setUserLocation] = useState<LatLng | null>(null);
+  const [userLocation, setUserLocation] = useState<LocationPoint | null>(null);
 
   /*
    *
@@ -131,6 +131,8 @@ export default function Page() {
     hunt ? CAPTURED_CLUES_STORAGE_ID + hunt.id : ""
   );
 
+  const [isCapturing, setIsCapturing] = useState(false);
+
   // Notify user that they've reached the clue.
   useEffect(() => {
     if (!clueState.near) return;
@@ -147,13 +149,14 @@ export default function Page() {
   // Animate map to an approximation of clue's location if we've reached.
   useEffect(() => {
     if (!clueState.location || !mapRef.current) return;
-    mapRef.current.animateToRegion(
+    mapRef.current.animateCamera(
       {
-        latitude: clueState.location.lat,
-        longitude: clueState.location.long,
-        ...getMapDeltas(),
+        center: {
+          latitude: clueState.location.lat,
+          longitude: clueState.location.long,
+        },
       },
-      2
+      { duration: 2000 }
     );
   }, [clueState.location]);
 
@@ -261,21 +264,29 @@ export default function Page() {
     currentClueRequest.send({});
   }
 
-  // TODO: Implement. For now just unlock the clue.
   function captureClue() {
-    captureClueRequest.send({ loc: clueState.location });
+    setIsCapturing(true);
+    // captureClueRequest.send({ loc: clueState.location });
   }
 
   useEffect(() => {
-    function locationUpdate(location: LatLng) {
-      console.log("Location update", location);
-
+    function locationUpdate(location: LocationPoint) {
       // Update our store
       setUserLocation(location);
 
       // Send update to socket
       socketSend("hunt.loc.check", {
-        loc: { lat: location.latitude, long: location.longitude },
+        loc: location,
+      });
+    }
+
+    // Fetch initial location, if we have permission
+    if (locationPermission.foreground && !userLocation) {
+      Location.getCurrentPositionAsync().then((location) => {
+        locationUpdate({
+          lat: location.coords.latitude,
+          long: location.coords.longitude,
+        });
       });
     }
 
@@ -284,7 +295,7 @@ export default function Page() {
     return () => {
       eventEmmiter.off("location:update", locationUpdate);
     };
-  }, [socket]);
+  }, [socket, locationPermission.foreground]);
 
   useEffect(() => {
     return () => {
@@ -322,40 +333,55 @@ export default function Page() {
     return <FullscreenError>Couldn't find hunt.</FullscreenError>;
   }
 
+  if (isCapturing && (typeof clueState.location === "undefined" || !userLocation)) {
+    return <FullscreenMessage>Something went, like, really wrong!</FullscreenMessage>;
+  }
+
   return (
     <View className="flex-1">
-      <View className="w-full h-full flex-col">
-        {/* Map */}
-        <HuntMap mapRef={mapRef} userLocation={userLocation}>
-          {/* Draw a marker for each clue we've captured */}
-          {capturedClues.map((clue) => (
-            <ClueMapMarker key={clue.id} clue={clue} />
-          ))}
-
-          {/* If we've reached clue, and clue's location is set, draw a circle around its approximate location. */}
-          {clueState.near && clueState.location && (
-            <InaccurateCircle
-              center={{
-                latitude: clueState.location.lat,
-                longitude: clueState.location.long,
-              }}
-            />
-          )}
-        </HuntMap>
-
-        {/* Clue Information */}
-        <CurrentClue
-          clue={clue}
-          isClueLoading={currentClueRequest.loading}
-          onRetryFetchCluePressed={askForCurrentClue}
-          isNear={clueState.near}
-          onCapturePressed={captureClue}
-          isCaptureClueLoading={captureClueRequest.loading}
+      {isCapturing ? (
+        <CaptureClueARScene
+          clueLocation={clueState.location!}
+          onClueCaptured={() => console.log("Captured!!")}
         />
-      </View>
+      ) : (
+        <View className="w-full h-full flex-col">
+          {/* Map */}
+          <HuntMap mapRef={mapRef} userLocation={userLocation}>
+            {/* Draw a marker for each clue we've captured */}
+            {capturedClues.map((clue) => (
+              <ClueMapMarker key={clue.id} clue={clue} />
+            ))}
+
+            {/* If we've reached clue, and clue's location is set, draw a circle around its approximate location. */}
+            {clueState.near && clueState.location && (
+              <InaccurateCircle
+                center={{
+                  latitude: clueState.location.lat,
+                  longitude: clueState.location.long,
+                }}
+              />
+            )}
+          </HuntMap>
+
+          {/* Clue Information */}
+          <CurrentClue
+            clue={clue}
+            isClueLoading={currentClueRequest.loading}
+            onRetryFetchCluePressed={askForCurrentClue}
+            isNear={clueState.near}
+            onCapturePressed={captureClue}
+            isCaptureClueLoading={captureClueRequest.loading}
+          />
+        </View>
+      )}
 
       {/* Header */}
-      <HuntHeader title={hunt.event.name} />
+      <HuntHeader
+        title={hunt.event.name}
+        isCapturing={isCapturing}
+        onCaptureBackPressed={() => setIsCapturing(false)}
+      />
     </View>
   );
 }
@@ -377,5 +403,5 @@ TaskManager.defineTask(LOCATION_TRACKING_TASK, async ({ data, error }: any) => {
   let long = locations[0].coords.longitude;
 
   // Emit message, that's handled from within the component.
-  eventEmmiter.emit("location:update", { latitude: lat, longitude: long });
+  eventEmmiter.emit("location:update", { lat, long });
 });

@@ -6,7 +6,7 @@ import { randomUUID } from "expo-crypto";
 import { useCallback, useEffect, useMemo } from "react";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
-const BASE_SOCKET_URL = "ws://localhost:8000/ws";
+const BASE_SOCKET_URL = `ws://${process.env.EXPO_PUBLIC_API_HOST}/ws`;
 
 type SocketType = ReconnectingWebSocket | null;
 
@@ -44,7 +44,7 @@ export function useWebSocket(path: string | null) {
   const send = useCallback<SocketSendFunction<THuntSocketCommand>>(
     (command, payload) => {
       if (!socket) {
-        console.log("socket is not connected. aborting send.", socket);
+        // console.log("socket is not connected. aborting send.", socket);
         return null;
       }
 
@@ -53,14 +53,14 @@ export function useWebSocket(path: string | null) {
         typeof socketState.sent.find((v) => v.command == command && !v.resolved) !==
         "undefined";
       if (isDuplicate) {
-        console.log("This is duplicate, not sending", command, socketState.sent);
+        // console.log("This is duplicate, not sending", command, socketState.sent);
         return null;
       }
 
       const id = randomUUID();
       const request = [command, id, payload];
 
-      console.log("Sending", request);
+      // console.log("Sending", request);
 
       // Store it in state
       dispatch(

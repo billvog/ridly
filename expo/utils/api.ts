@@ -1,6 +1,6 @@
 import { getAccessToken, setAccessToken } from "./authTokens";
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = `http://${process.env.EXPO_PUBLIC_API_HOST}`;
 
 type Method = "GET" | "POST" | "DELETE" | "UPDATE" | "PUT" | "PATCH";
 
