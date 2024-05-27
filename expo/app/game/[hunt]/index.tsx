@@ -26,16 +26,13 @@ import {
 } from "@/types/hunt";
 import { APIResponse, api } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
-import * as Location from "expo-location";
 import { useLocalSearchParams } from "expo-router";
 import * as TaskManager from "expo-task-manager";
 import { useEffect, useRef, useState } from "react";
-import { Text, View } from "react-native";
-import MapView, { LatLng } from "react-native-maps";
+import { View } from "react-native";
+import MapView from "react-native-maps";
 import Toast from "react-native-toast-message";
 import { TinyEmitter } from "tiny-emitter";
-import Button from "@/modules/ui/Button";
-import { Entypo } from "@expo/vector-icons";
 
 const LOCATION_TRACKING_TASK = "hunt/location-track";
 const CAPTURED_CLUES_STORAGE_ID = "hunt/captured-clues/";
@@ -146,20 +143,6 @@ export default function Page() {
     });
   }, [clueState.near]);
 
-  // Animate map to an approximation of clue's location if we've reached.
-  useEffect(() => {
-    if (!clueState.location || !mapRef.current) return;
-    mapRef.current.animateCamera(
-      {
-        center: {
-          latitude: clueState.location.lat,
-          longitude: clueState.location.long,
-        },
-      },
-      { duration: 2000 }
-    );
-  }, [clueState.location]);
-
   // Called when we capture a clue
   function onClueCaptured() {
     // Add clue to captured clues
@@ -265,35 +248,32 @@ export default function Page() {
   }
 
   function captureClue() {
-    setIsCapturing(true);
-    // captureClueRequest.send({ loc: clueState.location });
+    captureClueRequest.send({ loc: clueState.location });
   }
 
+  // Handle location updates
   useEffect(() => {
-    function locationUpdate(location: LocationPoint) {
-      // Update our store
+    function updateLocationState(location: LocationPoint) {
       setUserLocation(location);
+    }
 
-      // Send update to socket
+    // Every 2 seconds send location to socket
+    const sendSocketLocationTimerId = setInterval(() => {
+      if (!userLocation) return;
+
       socketSend("hunt.loc.check", {
-        loc: location,
+        loc: userLocation,
       });
-    }
+    }, 2000);
 
-    // Fetch initial location, if we have permission
-    if (locationPermission.foreground && !userLocation) {
-      Location.getCurrentPositionAsync().then((location) => {
-        locationUpdate({
-          lat: location.coords.latitude,
-          long: location.coords.longitude,
-        });
-      });
-    }
-
-    eventEmmiter.on("location:update", locationUpdate);
+    // Register event listener for location updates
+    // Gets triggered from the location tracking task
+    eventEmmiter.on("location:update", updateLocationState);
 
     return () => {
-      eventEmmiter.off("location:update", locationUpdate);
+      // Clear timer and event listener on unmount
+      clearInterval(sendSocketLocationTimerId);
+      eventEmmiter.off("location:update", updateLocationState);
     };
   }, [socket, locationPermission.foreground]);
 
@@ -342,7 +322,11 @@ export default function Page() {
       {isCapturing ? (
         <CaptureClueARScene
           clueLocation={clueState.location!}
-          onClueCaptured={() => console.log("Captured!!")}
+          onClueCaptured={() => {
+            console.log("Captured!!");
+            setIsCapturing(false);
+            // captureClue();
+          }}
         />
       ) : (
         <View className="w-full h-full flex-col">
@@ -370,7 +354,7 @@ export default function Page() {
             isClueLoading={currentClueRequest.loading}
             onRetryFetchCluePressed={askForCurrentClue}
             isNear={clueState.near}
-            onCapturePressed={captureClue}
+            onCapturePressed={() => setIsCapturing(true)}
             isCaptureClueLoading={captureClueRequest.loading}
           />
         </View>
