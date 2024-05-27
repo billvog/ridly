@@ -1,10 +1,14 @@
 import { LocationPoint } from "@/types/general";
 import { gpsToAR } from "@/utils/gpsToAR";
-import { ViroARScene, ViroARSceneNavigator, ViroText } from "@viro-community/react-viro";
 import {
-  Viro3DPoint,
-  ViroRotation,
-} from "@viro-community/react-viro/dist/components/Types/ViroUtils";
+  ViroARScene,
+  ViroARSceneNavigator,
+  ViroNode,
+  ViroSphere,
+  ViroText,
+  ViroTrackingStateConstants,
+} from "@viro-community/react-viro";
+import { Viro3DPoint } from "@viro-community/react-viro/dist/components/Types/ViroUtils";
 import * as Location from "expo-location";
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet } from "react-native";
@@ -17,8 +21,8 @@ type CaptureClueProps = {
 function CaptureClueARScene({ clueLocation, onClueCaptured }: CaptureClueProps) {
   const isReady = useRef(false);
 
+  const [trackingState, setTrackingState] = useState<ViroTrackingStateConstants>();
   const [cluePosition, setCluePosition] = useState<Viro3DPoint>([0, 0, 0]);
-  const [rotation, setRotation] = useState<ViroRotation>([0, 0, 0]);
 
   // Calculate distance between user and clue in meters
   // so we can render the clue on the AR scene.
@@ -26,7 +30,7 @@ function CaptureClueARScene({ clueLocation, onClueCaptured }: CaptureClueProps) 
     (async () => {
       // Fetch user's current location
       const userLocation = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Highest,
+        accuracy: Location.Accuracy.BestForNavigation,
       });
 
       const clueLocationPoint = {
@@ -41,22 +45,29 @@ function CaptureClueARScene({ clueLocation, onClueCaptured }: CaptureClueProps) 
     })();
   }, []);
 
+  useEffect(() => {
+    console.log(
+      "Tracking state:",
+      trackingState === ViroTrackingStateConstants.TRACKING_NORMAL
+        ? "Tracking normal"
+        : "Not tracking"
+    );
+  }, [trackingState]);
+
   return (
-    <ViroARScene
-      onTrackingUpdated={(state) => {
-        // console.log("Tracking state updated: ", state);
-      }}
-      onCameraTransformUpdate={(transform) => setRotation(transform.rotation)}
-    >
+    <ViroARScene onTrackingUpdated={setTrackingState}>
       {isReady.current && (
-        <ViroText
-          text="Hello World"
-          position={cluePosition}
-          rotation={[0, -rotation[1], 0]}
-          scale={[0.5, 0.5, 0.5]}
-          style={styles.helloWorldTextStyle}
-          onClick={onClueCaptured}
-        />
+        <ViroNode position={cluePosition}>
+          <ViroText
+            text="Tap to CAPTURE!"
+            transformBehaviors={["billboard"]}
+            position={[0, 0.4, 0]}
+            scale={[0.3, 0.3, 0.3]}
+            style={styles.helloWorldTextStyle}
+            onClick={() => onClueCaptured()}
+          />
+          <ViroSphere scale={[0.2, 0.2, 0.2]} />
+        </ViroNode>
       )}
     </ViroARScene>
   );
@@ -77,7 +88,8 @@ export default (props: CaptureClueProps) => {
 const styles = StyleSheet.create({
   helloWorldTextStyle: {
     fontFamily: "Arial",
-    fontSize: 20,
+    fontWeight: "900",
+    fontSize: 30,
     color: "#ffffff",
     textAlignVertical: "center",
     textAlign: "center",
