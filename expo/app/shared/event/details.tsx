@@ -1,35 +1,21 @@
 import { useIsRefreshing } from "@/hooks/useIsRefreshing";
-import Button from "@/modules/ui/Button";
 import FullscreenError from "@/modules/ui/FullscreenError";
+import JoinEventButton from "@/modules/ui/event/JoinEventButton";
 import { TEvent } from "@/types/event";
 import { APIResponse, api } from "@/utils/api";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Toast from "react-native-toast-message";
-
-type JoinEventResponse = {
-  has_joined: boolean;
-  participant_count: number;
-};
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function EventDetails() {
   const { event: eventId } = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   const eventQuery = useQuery<APIResponse<TEvent>>({
     queryKey: ["event", eventId],
@@ -41,11 +27,6 @@ export default function EventDetails() {
   const [refreshEvent, isEventRefreshing] = useIsRefreshing(eventQuery.refetch);
 
   const [event, setEvent] = useState<TEvent | null>();
-
-  const joinEventMutation = useMutation<APIResponse<JoinEventResponse>>({
-    mutationKey: ["event", eventId, "join"],
-    mutationFn: () => api("/event/" + eventId + "/join/", "POST"),
-  });
 
   // Get event from eventQuery
   useEffect(() => {
@@ -67,86 +48,6 @@ export default function EventDetails() {
       headerBackTitleVisible: false,
     } satisfies NativeStackNavigationOptions);
   }, [navigation, event]);
-
-  // Handle join/unjoin event
-  async function JoinEvent() {
-    if (!event) return;
-
-    const wantsToLeave = event?.has_joined;
-    const errorMessage = wantsToLeave ? "Couldn't unjoin event." : "Couldn't join event";
-
-    if (wantsToLeave) {
-      const shouldContinue = await new Promise<boolean>((resolve) => {
-        Alert.alert("Confirm", "Do you ridly.. want to leave?", [
-          {
-            text: "Yeah",
-            style: "destructive",
-            onPress: () => resolve(true),
-          },
-          { text: "God no!", onPress: () => resolve(false) },
-        ]);
-      });
-
-      if (!shouldContinue) {
-        return;
-      }
-    }
-
-    joinEventMutation.mutate(undefined, {
-      onSuccess(data) {
-        if (data.ok) {
-          // Extract new has_joined from response.
-          const { has_joined, participant_count } = data.data;
-
-          // Update cache.
-          queryClient.setQueryData<APIResponse<TEvent>>(
-            ["event", eventId],
-            (event) =>
-              event && {
-                ...event,
-                data: { ...event.data, participant_count, has_joined },
-              }
-          );
-
-          // Display toast to inform user it went ok.
-          if (has_joined) {
-            Toast.show({
-              type: "success",
-              text1: "Joined event!",
-              text1Style: {
-                fontSize: 16,
-              },
-              text2: event
-                ? `${event.name} in ${dayjs(event.happening_at).fromNow(true)}`
-                : undefined,
-              text2Style: {
-                fontSize: 12,
-              },
-            });
-          } else {
-            Toast.show({
-              type: "success",
-              text1: "Unjoined event :^(",
-            });
-          }
-        } else {
-          // Show error toast.
-          Toast.show({
-            type: "error",
-            text1: errorMessage,
-          });
-        }
-      },
-      onError(error) {
-        // Print error and show error toast.
-        console.error(error);
-        Toast.show({
-          type: "error",
-          text1: errorMessage,
-        });
-      },
-    });
-  }
 
   // Handle join event game
   function JoinHunt() {
@@ -241,13 +142,7 @@ export default function EventDetails() {
           )}
         </View>
         <View>
-          <Button
-            onPress={JoinEvent}
-            loading={joinEventMutation.isPending}
-            buttonStyle={event.has_joined ? "bg-red-600" : "bg-black"}
-          >
-            {event.has_joined ? "Unjoin" : "Join"}
-          </Button>
+          <JoinEventButton event={event} />
         </View>
         <Text>{event.description}</Text>
       </View>
