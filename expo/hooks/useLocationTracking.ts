@@ -22,11 +22,7 @@ export function useLocationTracking(taskId: string, track: boolean) {
 
     console.log("Starting location tracking...");
     Location.startLocationUpdatesAsync(taskId, {
-      accuracy: Location.Accuracy.Highest,
-      timeInterval: 5000,
-      deferredUpdatesInterval: 5000,
-      distanceInterval: 5,
-      deferredUpdatesDistance: 5,
+      accuracy: Location.Accuracy.BestForNavigation,
     });
   }, [track]);
 

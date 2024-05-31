@@ -36,13 +36,21 @@
     },
     "plugins": [
       "expo-router",
-      "expo-notifications",
       [
         "expo-location",
         {
           "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ],
+      [
+        "@viro-community/react-viro",
+        {
+          "ios": {
+            "cameraUsagePermission": "$(PRODUCT_NAME) uses your camera for AR experiences."
+          }
+        }
+      ],
+
       [
         "expo-dev-launcher",
         {

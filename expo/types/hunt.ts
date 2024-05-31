@@ -13,6 +13,7 @@ export type THuntClue = {
   id: string;
   riddle: string;
   order: number;
+  location_threshold: number;
 };
 
 export type TCapturedHuntClue = THuntClue & {
