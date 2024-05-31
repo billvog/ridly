@@ -14,6 +14,7 @@ function accurateToInaccurateCoordinates(coordinates: LatLng): LatLng {
 
 type InaccurateCircleProps = {
   center: LatLng;
+  radius: number;
 };
 
 /*
@@ -21,7 +22,7 @@ type InaccurateCircleProps = {
   centered inaccurately. We need that for displaying the area in which the clue
   is located when we reach its location by a threshold set by the clue.
 */
-export default function InaccurateCircle({ center }: InaccurateCircleProps) {
+export default function InaccurateCircle({ center, radius }: InaccurateCircleProps) {
   const [inaccurateCenter, setInaccurateCenter] = useState<LatLng>({
     latitude: 0,
     longitude: 0,
@@ -34,7 +35,7 @@ export default function InaccurateCircle({ center }: InaccurateCircleProps) {
   return (
     <Circle
       center={inaccurateCenter}
-      radius={100}
+      radius={radius}
       strokeWidth={2}
       strokeColor="rgba(255, 0, 0, 0.8)"
       fillColor="rgba(255, 0, 0, 0.35)"

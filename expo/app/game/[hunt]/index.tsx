@@ -338,8 +338,9 @@ export default function Page() {
             ))}
 
             {/* If we've reached clue, and clue's location is set, draw a circle around its approximate location. */}
-            {clueState.near && clueState.location && (
+            {clue && clueState.near && clueState.location && (
               <InaccurateCircle
+                radius={clue.location_threshold}
                 center={{
                   latitude: clueState.location.lat,
                   longitude: clueState.location.long,

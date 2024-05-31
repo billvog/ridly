@@ -47,4 +47,4 @@ class HuntSerializer(serializers.ModelSerializer):
 class HuntClueSerializer(serializers.ModelSerializer):
   class Meta:
     model = HuntClue
-    fields = ["id", "riddle", "order"]
+    fields = ["id", "riddle", "order", "location_threshold"]
