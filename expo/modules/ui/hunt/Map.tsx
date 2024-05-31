@@ -32,7 +32,7 @@ export default function Map({ mapRef, userLocation, children }: MapProps) {
           }}
           zIndex={20}
         >
-          <View className="w-4 h-4 rounded-full bg-orange-400" />
+          <View className="w-4 h-4 rounded-full bg-orange-400 border-2 border-white" />
         </Marker>
       )}
 
