@@ -7,21 +7,14 @@ const EventCardWidth = Dimensions.get("window").width * 0.8;
 const EventCardSpacingInset = Dimensions.get("window").width * 0.1 - 30;
 
 type EventScrollFeedProps = {
-  title?: string | React.ReactNode;
+  title: string;
   events: TEvent[];
 };
 
-export default function EventScrollFeed({
-  title = null,
-  events,
-}: EventScrollFeedProps) {
+export default function EventScrollFeed({ title, events }: EventScrollFeedProps) {
   return (
     <View>
-      {title && typeof title === "string" ? (
-        <Text className="p-6 pb-4 font-extrabold text-3xl">{title}</Text>
-      ) : (
-        title
-      )}
+      <Text className="p-6 pb-4 font-extrabold text-3xl">{title}</Text>
       <ScrollView
         style={{ height: 380 }}
         horizontal
@@ -36,8 +29,7 @@ export default function EventScrollFeed({
           right: EventCardSpacingInset,
         }}
         contentContainerStyle={{
-          paddingHorizontal:
-            Platform.OS === "android" ? EventCardSpacingInset : 0,
+          paddingHorizontal: Platform.OS === "android" ? EventCardSpacingInset : 0,
         }}
       >
         {events.map((e) => (

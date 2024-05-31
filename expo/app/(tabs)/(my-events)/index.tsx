@@ -23,15 +23,23 @@ export default function Page() {
   const [refreshEvents, areEventsRefreshing] = useIsRefreshing(eventsQuery.refetch);
 
   const [events, setEvents] = useState<TEvent[] | null>([]);
+  const [loadingQuery, setLoadingQuery] = useState(true);
+
   const [agendaSchedule, setAgendaSchedule] = useState<AgendaSchedule>({});
 
   // Extract events from the query data.
   useEffect(() => {
+    if (eventsQuery.isLoading) {
+      return;
+    }
+
     if (eventsQuery.data && eventsQuery.data.ok) {
       setEvents(eventsQuery.data.data);
     } else {
       setEvents(null);
     }
+
+    setLoadingQuery(false);
   }, [eventsQuery.data]);
 
   // Create AgendaSchedule from fetched events.
@@ -108,7 +116,7 @@ export default function Page() {
   }
 
   // Initial fetching.
-  if (eventsQuery.isFetching && !eventsQuery.isRefetching) {
+  if (loadingQuery) {
     return <FullscreenSpinner />;
   }
 

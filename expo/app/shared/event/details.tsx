@@ -49,10 +49,14 @@ export default function EventDetails() {
 
   // Get event from eventQuery
   useEffect(() => {
-    if (!eventQuery.data) {
-      setEvent(null);
-    } else if (eventQuery.data.ok) {
+    if (eventQuery.isLoading) {
+      return;
+    }
+
+    if (eventQuery.data && eventQuery.data.ok) {
       setEvent(eventQuery.data.data);
+    } else {
+      setEvent(null);
     }
   }, [eventQuery.data]);
 
@@ -168,7 +172,7 @@ export default function EventDetails() {
     >
       <Image
         // Stock image for testing.
-        source="https://fastly.picsum.photos/id/281/200/200.jpg?hmac=5FvZ-Y5zbbpS3-mJ_mp6-eH61MkwhUJi9qnhscegqkY"
+        source="https://images.unsplash.com/photo-1503417680882-163c1609fd2f?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         contentFit="cover"
         contentPosition="center"
         style={{
