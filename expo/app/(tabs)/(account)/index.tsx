@@ -2,7 +2,7 @@ import { useUser } from "@/hooks/useUser";
 import Button from "@/modules/ui/Button";
 import { APIResponse, api } from "@/utils/api";
 import { clearAuthTokens } from "@/utils/authTokens";
-import { AntDesign } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -40,7 +40,7 @@ export default function Page() {
               {
                 name: "Account Information",
                 href: "/(account)/accountInfo",
-                icon: <AntDesign name="user" size={20} color="black" />,
+                icon: <Feather name="user" size={20} color="black" />,
               },
             ],
           },
@@ -74,9 +74,7 @@ function PreferencesList({ options }: { options: OptionGroup[] }) {
                 onPress={() => router.push(option.href)}
               >
                 {option.icon}
-                <Text className="ml-4 font-medium text-base">
-                  {option.name}
-                </Text>
+                <Text className="ml-4 font-medium text-base">{option.name}</Text>
               </TouchableOpacity>
             ))}
           </View>

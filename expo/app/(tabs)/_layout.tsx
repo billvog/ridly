@@ -1,8 +1,6 @@
 import { useUser } from "@/hooks/useUser";
-import { Entypo, MaterialIcons } from "@expo/vector-icons";
-import { Image } from "expo-image";
+import { Feather } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
-import { View } from "react-native";
 
 export const unstable_settings = {
   initialRouteName: "(home)/index",
@@ -26,36 +24,21 @@ export default function Layout() {
         name="(home)"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => <Entypo size={28} name="home" color={color} />,
+          tabBarIcon: ({ color }) => <Feather name="home" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="(my-events)"
         options={{
           title: "My Events",
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="event" size={24} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <Feather name="calendar" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="(account)"
         options={{
           title: "Account",
-          tabBarIcon: ({ focused }) => (
-            <View>
-              <Image
-                source={user.avatar_url}
-                contentFit="cover"
-                tintColor={focused ? null : "grey"}
-                className="rounded-full"
-                style={{
-                  width: 24,
-                  height: 24,
-                }}
-              />
-            </View>
-          ),
+          tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />,
         }}
       />
     </Tabs>

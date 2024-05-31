@@ -4,7 +4,7 @@ import Button from "@/modules/ui/Button";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import { TEvent } from "@/types/event";
 import { APIResponse, api } from "@/utils/api";
-import { AntDesign, Entypo } from "@expo/vector-icons";
+import { AntDesign, Entypo, Feather } from "@expo/vector-icons";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
@@ -207,7 +207,7 @@ export default function EventDetails() {
           >
             <AntDesign name="exclamationcircleo" size={24} color="#eba40c" />
             <View className="ml-4 flex">
-              <Text className="">This event is happening now!</Text>
+              <Text>This event is happening now!</Text>
               <Text className="font-bold text-xs">Tap to join the hunt.</Text>
             </View>
           </TouchableOpacity>
@@ -215,13 +215,13 @@ export default function EventDetails() {
 
         <View className="space-y-3">
           <View className="flex flex-row space-x-1">
-            <Entypo name="location-pin" size={16} color="#fb923c" />
+            <Feather name="map-pin" size={16} color="#fb923c" />
             <Text>
               Where? <Text className="font-bold">{event.location_name}</Text>
             </Text>
           </View>
           <View className="flex flex-row space-x-1">
-            <Entypo name="clock" size={16} color="#fb923c" />
+            <Feather name="clock" size={16} color="#fb923c" />
             <Text>
               When?{" "}
               <Text className="font-bold">{dayjs(event.happening_at).format("LLL")}</Text>
@@ -229,7 +229,7 @@ export default function EventDetails() {
           </View>
           {event.participant_count > 0 ? (
             <View className="flex flex-row items-center space-x-1">
-              <AntDesign name="user" size={16} color="#fb923c" />
+              <Feather name="user" size={16} color="#fb923c" />
               <Text>Who?</Text>
               <EventParticipantsAvatars participants={event.participants} />
               <Text>

@@ -1,18 +1,13 @@
 import { TEvent } from "@/types/event";
 import { fakeAPIResponse } from "@/utils/api";
-import { AntDesign, Entypo } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { useRouter, useSegments } from "expo-router";
 import React from "react";
-import {
-  ViewProps as RNViewProps,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ViewProps as RNViewProps, Text, TouchableOpacity, View } from "react-native";
 
 export type EventCardProps = {
   event: TEvent;
@@ -54,24 +49,22 @@ export default function EventCard({ event, style }: EventCardProps) {
         tint="dark"
         className="absolute bottom-0 flex flex-col w-full px-5 pt-3 pb-4"
       >
-        <Text className="text-gray-200 font-extrabold text-lg">
-          {event.name}
-        </Text>
+        <Text className="text-gray-200 font-extrabold text-lg">{event.name}</Text>
         <View className="flex flex-row items-center space-x-4 mt-1">
           <View className="flex flex-row items-center">
-            <Entypo name="location-pin" size={16} color="#fb923c" />
+            <Feather name="map-pin" size={16} color="#fb923c" />
             <Text className="ml-1 font-bold text-gray-100 text-sm">
               {event.location_name}
             </Text>
           </View>
           <View className="flex flex-row items-center">
-            <Entypo name="clock" size={16} color="#fb923c" />
+            <Feather name="clock" size={16} color="#fb923c" />
             <Text className="ml-2 font-bold text-sm text-gray-100">
               {dayjs(event.happening_at).fromNow(true)}
             </Text>
           </View>
           <View className="flex flex-row items-center">
-            <AntDesign name="user" size={16} color="#fb923c" />
+            <Feather name="user" size={16} color="#fb923c" />
             <Text className="ml-2 font-bold text-sm text-gray-100">
               {event.participant_count}
             </Text>
