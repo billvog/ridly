@@ -1,21 +1,18 @@
 import { useIsRefreshing } from "@/hooks/useIsRefreshing";
-import { useSetNavigationOptions } from "@/hooks/useSetNavigationOptions";
 import Button from "@/modules/ui/Button";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import { TEvent } from "@/types/event";
 import { APIResponse, api } from "@/utils/api";
-import { AntDesign, Entypo, Feather } from "@expo/vector-icons";
-import { NativeStackHeaderProps } from "@react-navigation/native-stack";
+import { AntDesign, Feather } from "@expo/vector-icons";
+import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
   RefreshControl,
-  SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -29,10 +26,6 @@ type JoinEventResponse = {
 };
 
 export default function EventDetails() {
-  useSetNavigationOptions({
-    header: EventDetailsHeader,
-  });
-
   const { event: eventId } = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
@@ -66,8 +59,9 @@ export default function EventDetails() {
   // Set event's name as our header title.
   useEffect(() => {
     navigation.setOptions({
-      title: event ? event.name : String(),
-    });
+      title: event ? event.name : "Event",
+      headerBackTitleVisible: false,
+    } satisfies NativeStackNavigationOptions);
   }, [navigation, event]);
 
   // Handle join/unjoin event
@@ -254,30 +248,6 @@ export default function EventDetails() {
         <Text>{event.description}</Text>
       </View>
     </ScrollView>
-  );
-}
-
-function EventDetailsHeader({ navigation }: NativeStackHeaderProps) {
-  function backPressed() {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    }
-  }
-
-  return (
-    <View className="absolute top-0">
-      <SafeAreaView>
-        <TouchableOpacity
-          onPress={backPressed}
-          activeOpacity={0.5}
-          className="ml-6 mr-auto rounded-full overflow-hidden"
-        >
-          <BlurView tint="dark" className="p-2">
-            <Entypo name="chevron-left" size={24} color="#f2f2f2" />
-          </BlurView>
-        </TouchableOpacity>
-      </SafeAreaView>
-    </View>
   );
 }
 
