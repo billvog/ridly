@@ -47,7 +47,9 @@ INSTALLED_APPS = [
   "django.contrib.messages",
   "django.contrib.staticfiles",
   "django.contrib.gis",
+  "drf_spectacular",
   "rest_framework",
+  "ridl_api",
   "user",
   "oauth",
   "creator",
@@ -176,8 +178,16 @@ CORS_EXPOSE_HEADERS = [
 
 # Django Rest Framework
 REST_FRAMEWORK = {
+  "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
   "DEFAULT_AUTHENTICATION_CLASSES": (
     "rest_framework.authentication.SessionAuthentication",
     "user.authentication.JWTAuthentication",
-  )
+  ),
+}
+
+SPECTACULAR_SETTINGS = {
+  "TITLE": "Ridly API",
+  "DESCRIPTION": "Outdoor Treasure Hunt",
+  "VERSION": "1.0.0",
+  "SERVE_INCLUDE_SCHEMA": False,
 }
