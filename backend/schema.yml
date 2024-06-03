@@ -1,0 +1,419 @@
+openapi: 3.0.3
+info:
+  title: Ridly API
+  version: 1.0.0
+  description: Outdoor Treasure Hunt
+paths:
+  /event/:
+    get:
+      operationId: event_list
+      tags:
+      - event
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+  /event/{id}/:
+    get:
+      operationId: event_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - event
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+  /event/{id}/join/:
+    post:
+      operationId: event_join_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - event
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventJoin'
+          description: ''
+  /event/joined/:
+    get:
+      operationId: event_joined_list
+      tags:
+      - event
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+  /hunt/{id}/:
+    get:
+      operationId: hunt_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - hunt
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hunt'
+          description: ''
+  /hunt/{id}/clue/{clue_order}/:
+    get:
+      operationId: hunt_clue_retrieve
+      parameters:
+      - in: path
+        name: clue_order
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - hunt
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HuntClue'
+          description: ''
+  /oauth/google/login/:
+    post:
+      operationId: oauth_google_login_create
+      tags:
+      - oauth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+  /user/logout/:
+    delete:
+      operationId: user_logout_destroy
+      description: Logout the user by clearing the refresh token cookie.
+      tags:
+      - user
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      responses:
+        '204':
+          description: No response body
+  /user/me/:
+    get:
+      operationId: user_me_retrieve
+      tags:
+      - user
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /user/test-token/:
+    get:
+      operationId: user_test_token_retrieve
+      description: Test endpoint to get an access token for the first user in the
+        database used for WebSockets. Only for testing!
+      tags:
+      - user
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+        '404':
+          description: No response body
+components:
+  schemas:
+    Creator:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          $ref: '#/components/schemas/PublicUser'
+      required:
+      - id
+      - user
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+        creator:
+          $ref: '#/components/schemas/Creator'
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventParticipant'
+          readOnly: true
+        participant_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        has_joined:
+          type: boolean
+          readOnly: true
+        location_name:
+          type: string
+          maxLength: 100
+        happening_at:
+          type: string
+          format: date-time
+        hunt_id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - creator
+      - description
+      - happening_at
+      - has_joined
+      - hunt_id
+      - id
+      - location_name
+      - name
+      - participants
+    EventJoin:
+      type: object
+      properties:
+        has_joined:
+          type: boolean
+        participant_count:
+          type: integer
+      required:
+      - has_joined
+      - participant_count
+    EventParticipant:
+      type: object
+      properties:
+        avatar_url:
+          type: string
+          format: uri
+          maxLength: 200
+    Hunt:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        event:
+          $ref: '#/components/schemas/HuntEvent'
+        clue_count:
+          type: integer
+          readOnly: true
+      required:
+      - clue_count
+      - event
+      - id
+    HuntClue:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        riddle:
+          type: string
+          maxLength: 1000
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        location_threshold:
+          type: number
+          format: double
+      required:
+      - id
+      - riddle
+    HuntEvent:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 50
+        location_name:
+          type: string
+          maxLength: 100
+        location_coordinates:
+          type: object
+          additionalProperties:
+            long: number
+            lat: number
+      required:
+      - location_coordinates
+      - location_name
+      - name
+    Login:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+      - token
+    PublicUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 50
+        last_name:
+          type: string
+          maxLength: 50
+        username:
+          type: string
+          maxLength: 50
+        avatar_url:
+          type: string
+          format: uri
+          maxLength: 200
+      required:
+      - first_name
+      - id
+      - last_name
+      - username
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 50
+        last_name:
+          type: string
+          maxLength: 50
+        username:
+          type: string
+          maxLength: 50
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        avatar_url:
+          type: string
+          format: uri
+          maxLength: 200
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - first_name
+      - id
+      - last_name
+      - username
+  securitySchemes:
+    JWTAuthentication:
+      type: apiKey
+      in: header
+      name: x-access-token
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
