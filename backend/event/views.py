@@ -3,9 +3,10 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from drf_spectacular.utils import extend_schema
 
 from .models import Event
-from .serializers import EventSerializer
+from .serializers import EventJoinSerializer, EventSerializer
 
 
 class ListEventsAPIVIew(ListAPIView):
@@ -29,6 +30,10 @@ class ListJoinedEventsAPIView(ListAPIView):
 class JoinEventAPIView(APIView):
   permission_classes = [permissions.IsAuthenticated]
 
+  @extend_schema(
+    request=None,
+    responses={200: EventJoinSerializer},
+  )
   def post(self, request, *args, **kwargs):
     # Get logged in user.
     user = request.user
@@ -52,7 +57,12 @@ class JoinEventAPIView(APIView):
     # Save changes.
     event.save()
 
+    # Serialize response.
+    serialized_data = EventJoinSerializer(
+      data={"has_joined": has_joined, "participant_count": event.participant_count}
+    ).data
+
     return Response(
-      {"has_joined": has_joined, "participant_count": event.participant_count},
+      serialized_data,
       status=status.HTTP_200_OK,
     )

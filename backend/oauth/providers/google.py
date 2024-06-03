@@ -1,4 +1,5 @@
 import requests
+from requests.exceptions import RequestException
 from .abstract_provider import AbstractOAuthProvider
 
 
@@ -8,11 +9,13 @@ class GoogleOAuthProvider(AbstractOAuthProvider):
     url = "https://www.googleapis.com/oauth2/v3/userinfo"
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
+    try:
+      response = requests.get(url, headers=headers)
+      response.raise_for_status()
+    except RequestException:
+      return None
 
     user = GoogleOAuthProvider.map_response_to_user(response.json())
-
     return user
 
   @staticmethod

@@ -1,4 +1,6 @@
+import uuid
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 
 from user.models import User
 from .models import Event
@@ -34,6 +36,7 @@ class EventSerializer(serializers.ModelSerializer):
     ]
 
   # Get 3 first participants, always ignoring logged in user.
+  @extend_schema_field(EventParticipantSerializer(many=True))
   def get_participants(self, obj):
     request = self.context.get("request")
     user = request.user
@@ -43,7 +46,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     return serializer.data
 
-  def get_has_joined(self, obj):
+  def get_has_joined(self, obj) -> bool:
     request = self.context.get("request")
     user = request.user
     if user is None or user.is_authenticated is False:
@@ -51,6 +54,11 @@ class EventSerializer(serializers.ModelSerializer):
     else:
       return obj.participants.contains(user)
 
-  def get_hunt_id(self, obj):
+  def get_hunt_id(self, obj) -> uuid.UUID:
     hunt = obj.hunt.first()
     return hunt.id if hunt else None
+
+
+class EventJoinSerializer(serializers.Serializer):
+  has_joined = serializers.BooleanField()
+  participant_count = serializers.IntegerField()

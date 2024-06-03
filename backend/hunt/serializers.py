@@ -40,7 +40,7 @@ class HuntSerializer(serializers.ModelSerializer):
     model = Hunt
     fields = ["id", "event", "clue_count"]
 
-  def get_clue_count(self, obj):
+  def get_clue_count(self, obj) -> int:
     return obj.clues.count()
 
 
