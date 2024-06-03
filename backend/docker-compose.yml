@@ -38,6 +38,15 @@ services:
       - .env
     depends_on:
       - db
+  swagger:
+    image: swaggerapi/swagger-ui
+    container_name: ridly_swagger
+    ports:
+      - "80:8001"
+    environment:
+      SWAGGER_JSON: /schema.yml
+    volumes:
+      - ./schema.yml:/schema.yml
 volumes:
   ridly_db_data:
   ridly_redis_data:
