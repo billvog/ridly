@@ -189,6 +189,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedErrorResponse'
+          description: ''
   /user/test-token/:
     get:
       operationId: user_test_token_retrieve
@@ -219,6 +225,13 @@ components:
       required:
       - id
       - user
+    DetailedErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
     Event:
       type: object
       properties:

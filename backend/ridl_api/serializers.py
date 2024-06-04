@@ -21,3 +21,7 @@ from drf_spectacular.utils import extend_schema_field
 class PointSerializer(serializers.Field):
   def to_representation(self, value):
     return {"long": value.coords[0], "lat": value.coords[1]}
+
+
+class DetailedErrorResponse(serializers.Serializer):
+  detail = serializers.CharField()

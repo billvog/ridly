@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
+from ridl_api.serializers import DetailedErrorResponse
 from .models import User
 from .serializers import UserSerializer
 from .auth_tokens import (
@@ -54,6 +55,9 @@ class LogoutAPIView(APIView):
     return response
 
 
+@extend_schema(
+  responses={200: UserSerializer, 403: DetailedErrorResponse},
+)
 class MeAPIView(GenericAPIView):
   serializer_class = UserSerializer
   permission_classes = [permissions.IsAuthenticated]
