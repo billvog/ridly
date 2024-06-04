@@ -1,0 +1,1 @@
+{"type":"object","properties":{"has_joined":{"type":"boolean"},"participant_count":{"type":"integer"}},"required":["has_joined","participant_count"],"x-readme-ref-name":"EventJoin"}

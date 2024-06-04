@@ -1,0 +1,1 @@
+{"type":"object","properties":{"id":{"type":"integer","readOnly":true},"riddle":{"type":"string","maxLength":1000},"order":{"type":"integer","maximum":2147483647,"minimum":-2147483648},"location_threshold":{"type":"number","format":"double"}},"required":["id","riddle"],"x-readme-ref-name":"HuntClue"}

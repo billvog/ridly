@@ -1,15 +1,13 @@
+import Button from "@/modules/ui/Button";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
-import { TUser } from "@/types/user";
-import { api } from "@/utils/api";
+import { User, useUserMeRetrieve } from "@/types/gen";
 import { clearAuthTokens } from "@/utils/authTokens";
-import { useQuery } from "@tanstack/react-query";
 import React, { useContext, useEffect, useState } from "react";
 import { Text } from "react-native";
-import Button from "../ui/Button";
 
 type AuthContextType = {
-  user: TUser | null;
+  user: User | null;
   initializing: boolean;
 };
 
@@ -23,34 +21,34 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<TUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
 
-  const meQuery = useQuery({
-    queryKey: ["user", "me"],
-    queryFn: () => api("/user/me/"),
-  });
+  const meQuery = useUserMeRetrieve();
 
   useEffect(() => {
-    if (!meQuery.data) {
+    if (meQuery.isLoading) {
+      return;
+    }
+
+    if (meQuery.isError) {
       setUser(null);
-    } else if (meQuery.data.status === 200) {
-      setUser(meQuery.data.data.user);
-    } else if (
-      meQuery.data.status === 403 &&
-      meQuery.data.data.detail === "User not found"
-    ) {
-      clearAuthTokens();
+
+      if (meQuery.error.detail === "User not found") {
+        clearAuthTokens();
+      }
+    } else if (meQuery.isSuccess) {
+      setUser(meQuery.data);
     }
 
     setInitializing(false);
-  }, [meQuery.data]);
+  }, [meQuery]);
 
   function retryFailure() {
     meQuery.refetch();
   }
 
-  if (meQuery.isError) {
+  if (false) {
     return (
       <FullscreenError>
         <Text className="font-extrabold text-red-500 text-2xl text-center">{`Something went wrong.\nPlease try again later.`}</Text>

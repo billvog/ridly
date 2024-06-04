@@ -1,0 +1,1 @@
+{"type":"object","properties":{"name":{"type":"string","maxLength":50},"location_name":{"type":"string","maxLength":100},"location_coordinates":{"type":"object","properties":{"long":{"type":"number","format":"float"},"lat":{"type":"number","format":"float"}}}},"required":["location_coordinates","location_name","name"],"x-readme-ref-name":"HuntEvent"}

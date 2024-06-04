@@ -61,7 +61,7 @@ export default function Page() {
           });
 
           // Update cache
-          queryClient.setQueryData(["user", "me"], data);
+          queryClient.setQueryData(["user", "me"], data.data.user);
 
           router.push({ pathname: "/" });
         },
