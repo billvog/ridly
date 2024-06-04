@@ -6,10 +6,16 @@ from drf_spectacular.utils import extend_schema_field
 @extend_schema_field(
   field={
     "type": "object",
-    "additionalProperties": {
-      "long": "number",
-      "lat": "number",
-    }
+    "properties": {
+      "long": {
+        "type": "number",
+        "format": "float",
+      },
+      "lat": {
+        "type": "number",
+        "format": "float",
+      },
+    },
   },
 )
 class PointSerializer(serializers.Field):

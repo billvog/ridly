@@ -166,7 +166,6 @@ paths:
   /user/logout/:
     delete:
       operationId: user_logout_destroy
-      description: Logout the user by clearing the refresh token cookie.
       tags:
       - user
       security:
@@ -334,9 +333,13 @@ components:
           maxLength: 100
         location_coordinates:
           type: object
-          additionalProperties:
-            long: number
-            lat: number
+          properties:
+            long:
+              type: number
+              format: float
+            lat:
+              type: number
+              format: float
       required:
       - location_coordinates
       - location_name
