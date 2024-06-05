@@ -43,14 +43,13 @@
         }
       ],
       [
-        "@viro-community/react-viro",
+        "@reactvision/react-viro",
         {
           "ios": {
             "cameraUsagePermission": "$(PRODUCT_NAME) uses your camera for AR experiences."
           }
         }
       ],
-
       [
         "expo-dev-launcher",
         {

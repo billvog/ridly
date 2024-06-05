@@ -8,8 +8,8 @@ import {
   ViroSphere,
   ViroText,
   ViroTrackingStateConstants,
-} from "@viro-community/react-viro";
-import { Viro3DPoint } from "@viro-community/react-viro/dist/components/Types/ViroUtils";
+} from "@reactvision/react-viro";
+import { Viro3DPoint } from "@reactvision/react-viro/dist/components/Types/ViroUtils";
 import * as Location from "expo-location";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";

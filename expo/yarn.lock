@@ -2509,6 +2509,14 @@
   dependencies:
     nanoid "^3.1.23"
 
+"@reactvision/react-viro@^v2.23.0":
+  version "2.41.3"
+  resolved "https://registry.yarnpkg.com/@reactvision/react-viro/-/react-viro-2.41.3.tgz#3c59e3493cc34b01345a24ae287d35e21159592c"
+  integrity sha512-g7MdlJh2fMqk8mqoy5RD9EIltitfUeUJ0vJ8q9ICDsU+gZHKk/pJIW6/yLLZ9HnYp1OiCTDMo1QzGW5SAOyK1g==
+  dependencies:
+    "@expo/config-plugins" "^7.2.5"
+    react "^18.2.0"
+
 "@readme/better-ajv-errors@^1.6.0":
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/@readme/better-ajv-errors/-/better-ajv-errors-1.6.0.tgz#cf96740bd71d256ed628f3a7466ecae0846edd62"
@@ -2886,14 +2894,6 @@
   dependencies:
     "@urql/core" ">=2.3.1"
     wonka "^4.0.14"
-
-"@viro-community/react-viro@^2.41.1":
-  version "2.41.1"
-  resolved "https://registry.yarnpkg.com/@viro-community/react-viro/-/react-viro-2.41.1.tgz#90f9a599ef54384ce8057866a7bec7fc9fe6b0c1"
-  integrity sha512-DGZs+14aKFg5FdhZryDPqUqPorqG6KHbsOUMBgQtm6vF6LJWXjBtTeqOvfTUYX2MKPPFTGK1mOYNBMHJMUJwUw==
-  dependencies:
-    "@expo/config-plugins" "^7.2.5"
-    react "^18.2.0"
 
 "@web3-storage/multipart-parser@^1.0.0":
   version "1.0.0"
