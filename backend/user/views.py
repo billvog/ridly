@@ -65,4 +65,4 @@ class MeAPIView(GenericAPIView):
   def get(self, request):
     user = request.user
     data = self.get_serializer(user).data
-    return Response({"user": data})
+    return Response(data)
