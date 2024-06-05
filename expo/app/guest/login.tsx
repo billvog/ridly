@@ -4,9 +4,10 @@ import Button from "@/modules/ui/Button";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { APIResponse, api } from "../../utils/api";
+import { APIResponse, api } from "@/utils/api";
 import Toast from "react-native-toast-message";
 import { useRouter } from "expo-router";
+import { userMeRetrieveQueryKey } from "@/types/gen";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -61,7 +62,7 @@ export default function Page() {
           });
 
           // Update cache
-          queryClient.setQueryData(["user", "me"], data.data.user);
+          queryClient.setQueryData(userMeRetrieveQueryKey(), data.data.user);
 
           router.push({ pathname: "/" });
         },

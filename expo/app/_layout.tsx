@@ -7,8 +7,10 @@ import { axiosInstance } from "@kubb/swagger-client/client";
 import { Slot } from "expo-router";
 import React from "react";
 
+// Configure axios instance
 axiosInstance.interceptors.request.use((config) => {
   config.baseURL = `http://${process.env.EXPO_PUBLIC_API_HOST}`;
+  config.withCredentials = true;
 
   const accessToken = getAccessToken();
   if (accessToken && config.headers) {
