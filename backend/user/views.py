@@ -44,9 +44,6 @@ class TestAuthTokenAPIView(APIView):
 class LogoutAPIView(APIView):
   permission_classes = [permissions.IsAuthenticated]
 
-  @extend_schema(
-    request=None,
-  )
   def delete(self, _):
     response = Response(None, status=status.HTTP_204_NO_CONTENT)
     clear_refresh_token_cookie(response)
