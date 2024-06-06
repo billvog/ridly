@@ -1,5 +1,5 @@
 import EventCard from "@/modules/ui/EventCard";
-import { TEvent } from "@/types/event";
+import { Event } from "@/types/gen";
 import React from "react";
 import { Dimensions, Platform, ScrollView, Text, View } from "react-native";
 
@@ -8,7 +8,7 @@ const EventCardSpacingInset = Dimensions.get("window").width * 0.1 - 30;
 
 type EventScrollFeedProps = {
   title: string;
-  events: TEvent[];
+  events: Event[];
 };
 
 export default function EventScrollFeed({ title, events }: EventScrollFeedProps) {

@@ -1,15 +1,13 @@
 import { useIsRefreshing } from "@/hooks/useIsRefreshing";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import JoinEventButton from "@/modules/ui/event/JoinEventButton";
-import { TEvent } from "@/types/event";
-import { APIResponse, api } from "@/utils/api";
+import { EventParticipant, useEvent } from "@/types/gen";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
-import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function EventDetails() {
@@ -17,29 +15,13 @@ export default function EventDetails() {
   const navigation = useNavigation();
   const router = useRouter();
 
-  const eventQuery = useQuery<APIResponse<TEvent>>({
-    queryKey: ["event", eventId],
-    queryFn: () => api("/event/" + eventId + "/"),
-    // If no eventId is provided don't bother making a request.
-    enabled: typeof eventId === "string",
+  const eventQuery = useEvent(typeof eventId === "string" ? eventId : "", {
+    query: { enabled: typeof eventId === "string" },
   });
 
+  const event = useMemo(() => eventQuery.data, [eventQuery]);
+
   const [refreshEvent, isEventRefreshing] = useIsRefreshing(eventQuery.refetch);
-
-  const [event, setEvent] = useState<TEvent | null>();
-
-  // Get event from eventQuery
-  useEffect(() => {
-    if (eventQuery.isLoading) {
-      return;
-    }
-
-    if (eventQuery.data && eventQuery.data.ok) {
-      setEvent(eventQuery.data.data);
-    } else {
-      setEvent(null);
-    }
-  }, [eventQuery.data]);
 
   // Set event's name as our header title.
   useEffect(() => {
@@ -126,7 +108,7 @@ export default function EventDetails() {
               <Text className="font-bold">{dayjs(event.happening_at).format("LLL")}</Text>
             </Text>
           </View>
-          {event.participant_count > 0 ? (
+          {event.participant_count! > 0 ? (
             <View className="flex flex-row items-center space-x-1">
               <Feather name="user" size={16} color="#fb923c" />
               <Text>Who?</Text>
@@ -153,7 +135,7 @@ export default function EventDetails() {
 function EventParticipantsAvatars({
   participants,
 }: {
-  participants: TEvent["participants"];
+  participants: EventParticipant[];
 }) {
   return (
     <View className="flex flex-row items-center ml-1">

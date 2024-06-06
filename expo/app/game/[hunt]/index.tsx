@@ -16,19 +16,17 @@ import HuntMap from "@/modules/ui/hunt/Map";
 import InaccurateCircle from "@/modules/ui/map/InaccurateCircle";
 import { useStoreDispatch } from "@/redux/hooks";
 import { SocketActions } from "@/redux/socket/reducer";
+import { useHunt } from "@/types/gen";
 import { LocationPoint } from "@/types/general";
 import {
   TCapturedHuntClue,
-  THunt,
   THuntClue,
   THuntSocketCommand,
   THuntSocketResult,
 } from "@/types/hunt";
-import { APIResponse, api } from "@/utils/api";
-import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import * as TaskManager from "expo-task-manager";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native";
 import MapView from "react-native-maps";
 import Toast from "react-native-toast-message";
@@ -92,23 +90,14 @@ export default function Page() {
    *
    */
 
-  const huntQuery = useQuery<APIResponse<THunt>>({
-    queryKey: ["hunt", huntId],
-    queryFn: () => api("/hunt/" + huntId + "/"),
-    // If no eventId is provided don't bother making a request.
-    enabled: typeof huntId === "string",
+  const huntQuery = useHunt(typeof huntId === "string" ? huntId : "", {
+    query: {
+      // If no eventId is provided don't bother making a request.
+      enabled: typeof huntId === "string",
+    },
   });
 
-  const [hunt, setHunt] = useState<THunt | null>();
-
-  // Get hunt from huntQuery
-  useEffect(() => {
-    if (!huntQuery.data) {
-      setHunt(null);
-    } else if (huntQuery.data.ok) {
-      setHunt(huntQuery.data.data);
-    }
-  }, [huntQuery.data]);
+  const hunt = useMemo(() => huntQuery.data, [huntQuery.data]);
 
   /*
    *

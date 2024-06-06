@@ -2,45 +2,25 @@ import { useIsRefreshing } from "@/hooks/useIsRefreshing";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenMessage from "@/modules/ui/FullscreenMessage";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
-import { TEvent } from "@/types/event";
-import { APIResponse, api } from "@/utils/api";
+import { useJoinedEvents } from "@/types/gen";
 import { Entypo } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Agenda, AgendaEntry, AgendaSchedule } from "react-native-calendars";
 
 export default function Page() {
   const router = useRouter();
 
-  const eventsQuery = useQuery<APIResponse<TEvent[]>>({
-    queryKey: ["event", "joined"],
-    queryFn: () => api("/event/joined/"),
-  });
+  const eventsQuery = useJoinedEvents();
+  const events = useMemo(() => {
+    return eventsQuery.data;
+  }, [eventsQuery]);
 
   const [refreshEvents, areEventsRefreshing] = useIsRefreshing(eventsQuery.refetch);
 
-  const [events, setEvents] = useState<TEvent[] | null>([]);
-  const [loadingQuery, setLoadingQuery] = useState(true);
-
   const [agendaSchedule, setAgendaSchedule] = useState<AgendaSchedule>({});
-
-  // Extract events from the query data.
-  useEffect(() => {
-    if (eventsQuery.isLoading) {
-      return;
-    }
-
-    if (eventsQuery.data && eventsQuery.data.ok) {
-      setEvents(eventsQuery.data.data);
-    } else {
-      setEvents(null);
-    }
-
-    setLoadingQuery(false);
-  }, [eventsQuery.data]);
 
   // Create AgendaSchedule from fetched events.
   useEffect(() => {
@@ -116,7 +96,7 @@ export default function Page() {
   }
 
   // Initial fetching.
-  if (loadingQuery) {
+  if (eventsQuery.isLoading) {
     return <FullscreenSpinner />;
   }
 

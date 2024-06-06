@@ -1,5 +1,5 @@
 import Button from "@/modules/ui/Button";
-import { TEvent } from "@/types/event";
+import { Event, eventQueryKey } from "@/types/gen";
 import { APIResponse, api } from "@/utils/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
@@ -8,7 +8,7 @@ import { Alert } from "react-native";
 import Toast from "react-native-toast-message";
 
 type JoinEventButtonProps = {
-  event: TEvent;
+  event: Event;
 };
 
 type JoinEventResponse = {
@@ -56,12 +56,13 @@ export default function JoinEventButton({ event }: JoinEventButtonProps) {
           const { has_joined, participant_count } = data.data;
 
           // Update cache
-          queryClient.setQueryData<APIResponse<TEvent>>(
-            ["event", event.id],
+          queryClient.setQueryData<Event>(
+            eventQueryKey(event.id),
             (event) =>
               event && {
                 ...event,
-                data: { ...event.data, participant_count, has_joined },
+                participant_count,
+                has_joined,
               }
           );
 

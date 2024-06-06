@@ -1,5 +1,4 @@
-import { TEvent } from "@/types/event";
-import { fakeAPIResponse } from "@/utils/api";
+import { Event, eventQueryKey } from "@/types/gen";
 import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
@@ -10,7 +9,7 @@ import React from "react";
 import { ViewProps as RNViewProps, Text, TouchableOpacity, View } from "react-native";
 
 export type EventCardProps = {
-  event: TEvent;
+  event: Event;
   style?: RNViewProps["style"];
 };
 
@@ -20,7 +19,7 @@ export default function EventCard({ event, style }: EventCardProps) {
   const queryClient = useQueryClient();
 
   function onPress() {
-    queryClient.setQueryData(["event", event.id], fakeAPIResponse(event));
+    queryClient.setQueryData(eventQueryKey(event.id), event);
     router.push({
       pathname: `/(tabs)/${segments[1]}/[event]`,
       params: { event: event.id },
