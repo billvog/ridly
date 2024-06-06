@@ -1,6 +1,6 @@
 export type DetailedErrorResponse = {
     /**
-     * @type string
+     * @type string | undefined
     */
-    detail: string;
+    detail?: string;
 };

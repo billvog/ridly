@@ -24,4 +24,4 @@ class PointSerializer(serializers.Field):
 
 
 class DetailedErrorResponse(serializers.Serializer):
-  detail = serializers.CharField()
+  detail = serializers.CharField(required=False)
