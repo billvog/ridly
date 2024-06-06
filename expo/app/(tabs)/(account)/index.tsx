@@ -1,6 +1,6 @@
 import { useUser } from "@/hooks/useUser";
 import Button from "@/modules/ui/Button";
-import { userMeRetrieveQueryKey } from "@/types/gen";
+import { userMeQueryKey } from "@/types/gen";
 import { APIResponse, api } from "@/utils/api";
 import { clearAuthTokens } from "@/utils/authTokens";
 import { Feather } from "@expo/vector-icons";
@@ -100,7 +100,7 @@ function LogoutButton() {
         if (data.ok) {
           // Reset "user/me" cached query that
           // stores logged in user.
-          queryClient.resetQueries({ queryKey: userMeRetrieveQueryKey() });
+          queryClient.resetQueries({ queryKey: userMeQueryKey() });
 
           // Clear memory stored auth tokens
           clearAuthTokens();

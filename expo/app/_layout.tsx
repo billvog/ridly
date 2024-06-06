@@ -13,9 +13,7 @@ axiosInstance.interceptors.request.use((config) => {
   config.withCredentials = true;
 
   const accessToken = getAccessToken();
-  if (accessToken && config.headers) {
-    config.headers["x-access-token"] = accessToken;
-  }
+  config.headers["x-access-token"] = accessToken;
 
   return config;
 });
