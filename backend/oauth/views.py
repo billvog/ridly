@@ -1,17 +1,23 @@
-from rest_framework import serializers, status
+from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
+from .serializers import LoginSerializer
 from .providers.google import GoogleOAuthProvider
 from user.models import User
 from user.serializers import UserSerializer
 from user.auth_tokens import generate_tokens_for_user, set_refresh_token_cookie
 
 
+@extend_schema_view(
+  post=extend_schema(
+    operation_id="oauth_google_login",
+    request=LoginSerializer,
+    responses={200: UserSerializer},
+  )
+)
 class OAuthLoginAPIView(GenericAPIView):
-  class LoginSerializer(serializers.Serializer):
-    token = serializers.CharField(required=True)
-
   serializer_class = LoginSerializer
 
   @staticmethod
@@ -51,7 +57,7 @@ class OAuthLoginAPIView(GenericAPIView):
 
     (access_token, refresh_token) = generate_tokens_for_user(user)
 
-    body = {"user": UserSerializer(user, context=self.get_serializer_context()).data}
+    body = UserSerializer(user, context=self.get_serializer_context()).data
 
     headers = {
       "x-access-token": access_token,

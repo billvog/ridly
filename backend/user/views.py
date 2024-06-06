@@ -4,7 +4,7 @@ from rest_framework import status, permissions
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from ridl_api.serializers import DetailedErrorResponse
 from .models import User
@@ -15,12 +15,7 @@ from .auth_tokens import (
 )
 
 
-@extend_schema(
-  methods=["GET"],
-  request=None,
-  responses={200: None, 404: None},
-  description="Test endpoint to get an access token for the first user in the database used for WebSockets. Only for testing!",
-)
+@extend_schema(exclude=True)
 class TestAuthTokenAPIView(APIView):
   def get(self, _):
     # Only for testing!!!
@@ -38,10 +33,13 @@ class TestAuthTokenAPIView(APIView):
     return response
 
 
-@extend_schema(
-  methods=["DELETE"],
-  request=None,
-  responses={204: None},
+@extend_schema_view(
+  delete=extend_schema(
+    operation_id="user_logout",
+    methods=["DELETE"],
+    request=None,
+    responses={204: None},
+  )
 )
 class LogoutAPIView(APIView):
   permission_classes = [permissions.IsAuthenticated]
@@ -55,8 +53,11 @@ class LogoutAPIView(APIView):
     return response
 
 
-@extend_schema(
-  responses={200: UserSerializer, 403: DetailedErrorResponse},
+@extend_schema_view(
+  get=extend_schema(
+    operation_id="user_me",
+    responses={200: UserSerializer, 403: DetailedErrorResponse},
+  )
 )
 class MeAPIView(GenericAPIView):
   serializer_class = UserSerializer

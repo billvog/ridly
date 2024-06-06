@@ -6,7 +6,7 @@ info:
 paths:
   /event/:
     get:
-      operationId: event_list
+      operationId: events
       tags:
       - event
       security:
@@ -24,7 +24,7 @@ paths:
           description: ''
   /event/{id}/:
     get:
-      operationId: event_retrieve
+      operationId: event
       parameters:
       - in: path
         name: id
@@ -47,7 +47,7 @@ paths:
           description: ''
   /event/{id}/join/:
     post:
-      operationId: event_join_create
+      operationId: join_event
       parameters:
       - in: path
         name: id
@@ -69,7 +69,7 @@ paths:
           description: ''
   /event/joined/:
     get:
-      operationId: event_joined_list
+      operationId: joined_events
       tags:
       - event
       security:
@@ -86,7 +86,7 @@ paths:
           description: ''
   /hunt/{id}/:
     get:
-      operationId: hunt_retrieve
+      operationId: hunt
       parameters:
       - in: path
         name: id
@@ -109,7 +109,7 @@ paths:
           description: ''
   /hunt/{id}/clue/{clue_order}/:
     get:
-      operationId: hunt_clue_retrieve
+      operationId: hunt_clue
       parameters:
       - in: path
         name: clue_order
@@ -137,7 +137,7 @@ paths:
           description: ''
   /oauth/google/login/:
     post:
-      operationId: oauth_google_login_create
+      operationId: oauth_google_login
       tags:
       - oauth
       requestBody:
@@ -161,11 +161,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Login'
+                $ref: '#/components/schemas/User'
           description: ''
   /user/logout/:
     delete:
-      operationId: user_logout_destroy
+      operationId: user_logout
       tags:
       - user
       security:
@@ -176,7 +176,7 @@ paths:
           description: No response body
   /user/me/:
     get:
-      operationId: user_me_retrieve
+      operationId: user_me
       tags:
       - user
       security:
@@ -195,22 +195,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/DetailedErrorResponse'
           description: ''
-  /user/test-token/:
-    get:
-      operationId: user_test_token_retrieve
-      description: Test endpoint to get an access token for the first user in the
-        database used for WebSockets. Only for testing!
-      tags:
-      - user
-      security:
-      - cookieAuth: []
-      - JWTAuthentication: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-        '404':
-          description: No response body
 components:
   schemas:
     Creator:
