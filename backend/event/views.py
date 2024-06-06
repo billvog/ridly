@@ -78,11 +78,9 @@ class JoinEventAPIView(APIView):
     event.save()
 
     # Serialize response.
-    serialized_data = EventJoinSerializer(
-      data={"has_joined": has_joined, "participant_count": event.participant_count}
-    ).data
+    response = {"has_joined": has_joined, "participant_count": event.participant_count}
 
     return Response(
-      serialized_data,
+      response,
       status=status.HTTP_200_OK,
     )
