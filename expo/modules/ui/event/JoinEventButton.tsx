@@ -1,7 +1,6 @@
 import Button from "@/modules/ui/Button";
-import { Event, eventQueryKey } from "@/types/gen";
-import { APIResponse, api } from "@/utils/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Event, eventQueryKey, useJoinEvent } from "@/types/gen";
+import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import React from "react";
 import { Alert } from "react-native";
@@ -19,10 +18,7 @@ type JoinEventResponse = {
 export default function JoinEventButton({ event }: JoinEventButtonProps) {
   const queryClient = useQueryClient();
 
-  const joinEventMutation = useMutation<APIResponse<JoinEventResponse>>({
-    mutationKey: ["event", event.id, "join"],
-    mutationFn: () => api("/event/" + event.id + "/join/", "POST"),
-  });
+  const joinEventMutation = useJoinEvent(event.id);
 
   async function JoinEvent() {
     if (!event) return;
@@ -49,47 +45,39 @@ export default function JoinEventButton({ event }: JoinEventButtonProps) {
     }
 
     // Execute mutation
-    joinEventMutation.mutate(undefined, {
+    joinEventMutation.mutate(null as never, {
       onSuccess(data) {
-        if (data.ok) {
-          // Extract new has_joined from response
-          const { has_joined, participant_count } = data.data;
+        // Extract new has_joined from response
+        const { has_joined, participant_count } = data;
 
-          // Update cache
-          queryClient.setQueryData<Event>(
-            eventQueryKey(event.id),
-            (event) =>
-              event && {
-                ...event,
-                participant_count,
-                has_joined,
-              }
-          );
+        // Update cache
+        queryClient.setQueryData<Event>(
+          eventQueryKey(event.id),
+          (event) =>
+            event && {
+              ...event,
+              participant_count,
+              has_joined,
+            }
+        );
 
-          // Display toast to inform user it went ok
-          if (has_joined) {
-            Toast.show({
-              type: "success",
-              text1: "Joined event!",
-              text1Style: {
-                fontSize: 16,
-              },
-              text2: `${event.name} in ${dayjs(event.happening_at).fromNow(true)}`,
-              text2Style: {
-                fontSize: 12,
-              },
-            });
-          } else {
-            Toast.show({
-              type: "success",
-              text1: "Unjoined event :^(",
-            });
-          }
-        } else {
-          // Otherwise, show error toast
+        // Display toast to inform user it went ok
+        if (has_joined) {
           Toast.show({
-            type: "error",
-            text1: errorMessage,
+            type: "success",
+            text1: "Joined event!",
+            text1Style: {
+              fontSize: 16,
+            },
+            text2: `${event.name} in ${dayjs(event.happening_at).fromNow(true)}`,
+            text2Style: {
+              fontSize: 12,
+            },
+          });
+        } else {
+          Toast.show({
+            type: "success",
+            text1: "Unjoined event :^(",
           });
         }
       },

@@ -1,3 +1,6 @@
+// Configure axios instance.
+import "@/utils/axios";
+
 import { ModalProvider } from "@/modules/ModalContext";
 import { AuthProvider } from "@/modules/authentication/AuthContext";
 import { Store } from "@/redux/store";

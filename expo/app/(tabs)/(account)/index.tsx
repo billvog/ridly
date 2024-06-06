@@ -1,10 +1,9 @@
 import { useUser } from "@/hooks/useUser";
 import Button from "@/modules/ui/Button";
-import { userMeQueryKey } from "@/types/gen";
-import { APIResponse, api } from "@/utils/api";
+import { useUserLogout, userMeQueryKey } from "@/types/gen";
 import { clearAuthTokens } from "@/utils/authTokens";
 import { Feather } from "@expo/vector-icons";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Href } from "expo-router/build/link/href";
@@ -89,41 +88,30 @@ function PreferencesList({ options }: { options: OptionGroup[] }) {
 
 // Handles all the logout functionality.
 function LogoutButton() {
+  const router = useRouter();
+
   const queryClient = useQueryClient();
-  const logoutMutation = useMutation<APIResponse>({
-    mutationFn: () => api("/user/logout/", "DELETE"),
-  });
+  const logoutMutation = useUserLogout();
 
   function logout() {
-    logoutMutation.mutate(undefined, {
-      onSuccess(data) {
-        if (data.ok) {
-          // Reset "user/me" cached query that
-          // stores logged in user.
-          queryClient.resetQueries({ queryKey: userMeQueryKey() });
+    logoutMutation.mutate(null as never, {
+      onSuccess() {
+        // Reset "user/me" cached query that
+        // stores logged in user.
+        queryClient.resetQueries({ queryKey: userMeQueryKey() });
 
-          // Clear memory stored auth tokens
-          clearAuthTokens();
+        // Clear memory stored auth tokens
+        clearAuthTokens();
 
-          // Show success toast
-          Toast.show({
-            type: "success",
-            text1: "Logged out",
-          });
-
-          // Redirect will happen in (tabs)/_layout.tsx
-
-          return;
-        }
-
-        // Show erorr toast
+        // Show success toast
         Toast.show({
-          type: "error",
-          text1: "Failed to logout",
+          type: "success",
+          text1: "Logged out",
         });
+
+        router.push({ pathname: "/guest" });
       },
       onError(error) {
-        // Print error and show error toast
         console.error(error);
         Toast.show({
           type: "error",
