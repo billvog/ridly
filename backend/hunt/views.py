@@ -1,19 +1,30 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
+from ridl_api.serializers import DetailedErrorResponse
 from .models import Hunt
 from .serializers import HuntSerializer, HuntClueSerializer
 
 
-@extend_schema_view(get=extend_schema(operation_id="hunt"))
+@extend_schema_view(
+  get=extend_schema(
+    operation_id="hunt", responses={200: HuntSerializer, 404: DetailedErrorResponse}
+  )
+)
 class RetrieveHuntAPIView(RetrieveAPIView):
   queryset = Hunt.objects.all()
   serializer_class = HuntSerializer
 
 
-@extend_schema_view(get=extend_schema(operation_id="hunt_clue"))
+@extend_schema_view(
+  get=extend_schema(
+    operation_id="hunt_clue",
+    responses={200: HuntClueSerializer, 404: DetailedErrorResponse},
+  )
+)
 class RetrieveHuntClueAPIView(RetrieveAPIView):
   queryset = Hunt.objects.all()
   serializer_class = HuntClueSerializer
@@ -22,7 +33,7 @@ class RetrieveHuntClueAPIView(RetrieveAPIView):
     clue_order = kwargs.get("clue_order")
 
     hunt = self.get_object()
-    clue = hunt.clues.get(order=clue_order)
+    clue = get_object_or_404(hunt.clues, order=clue_order)
 
     serialized_clue = self.get_serializer(clue).data
 

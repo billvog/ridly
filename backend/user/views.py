@@ -38,7 +38,7 @@ class TestAuthTokenAPIView(APIView):
     operation_id="user_logout",
     methods=["DELETE"],
     request=None,
-    responses={204: None},
+    responses={204: None, 403: DetailedErrorResponse},
   )
 )
 class LogoutAPIView(APIView):

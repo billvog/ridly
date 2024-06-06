@@ -4,7 +4,9 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from .serializers import LoginSerializer
+from .exceptions import BadOAuthToken
 from .providers.google import GoogleOAuthProvider
+from ridl_api.serializers import DetailedErrorResponse
 from user.models import User
 from user.serializers import UserSerializer
 from user.auth_tokens import generate_tokens_for_user, set_refresh_token_cookie
@@ -14,7 +16,7 @@ from user.auth_tokens import generate_tokens_for_user, set_refresh_token_cookie
   post=extend_schema(
     operation_id="oauth_google_login",
     request=LoginSerializer,
-    responses={200: UserSerializer},
+    responses={200: UserSerializer, 400: DetailedErrorResponse},
   )
 )
 class OAuthLoginAPIView(GenericAPIView):
@@ -42,7 +44,7 @@ class OAuthLoginAPIView(GenericAPIView):
 
     raw_user = GoogleOAuthProvider.get_user(access_token=token)
     if raw_user is None:
-      return Response({"ok": False}, status=status.HTTP_400_BAD_REQUEST)
+      raise BadOAuthToken()
 
     # Find or create user
     user = None

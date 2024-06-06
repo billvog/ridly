@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
+from ridl_api.serializers import DetailedErrorResponse
 from .models import Event
 from .serializers import EventJoinSerializer, EventSerializer
 
@@ -15,13 +16,22 @@ class ListEventsAPIVIew(ListAPIView):
   serializer_class = EventSerializer
 
 
-@extend_schema_view(get=extend_schema(operation_id="event"))
+@extend_schema_view(
+  get=extend_schema(
+    operation_id="event", responses={200: EventSerializer, 404: DetailedErrorResponse}
+  )
+)
 class RetrieveEventAPIView(RetrieveAPIView):
   queryset = Event.objects.all()
   serializer_class = EventSerializer
 
 
-@extend_schema_view(get=extend_schema(operation_id="joined_events"))
+@extend_schema_view(
+  get=extend_schema(
+    operation_id="joined_events",
+    responses={200: EventSerializer, 403: DetailedErrorResponse},
+  )
+)
 class ListJoinedEventsAPIView(ListAPIView):
   serializer_class = EventSerializer
   permission_classes = [permissions.IsAuthenticated]
@@ -34,7 +44,11 @@ class ListJoinedEventsAPIView(ListAPIView):
   post=extend_schema(
     operation_id="join_event",
     request=None,
-    responses={200: EventJoinSerializer},
+    responses={
+      200: EventJoinSerializer,
+      403: DetailedErrorResponse,
+      404: DetailedErrorResponse,
+    },
   )
 )
 class JoinEventAPIView(APIView):

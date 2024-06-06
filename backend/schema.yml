@@ -45,6 +45,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Event'
           description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedErrorResponse'
+          description: ''
   /event/{id}/join/:
     post:
       operationId: join_event
@@ -67,6 +73,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/EventJoin'
           description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedErrorResponse'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedErrorResponse'
+          description: ''
   /event/joined/:
     get:
       operationId: joined_events
@@ -83,6 +101,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Event'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedErrorResponse'
           description: ''
   /hunt/{id}/:
     get:
@@ -106,6 +130,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Hunt'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedErrorResponse'
           description: ''
   /hunt/{id}/clue/{clue_order}/:
     get:
@@ -135,6 +165,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/HuntClue'
           description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedErrorResponse'
+          description: ''
   /oauth/google/login/:
     post:
       operationId: oauth_google_login
@@ -163,6 +199,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedErrorResponse'
+          description: ''
   /user/logout/:
     delete:
       operationId: user_logout
@@ -174,6 +216,12 @@ paths:
       responses:
         '204':
           description: No response body
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedErrorResponse'
+          description: ''
   /user/me/:
     get:
       operationId: user_me
