@@ -1,11 +1,11 @@
 import { Entypo } from "@expo/vector-icons";
 import React from "react";
 import { Callout, Marker } from "react-native-maps";
-import { TCapturedHuntClue } from "@/types/hunt";
+import { CapturedHuntClue } from "@/types/hunt";
 import { Text, View } from "react-native";
 
 type ClueMapMarkerProps = {
-  clue: TCapturedHuntClue;
+  clue: CapturedHuntClue;
 };
 
 export default function ClueMapMarker({ clue }: ClueMapMarkerProps) {
@@ -26,7 +26,7 @@ export default function ClueMapMarker({ clue }: ClueMapMarkerProps) {
 }
 
 type ClueMapCalloutProps = {
-  clue: TCapturedHuntClue;
+  clue: CapturedHuntClue;
 };
 
 function ClueMapCallout({ clue }: ClueMapCalloutProps) {

@@ -1,31 +1,16 @@
-import { TEvent } from "@/types/event";
+import { HuntClue } from "@/types/gen";
 import { LocationPoint } from "@/types/general";
 
-export type THuntEvent = Pick<TEvent, "name" | "location_name" | "location_coordinates">;
-
-export type THunt = {
-  id: string;
-  event: THuntEvent;
-  clue_count: number;
-};
-
-export type THuntClue = {
-  id: string;
-  riddle: string;
-  order: number;
-  location_threshold: number;
-};
-
-export type TCapturedHuntClue = THuntClue & {
+export type CapturedHuntClue = HuntClue & {
   location_point: LocationPoint;
 };
 
-export type THuntSocketCommand = "hunt.cl.current" | "hunt.cl.unlock" | "hunt.loc.check";
+export type HuntSocketCommand = "hunt.cl.current" | "hunt.cl.unlock" | "hunt.loc.check";
 
-export type THuntSocketResult =
+export type HuntSocketResult =
   | {
       command: "hunt.cl.current";
-      payload: THuntClue;
+      payload: HuntClue;
     }
   | {
       command: "hunt.cl.unlock";

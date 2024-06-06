@@ -1,9 +1,9 @@
-import { THuntSocketCommand } from "@/types/hunt";
+import { HuntSocketCommand } from "@/types/hunt";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 type SentSocketMessage = {
   id: string;
-  command: THuntSocketCommand;
+  command: HuntSocketCommand;
   resolved: boolean;
   sent_at: number;
 };

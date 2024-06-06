@@ -1,6 +1,6 @@
 import { useStoreDispatch, useStoreSelector } from "@/redux/hooks";
 import { SocketActions } from "@/redux/socket/reducer";
-import { THuntSocketCommand } from "@/types/hunt";
+import { HuntSocketCommand } from "@/types/hunt";
 import { getAccessToken } from "@/utils/authTokens";
 import { randomUUID } from "expo-crypto";
 import { useCallback, useEffect, useMemo } from "react";
@@ -41,7 +41,7 @@ export function useWebSocket(path: string | null) {
   const socketState = useStoreSelector((state) => state.socket);
   const dispatch = useStoreDispatch();
 
-  const send = useCallback<SocketSendFunction<THuntSocketCommand>>(
+  const send = useCallback<SocketSendFunction<HuntSocketCommand>>(
     (command, payload) => {
       if (!socket) {
         // console.log("socket is not connected. aborting send.", socket);

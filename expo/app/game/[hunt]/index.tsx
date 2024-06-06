@@ -16,14 +16,9 @@ import HuntMap from "@/modules/ui/hunt/Map";
 import InaccurateCircle from "@/modules/ui/map/InaccurateCircle";
 import { useStoreDispatch } from "@/redux/hooks";
 import { SocketActions } from "@/redux/socket/reducer";
-import { useHunt } from "@/types/gen";
+import { HuntClue, useHunt } from "@/types/gen";
 import { LocationPoint } from "@/types/general";
-import {
-  TCapturedHuntClue,
-  THuntClue,
-  THuntSocketCommand,
-  THuntSocketResult,
-} from "@/types/hunt";
+import { CapturedHuntClue, HuntSocketCommand, HuntSocketResult } from "@/types/hunt";
 import { useLocalSearchParams } from "expo-router";
 import * as TaskManager from "expo-task-manager";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -105,14 +100,14 @@ export default function Page() {
    *
    */
 
-  const [clue, setClue] = useState<THuntClue>();
+  const [clue, setClue] = useState<HuntClue>();
 
   const [clueState, setClueState] = useState<{
     near: boolean;
     location: LocationPoint | undefined;
   }>({ near: false, location: undefined });
 
-  const [capturedClues, setCapturedClues] = usePersistentState<TCapturedHuntClue[]>(
+  const [capturedClues, setCapturedClues] = usePersistentState<CapturedHuntClue[]>(
     [],
     hunt ? CAPTURED_CLUES_STORAGE_ID + hunt.id : ""
   );
@@ -157,12 +152,12 @@ export default function Page() {
   // Connect to WebSocket
   const { socket, send: socketSend } = useWebSocket(hunt ? `/hunt/${hunt.id}` : null);
 
-  const currentClueRequest = useSocketSend<THuntSocketCommand>(
+  const currentClueRequest = useSocketSend<HuntSocketCommand>(
     "hunt.cl.current",
     socketSend
   );
 
-  const captureClueRequest = useSocketSend<THuntSocketCommand>(
+  const captureClueRequest = useSocketSend<HuntSocketCommand>(
     "hunt.cl.current",
     socketSend
   );
@@ -183,7 +178,7 @@ export default function Page() {
   }, [socket, clue]);
 
   // Handle socket messages
-  useOnWebSocket<THuntSocketResult>(socket, (res) => {
+  useOnWebSocket<HuntSocketResult>(socket, (res) => {
     if (res.command === "hunt.cl.current") {
       setClue(res.payload);
     } else if (res.command === "hunt.loc.check") {
@@ -329,7 +324,7 @@ export default function Page() {
             {/* If we've reached clue, and clue's location is set, draw a circle around its approximate location. */}
             {clue && clueState.near && clueState.location && (
               <InaccurateCircle
-                radius={clue.location_threshold}
+                radius={clue.location_threshold!}
                 center={{
                   latitude: clueState.location.lat,
                   longitude: clueState.location.long,
