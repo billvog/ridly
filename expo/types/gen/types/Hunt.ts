@@ -1,4 +1,5 @@
 import { HuntEvent } from "./HuntEvent";
+import { DetailedErrorResponse } from "./DetailedErrorResponse";
 
  export type Hunt = {
     /**
@@ -10,4 +11,19 @@ import { HuntEvent } from "./HuntEvent";
      * @type integer
     */
     readonly clue_count: number;
+};
+
+ export type HuntPathParams = {
+    /**
+     * @type string, uuid
+    */
+    id: string;
+};
+export type Hunt200 = Hunt;
+export type Hunt404 = DetailedErrorResponse;
+export type HuntQueryResponse = Hunt;
+export type HuntQuery = {
+    Response: HuntQueryResponse;
+    PathParams: HuntPathParams;
+    Errors: Hunt404;
 };

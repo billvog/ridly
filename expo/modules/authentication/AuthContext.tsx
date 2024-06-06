@@ -1,10 +1,7 @@
-import Button from "@/modules/ui/Button";
-import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
-import { User, useUserMeRetrieve } from "@/types/gen";
+import { User, useUserMe } from "@/types/gen";
 import { clearAuthTokens } from "@/utils/authTokens";
 import React, { useContext, useEffect, useState } from "react";
-import { Text } from "react-native";
 
 type AuthContextType = {
   user: User | null;
@@ -24,7 +21,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
 
-  const meQuery = useUserMeRetrieve();
+  const meQuery = useUserMe();
 
   useEffect(() => {
     if (meQuery.isLoading) {
@@ -44,24 +41,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setInitializing(false);
   }, [meQuery]);
 
-  function retryFailure() {
-    meQuery.refetch();
-  }
-
-  if (false) {
-    return (
-      <FullscreenError>
-        <Text className="font-extrabold text-red-500 text-2xl text-center">{`Something went wrong.\nPlease try again later.`}</Text>
-        <Button
-          buttonStyle="mt-8 mx-auto"
-          textStyle="font-extrabold"
-          onPress={retryFailure}
-        >
-          Retry
-        </Button>
-      </FullscreenError>
-    );
-  }
+  // function retryFailure() {
+  //   meQuery.refetch();
+  // }
+  //
+  // if (false) {
+  //   return (
+  //     <FullscreenError>
+  //       <Text className="font-extrabold text-red-500 text-2xl text-center">{`Something went wrong.\nPlease try again later.`}</Text>
+  //       <Button
+  //         buttonStyle="mt-8 mx-auto"
+  //         textStyle="font-extrabold"
+  //         onPress={retryFailure}
+  //       >
+  //         Retry
+  //       </Button>
+  //     </FullscreenError>
+  //   );
+  // }
 
   if (meQuery.isLoading) {
     return <FullscreenSpinner />;

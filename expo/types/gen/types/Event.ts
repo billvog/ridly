@@ -1,5 +1,6 @@
 import { Creator } from "./Creator";
 import { EventParticipant } from "./EventParticipant";
+import { DetailedErrorResponse } from "./DetailedErrorResponse";
 
  export type Event = {
     /**
@@ -43,4 +44,19 @@ import { EventParticipant } from "./EventParticipant";
      * @type string, date-time
     */
     readonly created_at: string;
+};
+
+ export type EventPathParams = {
+    /**
+     * @type string, uuid
+    */
+    id: string;
+};
+export type Event200 = Event;
+export type Event404 = DetailedErrorResponse;
+export type EventQueryResponse = Event;
+export type EventQuery = {
+    Response: EventQueryResponse;
+    PathParams: EventPathParams;
+    Errors: Event404;
 };
