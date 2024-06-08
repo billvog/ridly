@@ -19,7 +19,7 @@ class HuntModule(BaseModule):
 
   @command("cl.current")
   async def get_current_clue(self, _):
-    clue, _ = await get_hunt_current_clue(self.consumer.hunt, self.consumer.user)
+    clue, _ = await get_hunt_current_clue(self.consumer.hunt_stat)
     if clue is None:
       await self.consumer.send_error("clue_404")
       return
@@ -41,7 +41,7 @@ class HuntModule(BaseModule):
     # Get current clue.
     # Ideally store the current clue each user in cache, so we don't
     # have to make queries to postgres every time a players checks their location.
-    clue, _ = await get_hunt_current_clue(self.consumer.hunt, self.consumer.user)
+    clue, _ = await get_hunt_current_clue(self.consumer.hunt_stat)
     if clue is None:
       await self.consumer.send_error("clue_404")
       return
@@ -78,9 +78,7 @@ class HuntModule(BaseModule):
     clue_location = serializer.validated_data["location"]
 
     # Get current clue
-    clue, clue_stat = await get_hunt_current_clue(
-      self.consumer.hunt, self.consumer.user
-    )
+    clue, clue_stat = await get_hunt_current_clue(self.consumer.hunt_stat)
     if clue is None or clue_stat is None:
       await self.consumer.send_error("clue_404")
       return
@@ -98,7 +96,7 @@ class HuntModule(BaseModule):
       return
 
     # Set clue stat as unlocked on database
-    is_over = await hunt_unlock_clue(clue_stat)
+    is_over = await hunt_unlock_clue(self.consumer.hunt_stat, clue_stat)
 
     response = {"unlocked": True}
     if is_over:

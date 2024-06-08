@@ -55,9 +55,13 @@ class HuntClue(models.Model):
 
 class HuntClueStat(models.Model):
   clue = models.ForeignKey(HuntClue, on_delete=models.CASCADE)
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+  hunt_stat = models.ForeignKey(
+    HuntStat, related_name="clue_stats", on_delete=models.CASCADE
+  )
 
   tries_made = models.PositiveSmallIntegerField(default=0)
+
   unlocked = models.BooleanField(default=False)
 
   created_at = models.DateTimeField(auto_now_add=True)

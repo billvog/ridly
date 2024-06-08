@@ -22,16 +22,13 @@ def get_hunt_stat(hunt, user):
 
 
 @database_sync_to_async
-def get_hunt_current_clue(hunt, user):
-  clue_stat = (
-    HuntClueStat.objects.filter(clue__hunt=hunt, user=user)
-    .order_by("clue__order")
-    .last()
-  )
+def get_hunt_current_clue(hunt_stat):
+  clue_stat = hunt_stat.clue_stats.order_by("clue__order").last()
 
   if clue_stat is None:
+    hunt = hunt_stat.hunt
     first_clue = hunt.clues.order_by("order").first()
-    clue_stat = HuntClueStat.objects.create(clue=first_clue, user=user)
+    clue_stat = HuntClueStat.objects.create(clue=first_clue, hunt_stat=hunt_stat)
 
   return clue_stat.clue, clue_stat
 
@@ -54,9 +51,7 @@ def hunt_unlock_clue(hunt_stat, clue_stat):
     return True
 
   # Else, move to next one
-  clue = clue_stat.clue
-  next_clue = HuntClue.objects.get(order=(clue.order + 1))
-  HuntClueStat.objects.create(clue=next_clue, user=clue_stat.user)
+  internal_hunt_next_clue(hunt_stat, clue_stat.clue)
 
   return False
 
@@ -81,6 +76,11 @@ def hunt_failed_unlock_clue(hunt_stat, clue_stat):
 """
 Internal functions, only called from within @database_sync_to_async functions.
 """
+
+
+def internal_hunt_next_clue(hunt_stat, current_clue):
+  next_clue = HuntClue.objects.get(order=(current_clue.order + 1))
+  HuntClueStat.objects.create(clue=next_clue, hunt_stat=hunt_stat)
 
 
 def internal_hunt_complete(hunt_stat):
