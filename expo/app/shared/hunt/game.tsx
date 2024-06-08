@@ -32,14 +32,14 @@ const CAPTURED_CLUES_STORAGE_ID = "hunt/captured-clues/";
 
 const eventEmmiter = new TinyEmitter();
 
-export default function Page() {
+export default function HuntGame() {
   /*
    *
    * Routing
    *
    */
 
-  const { hunt: huntId } = useLocalSearchParams();
+  const { id: huntId } = useLocalSearchParams();
 
   /*
    *

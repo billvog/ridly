@@ -39,9 +39,9 @@ export default function Page() {
   // Navigate to event detail screen.
   function onEventPressed(eventId: string) {
     router.push({
-      pathname: "/(my-events)/[event]",
+      pathname: "/(my-events)/event/[id]",
       params: {
-        event: eventId,
+        id: eventId,
       },
     });
   }
