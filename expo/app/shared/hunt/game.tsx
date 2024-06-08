@@ -19,6 +19,7 @@ import { SocketActions } from "@/redux/socket/reducer";
 import { HuntClue, useHunt } from "@/types/gen";
 import { LocationPoint } from "@/types/general";
 import { CapturedHuntClue, HuntSocketCommand, HuntSocketResult } from "@/types/hunt";
+import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { useLocalSearchParams } from "expo-router";
 import * as TaskManager from "expo-task-manager";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -32,14 +33,19 @@ const CAPTURED_CLUES_STORAGE_ID = "hunt/captured-clues/";
 
 const eventEmmiter = new TinyEmitter();
 
-export default function Page() {
+export const HuntGameNavigationOptions: NativeStackNavigationOptions = {
+  presentation: "fullScreenModal",
+  headerShown: false,
+};
+
+export default function HuntGame() {
   /*
    *
    * Routing
    *
    */
 
-  const { hunt: huntId } = useLocalSearchParams();
+  const { id: huntId } = useLocalSearchParams();
 
   /*
    *

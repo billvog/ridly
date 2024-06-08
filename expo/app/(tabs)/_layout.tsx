@@ -1,3 +1,4 @@
+import { useShouldHideTabBar } from "@/hooks/useShouldHideTabBar";
 import { useUser } from "@/hooks/useUser";
 import { Feather } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
@@ -8,6 +9,7 @@ export const unstable_settings = {
 
 export default function Layout() {
   const user = useUser();
+  const shouldHideTabBar = useShouldHideTabBar();
 
   if (!user) {
     return <Redirect href="/guest/login" />;
@@ -16,8 +18,11 @@ export default function Layout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#f4511e",
         headerShown: false,
+        tabBarActiveTintColor: "#f4511e",
+        tabBarStyle: {
+          display: shouldHideTabBar ? "none" : "flex",
+        },
       }}
     >
       <Tabs.Screen

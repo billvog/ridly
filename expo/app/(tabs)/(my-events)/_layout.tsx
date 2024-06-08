@@ -1,3 +1,4 @@
+import { HuntGameNavigationOptions } from "@/app/shared/hunt/game";
 import { Stack } from "expo-router";
 import React from "react";
 
@@ -15,6 +16,7 @@ export default function Layout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: "My Events" }} />
+      <Stack.Screen name="hunt/[id]" options={HuntGameNavigationOptions} />
     </Stack>
   );
 }

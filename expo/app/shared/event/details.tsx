@@ -6,14 +6,15 @@ import { AntDesign, Feather } from "@expo/vector-icons";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter, useSegments } from "expo-router";
 import React, { useEffect, useMemo } from "react";
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function EventDetails() {
-  const { event: eventId } = useLocalSearchParams();
+  const { id: eventId } = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
+  const segments = useSegments();
 
   const eventQuery = useEvent(typeof eventId === "string" ? eventId : "", {
     query: { enabled: typeof eventId === "string" },
@@ -36,10 +37,8 @@ export default function EventDetails() {
     if (!event || !event.hunt_id) return;
 
     router.push({
-      pathname: "/game/[hunt]",
-      params: {
-        hunt: event.hunt_id,
-      },
+      pathname: `/(tabs)/${segments[1]}/hunt/[id]`,
+      params: { id: event.hunt_id },
     });
   }
 

@@ -21,8 +21,8 @@ export default function EventCard({ event, style }: EventCardProps) {
   function onPress() {
     queryClient.setQueryData(eventQueryKey(event.id), event);
     router.push({
-      pathname: `/(tabs)/${segments[1]}/[event]`,
-      params: { event: event.id },
+      pathname: `/(tabs)/${segments[1]}/event/[id]`,
+      params: { id: event.id },
     });
   }
 
