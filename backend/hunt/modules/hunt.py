@@ -2,7 +2,11 @@ from geopy.distance import distance as geopy_distance
 
 from hunt.decorators import command
 from hunt.modules.base import BaseModule
-from hunt.service import get_hunt_current_clue, hunt_unlock_clue
+from hunt.service import (
+  get_hunt_current_clue,
+  hunt_unlock_clue,
+  hunt_failed_unlock_clue,
+)
 from hunt.serializers import (
   HuntClueSerializer,
   LocationCheckSerializer,
@@ -84,12 +88,12 @@ class HuntModule(BaseModule):
     # Construct tuple that looks like Point.coords
     clue_location_coords = (clue_location["long"], clue_location["lat"])
 
-    # In this case, the player is prolly cheating, OR our code is bad.
+    # In this case, the player is probably cheating.
     # The client should ONLY know the exact location of the clue, if
     # they've sent a location that's near the clue to "loc.check".
     # Otherwise, they're trying to brute force it (?)
-    # TODO: Update clue's tries left. Each user should have 2.
     if clue.location_point.coords != clue_location_coords:
+      await hunt_failed_unlock_clue(self.consumer.hunt_stat, clue_stat)
       await self.consumer.send_error("unlock_failed")
       return
 
