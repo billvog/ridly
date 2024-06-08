@@ -99,7 +99,7 @@ ASGI_APPLICATION = "ridl_api.asgi.application"
 DATABASES = {
   "default": {
     "ENGINE": "django.contrib.gis.db.backends.postgis",
-    "NAME": os.environ.get("POSTGRES_NAME"),
+    "NAME": os.environ.get("POSTGRES_DB"),
     "USER": os.environ.get("POSTGRES_USER"),
     "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
     "HOST": "db",
