@@ -98,8 +98,8 @@ DATABASES = {
     ),
     "USER": config("POSTGRES_USER"),
     "PASSWORD": config("POSTGRES_PASSWORD"),
-    "HOST": "db",
-    "PORT": "5432",
+    "HOST": config("POSTGRES_HOST", default="db"),
+    "PORT": config("POSTGRES_PORT", default="5432"),
   }
 }
 
@@ -111,8 +111,8 @@ CHANNEL_LAYERS = {
     "CONFIG": {
       "hosts": [
         (
-          "redis",  # host
-          6379,  # port
+          config("REDIS_HOST", default="redis"),
+          config("REDIS_PORT", default=6379),
         )
       ],
     },
