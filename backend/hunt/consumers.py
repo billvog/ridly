@@ -4,7 +4,7 @@ import asyncio
 from websockets import ConnectionClosed
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
-from hunt.service import get_hunt
+from hunt.service import get_hunt, get_hunt_stat
 from hunt.modules.hunt import HuntModule
 from hunt.exceptions import ConsumerException
 
@@ -19,6 +19,7 @@ class HuntConsumer(AsyncJsonWebsocketConsumer):
     self.room_group_name = None
     self.hunt_pk = None
     self.hunt = None
+    self.hunt_stat = None
     self.event = None
 
     self.components = {}
@@ -44,6 +45,12 @@ class HuntConsumer(AsyncJsonWebsocketConsumer):
     self.hunt = await get_hunt(pk=self.hunt_pk)
     if self.hunt is None:
       await self.send_error(0, "Hunt not found", close=True)
+      return
+
+    # Get, or create, associated hunt stat from database, if not found, reject
+    self.hunt_stat = await get_hunt_stat(hunt=self.hunt, user=self.user)
+    if self.hunt_stat is None:
+      await self.send_error(0, "Couldn't create hunt stat", close=True)
       return
 
     # Get associated event from database, if not found reject

@@ -19,6 +19,17 @@ class Hunt(models.Model):
     return 'Hunt for "{}"'.format(self.event.name)
 
 
+class HuntStat(models.Model):
+  hunt = models.ForeignKey(Hunt, related_name="hunt_stats", on_delete=models.CASCADE)
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+  completed = models.BooleanField(default=False)
+  completed_at = models.DateTimeField(null=True)
+
+  shadow_banned = models.BooleanField(default=False)
+  shadow_banned_at = models.DateTimeField(null=True)
+
+
 class HuntClue(models.Model):
   hunt = models.ForeignKey(Hunt, related_name="clues", on_delete=models.CASCADE)
 
@@ -44,9 +55,13 @@ class HuntClue(models.Model):
 
 class HuntClueStat(models.Model):
   clue = models.ForeignKey(HuntClue, on_delete=models.CASCADE)
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+  hunt_stat = models.ForeignKey(
+    HuntStat, related_name="clue_stats", on_delete=models.CASCADE
+  )
 
   tries_made = models.PositiveSmallIntegerField(default=0)
+
   unlocked = models.BooleanField(default=False)
 
   created_at = models.DateTimeField(auto_now_add=True)
