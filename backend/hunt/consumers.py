@@ -78,7 +78,7 @@ class HuntConsumer(AsyncJsonWebsocketConsumer):
     self.content = content
 
     # Simulate slow connection, by sleeping for 2s
-    await asyncio.sleep(2)
+    # await asyncio.sleep(2)
 
     namespace = content[0].split(".")[0]
     component = self.components.get(namespace)
