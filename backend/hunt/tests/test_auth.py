@@ -2,12 +2,9 @@ import jwt
 import uuid
 
 from django.conf import settings
-from channels.db import database_sync_to_async
 from datetime import datetime, timezone, timedelta
 
-from user.models import User
 from hunt.tests.base import ConsumerTestCase
-from user.auth_tokens import generate_tokens_for_user
 
 
 class TestHuntConsumerAuthentication(ConsumerTestCase):
@@ -24,14 +21,8 @@ class TestHuntConsumerAuthentication(ConsumerTestCase):
       settings.JWT_ACCESS_TOKEN_SECRET,
     )
 
-  @database_sync_to_async
-  def create_user(self, **kwargs):
-    return User.objects.create(**kwargs)
-
   async def test_connect_authenticated(self):
-    # Create a test user and generate access token for it
-    user = await self.create_user(email="test@example.com", password="password")
-    access_token, _ = generate_tokens_for_user(user)
+    _, access_token = await self._get_valid_user()
 
     # Create a communicator and connect
     communicator = self._get_communicator(
