@@ -70,7 +70,7 @@ class HuntConsumer(AsyncJsonWebsocketConsumer):
 
   async def disconnect(self, _):
     # Leave room, if joined (in case of early reject, like when not authenticated)
-    if hasattr(self, "room_group_name"):
+    if self.room_group_name is not None:
       await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
   # Receive message from client
