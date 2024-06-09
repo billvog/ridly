@@ -2,7 +2,7 @@ name: Django CI
 
 on:
   push:
-    branches: ["main", "feat/django-tests"]
+    branches: ["main"]
     paths:
       - "backend/**"
       - ".github/workflows/django.yml"
