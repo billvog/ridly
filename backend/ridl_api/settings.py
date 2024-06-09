@@ -10,14 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import os
 from pathlib import Path
-from dotenv import load_dotenv
 from corsheaders.defaults import default_headers
+from decouple import config
 
-
-# Load variables from .env
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,11 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-cye9hsla%)gf!5+qik28v$-#_=cv&qa%7(hww(-i5li5haf_!r"
+SECRET_KEY = config("DJANGO_SECRET_KEY", cast=str)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = ["*"]
 
@@ -99,9 +93,11 @@ ASGI_APPLICATION = "ridl_api.asgi.application"
 DATABASES = {
   "default": {
     "ENGINE": "django.contrib.gis.db.backends.postgis",
-    "NAME": os.environ.get("POSTGRES_DB"),
-    "USER": os.environ.get("POSTGRES_USER"),
-    "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+    "NAME": config(
+      "POSTGRES_DB",
+    ),
+    "USER": config("POSTGRES_USER"),
+    "PASSWORD": config("POSTGRES_PASSWORD"),
     "HOST": "db",
     "PORT": "5432",
   }
@@ -113,7 +109,12 @@ CHANNEL_LAYERS = {
   "default": {
     "BACKEND": "channels_redis.core.RedisChannelLayer",
     "CONFIG": {
-      "hosts": [("redis", 6379)],
+      "hosts": [
+        (
+          "redis",  # host
+          6379,  # port
+        )
+      ],
     },
   },
 }
@@ -161,8 +162,8 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Authentication token secrets
-JWT_ACCESS_TOKEN_SECRET = os.environ.get("JWT_ACCESS_TOKEN_SECRET")
-JWT_REFRESH_TOKEN_SECRET = os.environ.get("JWT_REFRESH_TOKEN_SECRET")
+JWT_ACCESS_TOKEN_SECRET = config("JWT_ACCESS_TOKEN_SECRET", cast=str)
+JWT_REFRESH_TOKEN_SECRET = config("JWT_REFRESH_TOKEN_SECRET", cast=str)
 
 # Configure Cors
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
