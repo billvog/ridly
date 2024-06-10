@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 from hunt.tests.base import ConsumerTestCase
 
 
-class TestHuntConsumerAuthentication(ConsumerTestCase):
+class TestConsumerAuthentication(ConsumerTestCase):
   def _generate_bad_access_token(self) -> str:
     """
     Generated an access token with a bad `user_id`.
