@@ -9,6 +9,15 @@
     }
   },
   {
+    "model": "hunt.hunt",
+    "pk": "6466b5c1-17a2-4ccd-af6a-b9a4f16cb127",
+    "fields": {
+      "event": "d9aff115-501d-4a55-be58-37eb26808627",
+      "created_at": "2024-06-09T19:45:02.907Z",
+      "updated_at": "2024-06-09T19:45:21.764Z"
+    }
+  },
+  {
     "model": "hunt.huntclue",
     "pk": 1,
     "fields": {
