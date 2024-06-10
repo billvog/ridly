@@ -27,7 +27,11 @@ def get_hunt_current_clue(hunt_stat):
 
   if clue_stat is None:
     hunt = hunt_stat.hunt
+
     first_clue = hunt.clues.order_by("order").first()
+    if first_clue is None:
+      return None, None
+
     clue_stat = HuntClueStat.objects.create(clue=first_clue, hunt_stat=hunt_stat)
 
   return clue_stat.clue, clue_stat
