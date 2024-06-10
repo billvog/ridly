@@ -1,0 +1,44 @@
+[
+  {
+    "model": "user.user",
+    "pk": "33398e61-31c4-41ab-9862-a52f34c4a77f",
+    "fields": {
+      "password": "pbkdf2_sha256$720000$cKKpeeD3pHmf2SxeNHpyV5$NfMtAH/tMRp5BNdB87t/U2GHvgzPRa7C2h6TG2Myu/I=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "max0",
+      "email": "max@example.com",
+      "first_name": "Max",
+      "last_name": "Mad",
+      "avatar_url": "",
+      "is_active": true,
+      "is_staff": false,
+      "token_version": 0,
+      "created_at": "2024-06-10T15:50:51.670Z",
+      "updated_at": "2024-06-10T15:51:08.069Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": "8745b5a0-f379-4ab6-a618-9b4803a60924",
+    "fields": {
+      "password": "pbkdf2_sha256$720000$cKKpeeD3pHmf2SxeNHpyV5$NfMtAH/tMRp5BNdB87t/U2GHvgzPRa7C2h6TG2Myu/I=",
+      "last_login": "2024-06-09T19:42:48Z",
+      "is_superuser": true,
+      "username": "Ridly",
+      "email": "hey@ridly.io",
+      "first_name": "Ridly",
+      "last_name": "Yldir",
+      "avatar_url": "",
+      "is_active": true,
+      "is_staff": true,
+      "token_version": 0,
+      "created_at": "2024-06-09T19:42:28.192Z",
+      "updated_at": "2024-06-09T19:45:55.396Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+]

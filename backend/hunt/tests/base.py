@@ -8,7 +8,11 @@ from ridl_api.asgi import application
 from user.models import User
 from user.auth_tokens import generate_tokens_for_user
 
+
 class ConsumerTestCase(TransactionTestCase):
+  # Load test data from fixtures for each test case.
+  fixtures = ["user", "creator", "event", "hunt"]
+
   def _get_url(self, hunt_id: uuid.UUID, access_token: str | None) -> str:
     """
     Generate consumer url with ranomd hunt id and access token.
@@ -20,16 +24,16 @@ class ConsumerTestCase(TransactionTestCase):
 
   def _get_communicator(self, hunt_id: uuid.UUID, access_token: str | None):
     return WebsocketCommunicator(application, self._get_url(hunt_id, access_token))
-  
+
   @database_sync_to_async
-  def _create_user(self, **kwargs):
-    return User.objects.create(**kwargs)
-  
-  async def _get_valid_user(self):
+  def _get_user(self, id):
+    return User.objects.get(id=id)
+
+  async def _get_valid_auth(self):
     """
-    Creates and returns a valid user with a valid access token.
+    Returns a valid user with a valid access token.
     """
-    user = await self._create_user(email="test@example.com", password="password")
-    self.assertIsNotNone(user, "Failed to create user.")
+    user = await self._get_user("33398e61-31c4-41ab-9862-a52f34c4a77f")
+    self.assertIsNotNone(user, "Failed to get user.")
     access_token, _ = generate_tokens_for_user(user)
     return user, access_token

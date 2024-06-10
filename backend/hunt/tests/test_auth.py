@@ -22,7 +22,7 @@ class TestHuntConsumerAuthentication(ConsumerTestCase):
     )
 
   async def test_connect_authenticated(self):
-    _, access_token = await self._get_valid_user()
+    _, access_token = await self._get_valid_auth()
 
     # Create a communicator and connect
     communicator = self._get_communicator(

@@ -1,34 +1,26 @@
 import uuid
 
-from django.utils import timezone
-from django.contrib.gis.geos import Point
 from channels.db import database_sync_to_async
 
-from user.models import User
-from event.models import Event
-from creator.models import Creator
 from hunt.tests.base import ConsumerTestCase
 from hunt.models import Hunt
 
 
 class TestHuntConsumer(ConsumerTestCase):
   @database_sync_to_async
-  def create_valid_hunt(self, user: User):
-    creator = Creator.objects.create(user=user)
-    event = Event.objects.create(
-      creator=creator, location_coordinates=Point(0, 0), happening_at=timezone.now()
-    )
-    hunt = Hunt.objects.create(event=event)
-    clue = hunt.clues.create(location_point=Point(0, 0))
-    return hunt, clue
+  def get_hunt(self, id):
+    hunt = Hunt.objects.get(id=id)
+    return hunt
 
   async def test_connect_success(self):
-    user, access_token = await self._get_valid_user()
+    _, access_token = await self._get_valid_auth()
+
+    HUNT_ID = "63b4a5da-ecf7-4678-aba3-a610c8223120"
+    CLUE_ID = 2
 
     # Create a test hunt
-    hunt, clue = await self.create_valid_hunt(user=user)
-    self.assertIsNotNone(hunt, "Failed to create hunt.")
-    self.assertIsNotNone(clue, "Failed to create clue.")
+    hunt = await self.get_hunt(HUNT_ID)
+    self.assertIsNotNone(hunt, "Failed to get hunt.")
 
     # Create a communicator and connect
     communicator = self._get_communicator(hunt_id=hunt.id, access_token=access_token)
@@ -45,24 +37,26 @@ class TestHuntConsumer(ConsumerTestCase):
     # Ensure the response is correct
     self.assertEqual(response[0], "success")
     self.assertEqual(response[1], command_id)
-    self.assertEqual(response[2]["id"], clue.id)
+    self.assertEqual(response[2]["id"], CLUE_ID)
 
     # Disconnect from the consumer
     await communicator.disconnect()
 
   async def test_connect_failure(self):
-    _, access_token = await self._get_valid_user()
+    _, access_token = await self._get_valid_auth()
 
-    invalid_hunt_id = uuid.uuid4()
-    
+    BAD_HUNT_ID = uuid.uuid4()
+
     # Create a communicator and connect
-    communicator = self._get_communicator(hunt_id=invalid_hunt_id, access_token=access_token)
+    communicator = self._get_communicator(
+      hunt_id=BAD_HUNT_ID, access_token=access_token
+    )
     connected, _ = await communicator.connect()
     self.assertTrue(connected, "Failed to connect to the consumer.")
-  
+
     # Wait for the response
     response = await communicator.receive_json_from()
-    
+
     # Ensure the response is correct
     self.assertEqual(response[0], "error")
     self.assertEqual(response[1]["message"], "Hunt not found")

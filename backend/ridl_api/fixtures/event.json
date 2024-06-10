@@ -1,0 +1,39 @@
+[
+  {
+    "model": "event.event",
+    "pk": "82dc6f67-16c6-484a-b1a3-ac307ffc5527",
+    "fields": {
+      "name": "Test event 1",
+      "description": "Test event description",
+      "creator": "7878dc5d-06d9-4bd4-ac9f-5d72b6628a7e",
+      "participant_count": 1,
+      "location_coordinates": "SRID=4326;POINT (29.281090536849 30.12907032795732)",
+      "location_name": "Athens, Greece",
+      "happening_at": "2024-06-18T17:00:00Z",
+      "created_at": "2024-06-09T19:43:46.675Z",
+      "updated_at": "2024-06-10T15:51:25.981Z",
+      "participants": [
+        "33398e61-31c4-41ab-9862-a52f34c4a77f"
+      ]
+    }
+  },
+  {
+    "model": "event.event",
+    "pk": "d9aff115-501d-4a55-be58-37eb26808627",
+    "fields": {
+      "name": "Amazing test event 2",
+      "description": "Test event, amazing, description!",
+      "creator": "7878dc5d-06d9-4bd4-ac9f-5d72b6628a7e",
+      "participant_count": 2,
+      "location_coordinates": "SRID=4326;POINT (19.57870617405569 41.0000000000000)",
+      "location_name": "Litochoro, Greece",
+      "happening_at": "2024-06-04T06:00:00Z",
+      "created_at": "2024-06-09T19:44:39.313Z",
+      "updated_at": "2024-06-10T15:51:33.966Z",
+      "participants": [
+        "33398e61-31c4-41ab-9862-a52f34c4a77f",
+        "8745b5a0-f379-4ab6-a618-9b4803a60924"
+      ]
+    }
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {
+    "model": "creator.creator",
+    "pk": "7878dc5d-06d9-4bd4-ac9f-5d72b6628a7e",
+    "fields": {
+      "user": "8745b5a0-f379-4ab6-a618-9b4803a60924",
+      "created_at": "2024-06-09T19:42:54.376Z",
+      "updated_at": "2024-06-09T19:42:54.376Z"
+    }
+  }
+]
