@@ -5,5 +5,6 @@ export * from "./useHuntClue";
 export * from "./useJoinEvent";
 export * from "./useJoinedEvents";
 export * from "./useOauthGoogleLogin";
+export * from "./useUserCompleteSignup";
 export * from "./useUserLogout";
 export * from "./useUserMe";

@@ -24,6 +24,10 @@ export type User = {
     */
     avatar_url?: string;
     /**
+     * @type boolean | undefined
+    */
+    did_complete_signup?: boolean;
+    /**
      * @type string, date-time
     */
     readonly created_at: string;

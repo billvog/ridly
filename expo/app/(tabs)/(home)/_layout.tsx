@@ -16,6 +16,10 @@ export default function Layout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: "Home" }} />
+      <Stack.Screen
+        name="complete-signup"
+        options={{ presentation: "modal", title: "Complete Setup" }}
+      />
       <Stack.Screen name="hunt/[id]" options={HuntGameNavigationOptions} />
     </Stack>
   );
