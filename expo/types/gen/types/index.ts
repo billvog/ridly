@@ -1,6 +1,6 @@
 export * from "./CompleteSignup";
 export * from "./Creator";
-export * from "./DetailedErrorResponse";
+export * from "./DetailedError";
 export * from "./Event";
 export * from "./EventJoin";
 export * from "./EventParticipant";

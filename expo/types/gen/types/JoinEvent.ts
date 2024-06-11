@@ -1,4 +1,4 @@
-import type { DetailedErrorResponse } from "./DetailedErrorResponse";
+import type { DetailedError } from "./DetailedError";
 import type { EventJoin } from "./EventJoin";
 
  export type JoinEventPathParams = {
@@ -8,8 +8,8 @@ import type { EventJoin } from "./EventJoin";
     id: string;
 };
 export type JoinEvent200 = EventJoin;
-export type JoinEvent403 = DetailedErrorResponse;
-export type JoinEvent404 = DetailedErrorResponse;
+export type JoinEvent403 = DetailedError;
+export type JoinEvent404 = DetailedError;
 export type JoinEventMutationResponse = EventJoin;
 export type JoinEventMutation = {
     Response: JoinEventMutationResponse;

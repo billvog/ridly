@@ -1,5 +1,5 @@
 import { HuntEvent } from "./HuntEvent";
-import { DetailedErrorResponse } from "./DetailedErrorResponse";
+import { DetailedError } from "./DetailedError";
 
  export type Hunt = {
     /**
@@ -20,7 +20,7 @@ import { DetailedErrorResponse } from "./DetailedErrorResponse";
     id: string;
 };
 export type Hunt200 = Hunt;
-export type Hunt404 = DetailedErrorResponse;
+export type Hunt404 = DetailedError;
 export type HuntQueryResponse = Hunt;
 export type HuntQuery = {
     Response: HuntQueryResponse;

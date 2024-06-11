@@ -4,14 +4,14 @@ from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from ridl_api.serializers import DetailedErrorResponse
+from ridl_api.serializers import DetailedErrorSerializer
 from .models import Hunt
 from .serializers import HuntSerializer, HuntClueSerializer
 
 
 @extend_schema_view(
   get=extend_schema(
-    operation_id="hunt", responses={200: HuntSerializer, 404: DetailedErrorResponse}
+    operation_id="hunt", responses={200: HuntSerializer, 404: DetailedErrorSerializer}
   )
 )
 class RetrieveHuntAPIView(RetrieveAPIView):
@@ -22,7 +22,7 @@ class RetrieveHuntAPIView(RetrieveAPIView):
 @extend_schema_view(
   get=extend_schema(
     operation_id="hunt_clue",
-    responses={200: HuntClueSerializer, 404: DetailedErrorResponse},
+    responses={200: HuntClueSerializer, 404: DetailedErrorSerializer},
   )
 )
 class RetrieveHuntClueAPIView(RetrieveAPIView):

@@ -1,6 +1,6 @@
 import { Creator } from "./Creator";
 import { EventParticipant } from "./EventParticipant";
-import { DetailedErrorResponse } from "./DetailedErrorResponse";
+import { DetailedError } from "./DetailedError";
 
  export type Event = {
     /**
@@ -53,7 +53,7 @@ import { DetailedErrorResponse } from "./DetailedErrorResponse";
     id: string;
 };
 export type Event200 = Event;
-export type Event404 = DetailedErrorResponse;
+export type Event404 = DetailedError;
 export type EventQueryResponse = Event;
 export type EventQuery = {
     Response: EventQueryResponse;
