@@ -6,7 +6,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from .serializers import LoginSerializer
 from .exceptions import BadOAuthToken
 from .providers.google import GoogleOAuthProvider
-from ridl_api.serializers import DetailedErrorResponse
+from ridl_api.serializers import DetailedErrorSerializer
 from user.models import User
 from user.serializers import UserSerializer
 from user.auth_tokens import generate_tokens_for_user, set_refresh_token_cookie
@@ -16,7 +16,7 @@ from user.auth_tokens import generate_tokens_for_user, set_refresh_token_cookie
   post=extend_schema(
     operation_id="oauth_google_login",
     request=LoginSerializer,
-    responses={200: UserSerializer, 400: DetailedErrorResponse},
+    responses={200: UserSerializer, 400: DetailedErrorSerializer},
   )
 )
 class OAuthLoginAPIView(GenericAPIView):

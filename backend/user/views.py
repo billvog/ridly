@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from ridl_api.serializers import DetailedErrorResponse, ValidationErrorSerializer
+from ridl_api.serializers import DetailedErrorSerializer, ValidationErrorSerializer
 from user.models import User
 from user.serializers import UserSerializer, CompleteSignupSerializer
 from user.auth_tokens import (
@@ -38,7 +38,7 @@ class TestAuthTokenAPIView(APIView):
     operation_id="user_logout",
     methods=["DELETE"],
     request=None,
-    responses={204: None, 403: DetailedErrorResponse},
+    responses={204: None, 403: DetailedErrorSerializer},
   )
 )
 class LogoutAPIView(APIView):
@@ -53,7 +53,7 @@ class LogoutAPIView(APIView):
 @extend_schema_view(
   get=extend_schema(
     operation_id="user_me",
-    responses={200: UserSerializer, 403: DetailedErrorResponse},
+    responses={200: UserSerializer, 403: DetailedErrorSerializer},
   )
 )
 class MeAPIView(GenericAPIView):
@@ -73,7 +73,7 @@ class MeAPIView(GenericAPIView):
     responses={
       200: CompleteSignupSerializer,
       400: ValidationErrorSerializer,
-      403: DetailedErrorResponse,
+      403: DetailedErrorSerializer,
     },
   ),
 )

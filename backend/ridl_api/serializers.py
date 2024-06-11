@@ -23,7 +23,7 @@ class PointSerializer(serializers.Field):
     return {"long": value.coords[0], "lat": value.coords[1]}
 
 
-class DetailedErrorResponse(serializers.Serializer):
+class DetailedErrorSerializer(serializers.Serializer):
   detail = serializers.CharField(required=False)
 
 

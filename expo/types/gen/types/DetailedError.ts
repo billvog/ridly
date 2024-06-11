@@ -1,4 +1,4 @@
-export type DetailedErrorResponse = {
+export type DetailedError = {
     /**
      * @type string | undefined
     */

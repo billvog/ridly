@@ -1,4 +1,4 @@
-import { DetailedErrorResponse } from "./DetailedErrorResponse";
+import { DetailedError } from "./DetailedError";
 
  export type HuntClue = {
     /**
@@ -30,7 +30,7 @@ import { DetailedErrorResponse } from "./DetailedErrorResponse";
     id: string;
 };
 export type HuntClue200 = HuntClue;
-export type HuntClue404 = DetailedErrorResponse;
+export type HuntClue404 = DetailedError;
 export type HuntClueQueryResponse = HuntClue;
 export type HuntClueQuery = {
     Response: HuntClueQueryResponse;
