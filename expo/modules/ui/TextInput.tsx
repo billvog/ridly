@@ -1,13 +1,8 @@
 import React from "react";
-import {
-  UseControllerProps,
-  useController,
-  useFormContext,
-} from "react-hook-form";
+import { UseControllerProps, useController, useFormContext } from "react-hook-form";
 import {
   TextInput as RNTextInput,
   TextInputProps as RNTextInputProps,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
@@ -25,7 +20,7 @@ const ControlledInput = (props: TextInputProps) => {
   const hasError = Boolean(formState?.errors[name]);
 
   return (
-    <View className="mb-6 space-y-2.5">
+    <View className="mb-4 space-y-2.5">
       {label && <Text className="font-bold">{label}</Text>}
       <RNTextInput
         autoCapitalize="none"

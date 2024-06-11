@@ -1,3 +1,4 @@
+export * from "./CompleteSignup";
 export * from "./Creator";
 export * from "./DetailedErrorResponse";
 export * from "./Event";
@@ -13,5 +14,7 @@ export * from "./Login";
 export * from "./OauthGoogleLogin";
 export * from "./PublicUser";
 export * from "./User";
+export * from "./UserCompleteSignup";
 export * from "./UserLogout";
 export * from "./UserMe";
+export * from "./ValidationError";

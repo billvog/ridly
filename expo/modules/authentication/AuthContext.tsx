@@ -1,6 +1,7 @@
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
 import { User, useUserMe } from "@/types/gen";
 import { clearAuthTokens } from "@/utils/authTokens";
+import { useRouter } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 
 type AuthContextType = {
@@ -18,10 +19,11 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
 
-  const meQuery = useUserMe();
+  const meQuery = useUserMe({ query: { retry: false } });
 
   useEffect(() => {
     if (meQuery.isLoading) {
@@ -41,24 +43,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setInitializing(false);
   }, [meQuery]);
 
-  // function retryFailure() {
-  //   meQuery.refetch();
-  // }
-  //
-  // if (false) {
-  //   return (
-  //     <FullscreenError>
-  //       <Text className="font-extrabold text-red-500 text-2xl text-center">{`Something went wrong.\nPlease try again later.`}</Text>
-  //       <Button
-  //         buttonStyle="mt-8 mx-auto"
-  //         textStyle="font-extrabold"
-  //         onPress={retryFailure}
-  //       >
-  //         Retry
-  //       </Button>
-  //     </FullscreenError>
-  //   );
-  // }
+  // Propmt user to complete signup if they haven't
+  useEffect(() => {
+    if (user && !user.did_complete_signup) {
+      router.navigate("/(tabs)/(home)/complete-signup");
+    }
+  }, [user]);
 
   if (meQuery.isLoading) {
     return <FullscreenSpinner />;
