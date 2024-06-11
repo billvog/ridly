@@ -25,3 +25,9 @@ class PointSerializer(serializers.Field):
 
 class DetailedErrorResponse(serializers.Serializer):
   detail = serializers.CharField(required=False)
+
+
+class ValidationErrorSerializer(serializers.Serializer):
+  errors = serializers.DictField(
+    child=serializers.ListSerializer(child=serializers.CharField())
+  )

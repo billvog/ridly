@@ -180,6 +180,7 @@ CORS_EXPOSE_HEADERS = [
 # Django Rest Framework
 REST_FRAMEWORK = {
   "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+  "EXCEPTION_HANDLER": "ridl_api.exceptions.custom_exception_handler",
   "DEFAULT_AUTHENTICATION_CLASSES": (
     "rest_framework.authentication.SessionAuthentication",
     "user.authentication.JWTAuthentication",
