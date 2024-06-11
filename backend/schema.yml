@@ -205,6 +205,45 @@ paths:
               schema:
                 $ref: '#/components/schemas/DetailedErrorResponse'
           description: ''
+  /user/complete-signup/:
+    put:
+      operationId: user_complete_signup
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteSignup'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompleteSignup'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompleteSignup'
+        required: true
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompleteSignup'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedErrorResponse'
+          description: ''
   /user/logout/:
     delete:
       operationId: user_logout
@@ -245,6 +284,18 @@ paths:
           description: ''
 components:
   schemas:
+    CompleteSignup:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 50
+        did_complete_signup:
+          type: boolean
+          readOnly: true
+      required:
+      - did_complete_signup
+      - username
     Creator:
       type: object
       properties:
@@ -443,6 +494,8 @@ components:
           type: string
           format: uri
           maxLength: 200
+        did_complete_signup:
+          type: boolean
         created_at:
           type: string
           format: date-time
@@ -454,6 +507,17 @@ components:
       - id
       - last_name
       - username
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+      required:
+      - errors
   securitySchemes:
     JWTAuthentication:
       type: apiKey

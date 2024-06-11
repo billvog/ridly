@@ -24,11 +24,7 @@ class OAuthLoginAPIView(GenericAPIView):
 
   @staticmethod
   def create_user_from_raw_user(raw_user):
-    # Fix! sketchy way to set username because google doesn't provide one.
-    username = raw_user.get("email").split("@")[0]
-
     user = User.objects.create(
-      username=username,
       email=raw_user.get("email"),
       first_name=raw_user.get("first_name"),
       last_name=raw_user.get("last_name"),
@@ -50,8 +46,6 @@ class OAuthLoginAPIView(GenericAPIView):
     user = None
     try:
       user = User.objects.get(email=raw_user.get("email"))
-
-      # Update avatar
       user.avatar_url = raw_user.get("avatar")
       user.save()
     except User.DoesNotExist:
