@@ -84,6 +84,8 @@ Internal functions, only called from within @database_sync_to_async functions.
 
 def internal_hunt_next_clue(hunt_stat, current_clue):
   next_clue = HuntClue.objects.get(order=(current_clue.order + 1))
+  if next_clue is None:
+    return
   HuntClueStat.objects.create(clue=next_clue, hunt_stat=hunt_stat)
 
 

@@ -1,5 +1,5 @@
+import time
 import orjson
-import asyncio
 
 from websockets import ConnectionClosed
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
@@ -15,12 +15,16 @@ class HuntConsumer(AsyncJsonWebsocketConsumer):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
-    self.user = None
     self.room_group_name = None
+
+    self.user = None
     self.hunt_pk = None
-    self.hunt = None
     self.hunt_stat = None
+    self.hunt = None
     self.event = None
+
+    self.channel_cache = {}
+    self.invalidate_cache_at = 0
 
     self.components = {}
 
@@ -77,9 +81,6 @@ class HuntConsumer(AsyncJsonWebsocketConsumer):
   async def receive_json(self, content, **kwargs):
     self.content = content
 
-    # Simulate slow connection, by sleeping for 2s
-    # await asyncio.sleep(2)
-
     namespace = content[0].split(".")[0]
     component = self.components.get(namespace)
     if component:
@@ -124,3 +125,41 @@ class HuntConsumer(AsyncJsonWebsocketConsumer):
   @classmethod
   async def decode_json(cls, text_data):
     return orjson.loads(text_data)
+
+  # Caching
+
+  def get_cached(self, key):
+    """
+    Get a value from the cache. If cache is invalid, return None.
+    If None is returned, the caller should fetch the value from the database.
+    """
+    if self._is_cache_stale():
+      self._invalidate_cache()
+      return None
+    return self.channel_cache.get(key)
+
+  def set_cached(self, key, value):
+    """
+    Set a value in the cache.
+    """
+    self.channel_cache[key] = value
+
+  def remove_cached(self, key):
+    """
+    Remove a value from cache.
+    """
+    del self.channel_cache[key]
+
+  def _is_cache_stale(self):
+    """
+    Returns whether the cache is stale or not.
+    """
+    now = time.time()
+    return self.invalidate_cache_at <= now
+
+  def _invalidate_cache(self):
+    """
+    Resets the cache invalidation clock.
+    """
+    self.channel_cache = {}
+    self.invalidate_cache_at = time.time() + 10

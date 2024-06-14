@@ -17,9 +17,36 @@ from hunt.serializers import (
 class HuntModule(BaseModule):
   prefix = "hunt"
 
+  async def _get_current_clue(self):
+    """
+    Internal function to get current clue, either from cache, if is fresh, or from database.
+    """
+
+    if self.consumer.hunt_stat is None:
+      return None, None
+
+    # Get current clue from cache
+    clue = self.consumer.get_cached("clue")
+    clue_stat = self.consumer.get_cached("clue_stat")
+
+    # If not there, refetch from database, and update cache
+    if clue is None or clue_stat is None:
+      clue, clue_stat = await get_hunt_current_clue(self.consumer.hunt_stat)
+      self.consumer.set_cached("clue", clue)
+      self.consumer.set_cached("clue_stat", clue_stat)
+
+    return clue, clue_stat
+
+  def _clear_cached_clue(self):
+    """
+    Internal function to clean current clue from consumer's cache.
+    """
+    self.consumer.remove_cached("clue")
+    self.consumer.remove_cached("clue_stat")
+
   @command("cl.current")
   async def get_current_clue(self, _):
-    clue, _ = await get_hunt_current_clue(self.consumer.hunt_stat)
+    clue, _ = await self._get_current_clue()
     if clue is None:
       await self.consumer.send_error("clue_404")
       return
@@ -39,9 +66,7 @@ class HuntModule(BaseModule):
     location = serializer.validated_data["location"]
 
     # Get current clue.
-    # Ideally store the current clue each user in cache, so we don't
-    # have to make queries to postgres every time a players checks their location.
-    clue, _ = await get_hunt_current_clue(self.consumer.hunt_stat)
+    clue, _ = await self._get_current_clue()
     if clue is None:
       await self.consumer.send_error("clue_404")
       return
@@ -78,7 +103,7 @@ class HuntModule(BaseModule):
     clue_location = serializer.validated_data["location"]
 
     # Get current clue
-    clue, clue_stat = await get_hunt_current_clue(self.consumer.hunt_stat)
+    clue, clue_stat = await self._get_current_clue()
     if clue is None or clue_stat is None:
       await self.consumer.send_error("clue_404")
       return
@@ -86,17 +111,18 @@ class HuntModule(BaseModule):
     # Construct tuple that looks like Point.coords
     clue_location_coords = (clue_location["long"], clue_location["lat"])
 
-    # In this case, the player is probably cheating.
-    # The client should ONLY know the exact location of the clue, if
-    # they've sent a location that's near the clue to "loc.check".
-    # Otherwise, they're trying to brute force it (?)
+    # If the player's provided location does not match the exact location of the clue,
+    # it indicates that they are likely cheating or attempting to brute force the clue.
     if clue.location_point.coords != clue_location_coords:
       await hunt_failed_unlock_clue(self.consumer.hunt_stat, clue_stat)
       await self.consumer.send_error("unlock_failed")
       return
 
-    # Set clue stat as unlocked on database
+    # Set clue stat as unlocked on database, and get next one
     is_over = await hunt_unlock_clue(self.consumer.hunt_stat, clue_stat)
+
+    # Clear cached clue, so we can fetch it fresh from database
+    self._clear_cached_clue()
 
     response = {"unlocked": True}
     if is_over:
