@@ -1,4 +1,6 @@
-export type HuntEvent = {
+import { Point } from "./Point";
+
+ export type HuntEvent = {
     /**
      * @type string
     */
@@ -7,17 +9,5 @@ export type HuntEvent = {
      * @type string
     */
     location_name: string;
-    /**
-     * @type object
-    */
-    location_coordinates: {
-        /**
-         * @type number | undefined, float
-        */
-        long?: number;
-        /**
-         * @type number | undefined, float
-        */
-        lat?: number;
-    };
+    location_coordinates: Point;
 };

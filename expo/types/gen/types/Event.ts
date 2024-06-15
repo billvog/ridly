@@ -1,5 +1,4 @@
 import { Creator } from "./Creator";
-import { EventParticipant } from "./EventParticipant";
 import { DetailedError } from "./DetailedError";
 
  export type Event = {
@@ -17,9 +16,10 @@ import { DetailedError } from "./DetailedError";
     description: string;
     creator: Creator;
     /**
+     * @description Get the first 3 participants who have an avatar_url set and are not the current user.
      * @type array
     */
-    readonly participants: EventParticipant[];
+    readonly participant_avatars: string[];
     /**
      * @type integer | undefined
     */
@@ -39,7 +39,7 @@ import { DetailedError } from "./DetailedError";
     /**
      * @type string, uuid
     */
-    readonly hunt_id: string;
+    hunt_id: string;
     /**
      * @type string, date-time
     */

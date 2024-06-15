@@ -1,0 +1,1 @@
+{"type":"object","properties":{"last_known_location":{"description":"Serializer for django.contrib.gis.geos.Point","type":"object","properties":{"long":{"type":"number","format":"double"},"lat":{"type":"number","format":"double"}},"required":["lat","long"],"x-readme-ref-name":"Point"}},"required":["last_known_location"],"x-readme-ref-name":"UpdateLastKnownLocation"}

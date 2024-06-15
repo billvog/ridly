@@ -2,12 +2,12 @@ import { useIsRefreshing } from "@/hooks/useIsRefreshing";
 import ErrorMessage from "@/modules/ui/ErrorMessage";
 import EventScrollFeed from "@/modules/ui/EventScrollFeed";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
-import { useEvents } from "@/types/gen";
+import { useUpcomingEvents } from "@/types/gen";
 import React from "react";
 import { RefreshControl, ScrollView } from "react-native";
 
 export default function Page() {
-  const eventsQuery = useEvents();
+  const eventsQuery = useUpcomingEvents();
 
   const [refreshEvents, areEventsRefreshing] = useIsRefreshing(eventsQuery.refetch);
 
