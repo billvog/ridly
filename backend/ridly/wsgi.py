@@ -1,5 +1,5 @@
 """
-WSGI config for ridl_api project.
+WSGI config for ridly project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ridl_api.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ridly.settings")
 
 application = get_wsgi_application()

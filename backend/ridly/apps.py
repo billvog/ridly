@@ -2,7 +2,7 @@ from django.apps import AppConfig
 
 
 class MyMainAppNameConfig(AppConfig):
-  name = "ridl_api"
+  name = "ridly"
 
   def ready(self):
-    import ridl_api.schema  # noqa: F401
+    import ridly.schema  # noqa: F401

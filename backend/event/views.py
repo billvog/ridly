@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from ridl_api.serializers import DetailedErrorSerializer
+from ridly.serializers import DetailedErrorSerializer
 from .models import Event
 from .serializers import EventJoinSerializer, EventSerializer
 

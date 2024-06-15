@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from ridl_api.serializers import DetailedErrorSerializer, ValidationErrorSerializer
+from ridly.serializers import DetailedErrorSerializer, ValidationErrorSerializer
 from user.models import User
 from user.serializers import UserSerializer, CompleteSignupSerializer
 from user.auth_tokens import (

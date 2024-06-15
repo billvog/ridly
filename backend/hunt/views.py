@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from ridl_api.serializers import DetailedErrorSerializer
+from ridly.serializers import DetailedErrorSerializer
 from .models import Hunt
 from .serializers import HuntSerializer, HuntClueSerializer
 
