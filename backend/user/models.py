@@ -1,10 +1,11 @@
 import uuid
-from django.db import models
+
+from django.contrib.gis.db import models
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import gettext_lazy as _
 
-from .managers import UserManager
+from user.managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -18,6 +19,8 @@ class User(AbstractBaseUser, PermissionsMixin):
   avatar_url = models.URLField(blank=True)
 
   did_complete_signup = models.BooleanField(default=False)
+
+  last_known_location = models.PointField(null=True, blank=True)
 
   is_active = models.BooleanField(default=True)
   is_staff = models.BooleanField(default=False)

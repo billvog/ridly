@@ -1,26 +1,22 @@
+from django.contrib.gis.geos import Point
 from rest_framework import serializers
-from drf_spectacular.utils import extend_schema_field
 
 
-# Serializer for django.contrib.gis.geos.Point
-@extend_schema_field(
-  field={
-    "type": "object",
-    "properties": {
-      "long": {
-        "type": "number",
-        "format": "float",
-      },
-      "lat": {
-        "type": "number",
-        "format": "float",
-      },
-    },
-  },
-)
-class PointSerializer(serializers.Field):
-  def to_representation(self, value):
-    return {"long": value.coords[0], "lat": value.coords[1]}
+class PointSerializer(serializers.Serializer):
+  """
+  Serializer for django.contrib.gis.geos.Point
+  """
+
+  def to_internal_value(self, data):
+    try:
+      lat = data.get("lat")
+      long = data.get("long")
+      return Point(long, lat)
+    except (TypeError, ValueError, AttributeError):
+      raise serializers.ValidationError("Invalid Point format.")
+
+  long = serializers.FloatField(source="x")
+  lat = serializers.FloatField(source="y")
 
 
 class DetailedErrorSerializer(serializers.Serializer):

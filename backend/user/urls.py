@@ -7,6 +7,7 @@ urlpatterns = [
   path("logout/", view=views.LogoutAPIView.as_view()),
   path("me/", view=views.MeAPIView.as_view()),
   path("complete-signup/", view=views.CompleteSignupAPIView.as_view()),
+  path("update/location/", view=views.UpdateLastKnownLocationAPIView.as_view()),
 ]
 
 # Only for testing!!!
