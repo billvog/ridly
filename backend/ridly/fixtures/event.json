@@ -5,7 +5,7 @@
     "fields": {
       "name": "Test event 1",
       "description": "Test event description",
-      "creator": "7878dc5d-06d9-4bd4-ac9f-5d72b6628a7e",
+      "creator": "8745b5a0-f379-4ab6-a618-9b4803a60924",
       "participant_count": 1,
       "location_coordinates": "SRID=4326;POINT (29.281090536849 30.12907032795732)",
       "location_name": "Athens, Greece",
@@ -23,7 +23,7 @@
     "fields": {
       "name": "Amazing test event 2",
       "description": "Test event, amazing, description!",
-      "creator": "7878dc5d-06d9-4bd4-ac9f-5d72b6628a7e",
+      "creator": "8745b5a0-f379-4ab6-a618-9b4803a60924",
       "participant_count": 2,
       "location_coordinates": "SRID=4326;POINT (19.57870617405569 41.0000000000000)",
       "location_name": "Litochoro, Greece",
