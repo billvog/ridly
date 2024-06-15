@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -10,10 +11,17 @@ from .models import Event
 from .serializers import EventJoinSerializer, EventSerializer
 
 
-@extend_schema_view(get=extend_schema(operation_id="events"))
-class ListEventsAPIVIew(ListAPIView):
-  queryset = Event.objects.all()
+@extend_schema_view(get=extend_schema(operation_id="upcoming_events"))
+class ListUpcomingEventsAPIVIew(ListAPIView):
   serializer_class = EventSerializer
+
+  def get_queryset(self):
+    """
+    Get the 10 first upcoming events.
+    """
+    return Event.objects.filter(happening_at__gte=timezone.now()).order_by(
+      "happening_at"
+    )[:10]
 
 
 @extend_schema_view(

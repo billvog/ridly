@@ -1,23 +1,15 @@
-import uuid
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_field
 
-from user.models import User
-from .models import Event
+from event.models import Event
 from creator.serializers import CreatorSerializer
-
-
-class EventParticipantSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = User
-    fields = ["avatar_url"]
 
 
 class EventSerializer(serializers.ModelSerializer):
   creator = CreatorSerializer()
-  participants = serializers.SerializerMethodField()
+  participant_avatars = serializers.SerializerMethodField()
   has_joined = serializers.SerializerMethodField()
-  hunt_id = serializers.SerializerMethodField()
+  hunt_id = serializers.UUIDField(source="hunt.id")
 
   class Meta:
     model = Event
@@ -26,7 +18,7 @@ class EventSerializer(serializers.ModelSerializer):
       "name",
       "description",
       "creator",
-      "participants",
+      "participant_avatars",
       "participant_count",
       "has_joined",
       "location_name",
@@ -35,16 +27,16 @@ class EventSerializer(serializers.ModelSerializer):
       "created_at",
     ]
 
-  # Get 3 first participants, always ignoring logged in user.
-  @extend_schema_field(EventParticipantSerializer(many=True))
-  def get_participants(self, obj):
+  @extend_schema_field(list[str])
+  def get_participant_avatars(self, obj):
+    """
+    Get the first 3 participants who have an avatar_url set and are not the current user.
+    """
     request = self.context.get("request")
     user = request.user
 
-    participants = obj.participants.all().exclude(id=user.id)[:3]
-    serializer = EventParticipantSerializer(participants, many=True)
-
-    return serializer.data
+    participants = obj.participants.exclude(id=user.id).exclude(avatar_url="").all()[:3]
+    return [participant.avatar_url for participant in participants]
 
   def get_has_joined(self, obj) -> bool:
     request = self.context.get("request")
@@ -53,10 +45,6 @@ class EventSerializer(serializers.ModelSerializer):
       return False
     else:
       return obj.participants.contains(user)
-
-  def get_hunt_id(self, obj) -> uuid.UUID:
-    hunt = obj.hunt.first()
-    return hunt.id if hunt else None
 
 
 class EventJoinSerializer(serializers.Serializer):

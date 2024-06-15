@@ -4,24 +4,6 @@ info:
   version: 1.0.0
   description: Outdoor Treasure Hunt
 paths:
-  /event/:
-    get:
-      operationId: events
-      tags:
-      - event
-      security:
-      - cookieAuth: []
-      - JWTAuthentication: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Event'
-          description: ''
   /event/{id}/:
     get:
       operationId: event
@@ -49,7 +31,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /event/{id}/join/:
     post:
@@ -77,13 +59,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
         '404':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /event/joined/:
     get:
@@ -106,7 +88,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
+          description: ''
+  /event/upcoming/:
+    get:
+      operationId: upcoming_events
+      tags:
+      - event
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
           description: ''
   /hunt/{id}/:
     get:
@@ -135,7 +135,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /hunt/{id}/clue/{clue_order}/:
     get:
@@ -169,7 +169,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /oauth/google/login/:
     post:
@@ -203,7 +203,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /user/complete-signup/:
     put:
@@ -242,7 +242,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /user/logout/:
     delete:
@@ -259,7 +259,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /user/me/:
     get:
@@ -280,7 +280,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
 components:
   schemas:
@@ -308,7 +308,7 @@ components:
       required:
       - id
       - user
-    DetailedErrorResponse:
+    DetailedError:
       type: object
       properties:
         detail:
@@ -327,10 +327,12 @@ components:
           type: string
         creator:
           $ref: '#/components/schemas/Creator'
-        participants:
+        participant_avatars:
           type: array
           items:
-            $ref: '#/components/schemas/EventParticipant'
+            type: string
+          description: Get the first 3 participants who have an avatar_url set and
+            are not the current user.
           readOnly: true
         participant_count:
           type: integer
@@ -363,7 +365,7 @@ components:
       - id
       - location_name
       - name
-      - participants
+      - participant_avatars
     EventJoin:
       type: object
       properties:
@@ -374,13 +376,6 @@ components:
       required:
       - has_joined
       - participant_count
-    EventParticipant:
-      type: object
-      properties:
-        avatar_url:
-          type: string
-          format: uri
-          maxLength: 200
     Hunt:
       type: object
       properties:
