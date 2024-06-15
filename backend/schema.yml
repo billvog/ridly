@@ -93,6 +93,12 @@ paths:
   /event/upcoming/:
     get:
       operationId: upcoming_events
+      parameters:
+      - in: query
+        name: distance
+        schema:
+          type: integer
+        description: Distance in km from user's last known location
       tags:
       - event
       security:

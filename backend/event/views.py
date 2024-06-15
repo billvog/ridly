@@ -1,27 +1,49 @@
-from django.utils import timezone
+from django.contrib.gis.measure import D
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from rest_framework import permissions, status
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView, RetrieveAPIView
-from drf_spectacular.utils import extend_schema, extend_schema_view
 
+from event.models import Event
+from event.serializers import EventJoinSerializer, EventSerializer
 from ridly.serializers import DetailedErrorSerializer
-from .models import Event
-from .serializers import EventJoinSerializer, EventSerializer
 
 
-@extend_schema_view(get=extend_schema(operation_id="upcoming_events"))
+@extend_schema_view(
+  get=extend_schema(
+    operation_id="upcoming_events",
+    parameters=[
+      OpenApiParameter(
+        name="distance",
+        type=int,
+        description="Distance in km from user's last known location",
+        required=False,
+      )
+    ],
+  )
+)
 class ListUpcomingEventsAPIVIew(ListAPIView):
   serializer_class = EventSerializer
 
   def get_queryset(self):
     """
     Get the 10 first upcoming events.
+    If user is authenticated, only get events within 10km of their last known location.
     """
-    return Event.objects.filter(happening_at__gte=timezone.now()).order_by(
-      "happening_at"
-    )[:10]
+
+    user = self.request.user
+    distance = self.request.GET.get("distance", 10)  # in km
+    qs = Event.objects.filter(happening_at__gte=timezone.now())
+
+    if user.is_authenticated:
+      qs = qs.filter(
+        location_coordinates__distance_lt=(user.last_known_location, D(km=distance))
+      )
+
+    return qs.order_by("happening_at")[:10]
 
 
 @extend_schema_view(

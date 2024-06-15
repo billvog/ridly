@@ -1,9 +1,10 @@
 import { useIsRefreshing } from "@/hooks/useIsRefreshing";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import JoinEventButton from "@/modules/ui/event/JoinEventButton";
-import { EventParticipant, useEvent } from "@/types/gen";
+import { useEvent } from "@/types/gen";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
+import classNames from "classnames";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useNavigation, useRouter, useSegments } from "expo-router";
@@ -111,7 +112,7 @@ export default function EventDetails() {
             <View className="flex flex-row items-center space-x-1">
               <Feather name="user" size={16} color="#fb923c" />
               <Text>Who?</Text>
-              <EventParticipantsAvatars participants={event.participants} />
+              <EventParticipantsAvatars avatars={event.participant_avatars} />
               <Text>
                 <Text className="font-bold">{event.participant_count}</Text> joined
               </Text>
@@ -131,17 +132,18 @@ export default function EventDetails() {
   );
 }
 
-function EventParticipantsAvatars({
-  participants,
-}: {
-  participants: EventParticipant[];
-}) {
+function EventParticipantsAvatars({ avatars }: { avatars: string[] }) {
   return (
-    <View className="flex flex-row items-center ml-1">
-      {participants.map((p, index) => (
+    <View
+      className={classNames([
+        "flex flex-row items-center",
+        { "ml-1": avatars.length > 0 },
+      ])}
+    >
+      {avatars.map((avatar, index) => (
         <Image
           key={index}
-          source={p.avatar_url || "https://placehold.co/20/000/FFF"}
+          source={avatar || "https://placehold.co/20/000/FFF"}
           className="rounded-full border border-white"
           style={{
             width: 20,

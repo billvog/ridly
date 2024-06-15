@@ -1,6 +1,6 @@
 import client from "@kubb/swagger-client/client";
 import { useQuery, queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import type { UpcomingEventsQueryResponse } from "../types/UpcomingEvents";
+import type { UpcomingEventsQueryResponse, UpcomingEventsQueryParams } from "../types/UpcomingEvents";
 import type { QueryObserverOptions, UseQueryResult, QueryKey, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 
  type UpcomingEventsClient = typeof client<UpcomingEventsQueryResponse, never, never>;
@@ -9,7 +9,7 @@ type UpcomingEvents = {
     error: never;
     request: never;
     pathParams: never;
-    queryParams: never;
+    queryParams: UpcomingEventsQueryParams;
     headerParams: never;
     response: UpcomingEventsQueryResponse;
     client: {
@@ -17,16 +17,17 @@ type UpcomingEvents = {
         return: Awaited<ReturnType<UpcomingEventsClient>>;
     };
 };
-export const upcomingEventsQueryKey = () => [{ url: "/event/upcoming/" }] as const;
+export const upcomingEventsQueryKey = (params?: UpcomingEvents["queryParams"]) => [{ url: "/event/upcoming/" }, ...(params ? [params] : [])] as const;
 export type UpcomingEventsQueryKey = ReturnType<typeof upcomingEventsQueryKey>;
-export function upcomingEventsQueryOptions(options: UpcomingEvents["client"]["parameters"] = {}) {
-    const queryKey = upcomingEventsQueryKey();
+export function upcomingEventsQueryOptions(params?: UpcomingEvents["queryParams"], options: UpcomingEvents["client"]["parameters"] = {}) {
+    const queryKey = upcomingEventsQueryKey(params);
     return queryOptions({
         queryKey,
         queryFn: async () => {
             const res = await client<UpcomingEvents["data"], UpcomingEvents["error"]>({
                 method: "get",
                 url: `/event/upcoming/`,
+                params,
                 ...options
             });
             return res.data;
@@ -36,16 +37,16 @@ export function upcomingEventsQueryOptions(options: UpcomingEvents["client"]["pa
 /**
  * @link /event/upcoming/
  */
-export function useUpcomingEvents<TData = UpcomingEvents["response"], TQueryData = UpcomingEvents["response"], TQueryKey extends QueryKey = UpcomingEventsQueryKey>(options: {
+export function useUpcomingEvents<TData = UpcomingEvents["response"], TQueryData = UpcomingEvents["response"], TQueryKey extends QueryKey = UpcomingEventsQueryKey>(params?: UpcomingEvents["queryParams"], options: {
     query?: Partial<QueryObserverOptions<UpcomingEvents["response"], UpcomingEvents["error"], TData, TQueryData, TQueryKey>>;
     client?: UpcomingEvents["client"]["parameters"];
 } = {}): UseQueryResult<TData, UpcomingEvents["error"]> & {
     queryKey: TQueryKey;
 } {
     const { query: queryOptions, client: clientOptions = {} } = options ?? {};
-    const queryKey = queryOptions?.queryKey ?? upcomingEventsQueryKey();
+    const queryKey = queryOptions?.queryKey ?? upcomingEventsQueryKey(params);
     const query = useQuery({
-        ...upcomingEventsQueryOptions(clientOptions) as unknown as QueryObserverOptions,
+        ...upcomingEventsQueryOptions(params, clientOptions) as unknown as QueryObserverOptions,
         queryKey,
         ...queryOptions as unknown as Omit<QueryObserverOptions, "queryKey">
     }) as UseQueryResult<TData, UpcomingEvents["error"]> & {
@@ -54,16 +55,17 @@ export function useUpcomingEvents<TData = UpcomingEvents["response"], TQueryData
     query.queryKey = queryKey as TQueryKey;
     return query;
 }
-export const upcomingEventsSuspenseQueryKey = () => [{ url: "/event/upcoming/" }] as const;
+export const upcomingEventsSuspenseQueryKey = (params?: UpcomingEvents["queryParams"]) => [{ url: "/event/upcoming/" }, ...(params ? [params] : [])] as const;
 export type UpcomingEventsSuspenseQueryKey = ReturnType<typeof upcomingEventsSuspenseQueryKey>;
-export function upcomingEventsSuspenseQueryOptions(options: UpcomingEvents["client"]["parameters"] = {}) {
-    const queryKey = upcomingEventsSuspenseQueryKey();
+export function upcomingEventsSuspenseQueryOptions(params?: UpcomingEvents["queryParams"], options: UpcomingEvents["client"]["parameters"] = {}) {
+    const queryKey = upcomingEventsSuspenseQueryKey(params);
     return queryOptions({
         queryKey,
         queryFn: async () => {
             const res = await client<UpcomingEvents["data"], UpcomingEvents["error"]>({
                 method: "get",
                 url: `/event/upcoming/`,
+                params,
                 ...options
             });
             return res.data;
@@ -73,16 +75,16 @@ export function upcomingEventsSuspenseQueryOptions(options: UpcomingEvents["clie
 /**
  * @link /event/upcoming/
  */
-export function useUpcomingEventsSuspense<TData = UpcomingEvents["response"], TQueryKey extends QueryKey = UpcomingEventsSuspenseQueryKey>(options: {
+export function useUpcomingEventsSuspense<TData = UpcomingEvents["response"], TQueryKey extends QueryKey = UpcomingEventsSuspenseQueryKey>(params?: UpcomingEvents["queryParams"], options: {
     query?: Partial<UseSuspenseQueryOptions<UpcomingEvents["response"], UpcomingEvents["error"], TData, TQueryKey>>;
     client?: UpcomingEvents["client"]["parameters"];
 } = {}): UseSuspenseQueryResult<TData, UpcomingEvents["error"]> & {
     queryKey: TQueryKey;
 } {
     const { query: queryOptions, client: clientOptions = {} } = options ?? {};
-    const queryKey = queryOptions?.queryKey ?? upcomingEventsSuspenseQueryKey();
+    const queryKey = queryOptions?.queryKey ?? upcomingEventsSuspenseQueryKey(params);
     const query = useSuspenseQuery({
-        ...upcomingEventsSuspenseQueryOptions(clientOptions) as unknown as QueryObserverOptions,
+        ...upcomingEventsSuspenseQueryOptions(params, clientOptions) as unknown as QueryObserverOptions,
         queryKey,
         ...queryOptions as unknown as Omit<QueryObserverOptions, "queryKey">
     }) as UseSuspenseQueryResult<TData, UpcomingEvents["error"]> & {
