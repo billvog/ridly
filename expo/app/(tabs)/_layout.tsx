@@ -1,11 +1,7 @@
-import { useLocationPermission } from "@/hooks/useLocationPermission";
 import { useShouldHideTabBar } from "@/hooks/useShouldHideTabBar";
-import { useUser } from "@/hooks/useUser";
-import { useUserUpdateLastKnownLocation } from "@/types/gen";
+import { useUser } from "@/hooks/user/useUser";
 import { Feather } from "@expo/vector-icons";
-import * as Location from "expo-location";
 import { Redirect, Tabs } from "expo-router";
-import { useEffect } from "react";
 
 export const unstable_settings = {
   initialRouteName: "(home)/index",
@@ -14,28 +10,6 @@ export const unstable_settings = {
 export default function Layout() {
   const user = useUser();
   const shouldHideTabBar = useShouldHideTabBar();
-
-  const locationPermissions = useLocationPermission();
-  const updateLastKnownLocationMutation = useUserUpdateLastKnownLocation();
-
-  // Get user's current location, and update it in the backend.
-  useEffect(() => {
-    if (!user || !locationPermissions.determined || !locationPermissions.foreground) {
-      return;
-    }
-
-    // Fetch current location.
-    Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low }).then(
-      (response) => {
-        const position = response.coords;
-        updateLastKnownLocationMutation.mutateAsync({
-          last_known_location: { lat: position.latitude, long: position.longitude },
-        });
-      }
-    );
-
-    // Send location to backend.
-  }, [user, locationPermissions]);
 
   if (!user) {
     return <Redirect href="/guest/login" />;

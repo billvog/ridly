@@ -1,4 +1,5 @@
 import { useIsRefreshing } from "@/hooks/useIsRefreshing";
+import { useAuth } from "@/modules/authentication/AuthContext";
 import ErrorMessage from "@/modules/ui/ErrorMessage";
 import EventScrollFeed from "@/modules/ui/EventScrollFeed";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
@@ -7,11 +8,17 @@ import React from "react";
 import { RefreshControl, ScrollView } from "react-native";
 
 export default function Page() {
-  const eventsQuery = useUpcomingEvents();
+  const auth = useAuth();
+
+  const eventsQuery = useUpcomingEvents(
+    { distance: 10 },
+    // Wait for user's location update to finish, as we want to show events nearby, if possible.
+    { query: { enabled: typeof auth.didUpdateLocation === "boolean" } }
+  );
 
   const [refreshEvents, areEventsRefreshing] = useIsRefreshing(eventsQuery.refetch);
 
-  if (eventsQuery.isLoading) {
+  if (eventsQuery.isPending) {
     return <FullscreenSpinner />;
   }
 
