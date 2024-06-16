@@ -6,9 +6,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from ridl_api.serializers import DetailedErrorSerializer, ValidationErrorSerializer
+from ridly.serializers import DetailedErrorSerializer, ValidationErrorSerializer
 from user.models import User
-from user.serializers import UserSerializer, CompleteSignupSerializer
+from user.serializers import (
+  UpdateLastKnownLocationSerializer,
+  UserSerializer,
+  CompleteSignupSerializer,
+)
 from user.auth_tokens import (
   clear_refresh_token_cookie,
   generate_tokens_for_user,
@@ -69,7 +73,6 @@ class MeAPIView(GenericAPIView):
 @extend_schema_view(
   put=extend_schema(
     operation_id="user_complete_signup",
-    request=CompleteSignupSerializer,
     responses={
       200: CompleteSignupSerializer,
       400: ValidationErrorSerializer,
@@ -89,3 +92,22 @@ class CompleteSignupAPIView(UpdateAPIView):
     validated_data = serializer.validated_data
     validated_data["did_complete_signup"] = True
     return super().perform_update(serializer)
+
+
+@extend_schema_view(
+  put=extend_schema(
+    operation_id="user_update_last_known_location",
+    responses={
+      200: UpdateLastKnownLocationSerializer,
+      400: ValidationErrorSerializer,
+      403: DetailedErrorSerializer,
+    },
+  ),
+)
+class UpdateLastKnownLocationAPIView(UpdateAPIView):
+  serializer_class = UpdateLastKnownLocationSerializer
+  permission_classes = [permissions.IsAuthenticated]
+  http_method_names = ["put"]
+
+  def get_object(self):
+    return self.request.user

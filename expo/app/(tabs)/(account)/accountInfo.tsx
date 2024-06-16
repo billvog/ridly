@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import { Image } from "expo-image";
 import dayjs from "dayjs";
 
@@ -30,10 +30,7 @@ export default function Page() {
 
       <AccountInfoSeperator />
 
-      <AccountInfoRow
-        name="Joined At"
-        value={dayjs(user.created_at).format("LL")}
-      />
+      <AccountInfoRow name="Joined At" value={dayjs(user.created_at).format("LL")} />
     </View>
   );
 }

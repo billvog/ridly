@@ -1,10 +1,10 @@
 import Button from "@/modules/ui/Button";
-import { THuntClue } from "@/types/hunt";
+import { HuntClue } from "@/types/gen";
 import React from "react";
 import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from "react-native";
 
 type CurrentClueProps = {
-  clue?: THuntClue;
+  clue?: HuntClue;
   isClueLoading: boolean;
   onRetryFetchCluePressed: () => any;
   isNear: boolean;

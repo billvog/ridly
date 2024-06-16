@@ -4,7 +4,7 @@ from django.test import TransactionTestCase
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 
-from ridl_api.asgi import application
+from ridly.asgi import application
 from user.models import User
 from user.auth_tokens import generate_tokens_for_user
 

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ridl_api.serializers import PointSerializer
+from ridly.serializers import PointSerializer
 from event.models import Event
 from .models import Hunt, HuntClue
 

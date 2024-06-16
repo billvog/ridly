@@ -1,5 +1,5 @@
 """
-ASGI config for ridl_api project.
+ASGI config for ridly project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -17,7 +17,7 @@ from django.core.asgi import get_asgi_application
 import hunt.routing
 from user.authentication import JWTWebSocketAuthentication
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ridl_api.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ridly.settings")
 
 django_asgi_app = get_asgi_application()
 

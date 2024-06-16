@@ -9,4 +9,4 @@ class CreatorSerializer(serializers.ModelSerializer):
 
   class Meta:
     model = Creator
-    fields = ["id", "user"]
+    fields = ["user"]

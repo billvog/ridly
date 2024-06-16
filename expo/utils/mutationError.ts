@@ -1,16 +1,16 @@
-import { DetailedErrorResponse, ValidationError } from "@/types/gen";
+import { DetailedError, ValidationError } from "@/types/gen";
 import { AxiosError } from "axios";
 import Toast from "react-native-toast-message";
 
 export function isValidationError(
-  error: ValidationError | DetailedErrorResponse
+  error: ValidationError | DetailedError
 ): error is ValidationError {
   return (error as ValidationError).errors !== undefined;
 }
 
 export function handleMutationError(
-  error: AxiosError<ValidationError | DetailedErrorResponse>,
-  handleValidationError: (error: ValidationError) => void
+  error: AxiosError<ValidationError | DetailedError>,
+  handleValidationError?: (error: ValidationError) => void
 ) {
   function showErrorToast(message: string) {
     Toast.show({
@@ -23,7 +23,7 @@ export function handleMutationError(
   const data = error.response?.data || null;
 
   if (data && isValidationError(data)) {
-    handleValidationError(data);
+    handleValidationError?.(data);
     return;
   }
 

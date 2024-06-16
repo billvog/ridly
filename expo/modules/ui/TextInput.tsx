@@ -7,22 +7,32 @@ import {
   View,
 } from "react-native";
 
-interface TextInputProps extends RNTextInputProps, UseControllerProps {
-  label: string;
-  name: string;
-  defaultValue?: string;
-}
+type TextInputProps<TComponent extends React.ElementType = typeof RNTextInput> =
+  RNTextInputProps &
+    UseControllerProps & {
+      label: string;
+      name: string;
+      defaultValue?: string;
+      component?: TComponent;
+    };
 
-const ControlledInput = (props: TextInputProps) => {
+function ControlledInput<T extends React.ElementType>(props: TextInputProps<T>) {
   const { formState } = useFormContext();
-  const { name, label, rules, defaultValue, ...inputProps } = props;
+  const {
+    name,
+    label,
+    rules,
+    defaultValue,
+    component: Component = RNTextInput,
+    ...inputProps
+  } = props;
   const { field } = useController({ name, rules, defaultValue });
   const hasError = Boolean(formState?.errors[name]);
 
   return (
     <View className="mb-4 space-y-2.5">
       {label && <Text className="font-bold">{label}</Text>}
-      <RNTextInput
+      <Component
         autoCapitalize="none"
         textAlign="left"
         className="px-5 py-3 bg-gray-200 rounded-xl"
@@ -40,8 +50,10 @@ const ControlledInput = (props: TextInputProps) => {
       )}
     </View>
   );
-};
+}
 
-export const TextInput = (props: TextInputProps) => {
+export const TextInput = <T extends React.ElementType = typeof RNTextInput>(
+  props: TextInputProps<T>
+) => {
   return <ControlledInput {...props} />;
 };

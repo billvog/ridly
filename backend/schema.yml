@@ -4,24 +4,6 @@ info:
   version: 1.0.0
   description: Outdoor Treasure Hunt
 paths:
-  /event/:
-    get:
-      operationId: events
-      tags:
-      - event
-      security:
-      - cookieAuth: []
-      - JWTAuthentication: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Event'
-          description: ''
   /event/{id}/:
     get:
       operationId: event
@@ -49,7 +31,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /event/{id}/join/:
     post:
@@ -77,13 +59,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
         '404':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /event/joined/:
     get:
@@ -106,7 +88,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
+          description: ''
+  /event/upcoming/:
+    get:
+      operationId: upcoming_events
+      parameters:
+      - in: query
+        name: distance
+        schema:
+          type: integer
+        description: Distance in km from user's last known location
+      tags:
+      - event
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
           description: ''
   /hunt/{id}/:
     get:
@@ -135,7 +141,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /hunt/{id}/clue/{clue_order}/:
     get:
@@ -169,7 +175,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /oauth/google/login/:
     post:
@@ -203,7 +209,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /user/complete-signup/:
     put:
@@ -242,7 +248,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /user/logout/:
     delete:
@@ -259,7 +265,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
           description: ''
   /user/me/:
     get:
@@ -280,7 +286,46 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DetailedErrorResponse'
+                $ref: '#/components/schemas/DetailedError'
+          description: ''
+  /user/update/location/:
+    put:
+      operationId: user_update_last_known_location
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLastKnownLocation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UpdateLastKnownLocation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateLastKnownLocation'
+        required: true
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateLastKnownLocation'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedError'
           description: ''
 components:
   schemas:
@@ -299,16 +344,11 @@ components:
     Creator:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
         user:
           $ref: '#/components/schemas/PublicUser'
       required:
-      - id
       - user
-    DetailedErrorResponse:
+    DetailedError:
       type: object
       properties:
         detail:
@@ -327,10 +367,12 @@ components:
           type: string
         creator:
           $ref: '#/components/schemas/Creator'
-        participants:
+        participant_avatars:
           type: array
           items:
-            $ref: '#/components/schemas/EventParticipant'
+            type: string
+          description: Get the first 3 participants who have an avatar_url set and
+            are not the current user.
           readOnly: true
         participant_count:
           type: integer
@@ -348,7 +390,6 @@ components:
         hunt_id:
           type: string
           format: uuid
-          readOnly: true
         created_at:
           type: string
           format: date-time
@@ -363,7 +404,7 @@ components:
       - id
       - location_name
       - name
-      - participants
+      - participant_avatars
     EventJoin:
       type: object
       properties:
@@ -374,13 +415,6 @@ components:
       required:
       - has_joined
       - participant_count
-    EventParticipant:
-      type: object
-      properties:
-        avatar_url:
-          type: string
-          format: uri
-          maxLength: 200
     Hunt:
       type: object
       properties:
@@ -426,14 +460,7 @@ components:
           type: string
           maxLength: 100
         location_coordinates:
-          type: object
-          properties:
-            long:
-              type: number
-              format: float
-            lat:
-              type: number
-              format: float
+          $ref: '#/components/schemas/Point'
       required:
       - location_coordinates
       - location_name
@@ -445,6 +472,19 @@ components:
           type: string
       required:
       - token
+    Point:
+      type: object
+      description: Serializer for django.contrib.gis.geos.Point
+      properties:
+        long:
+          type: number
+          format: double
+        lat:
+          type: number
+          format: double
+      required:
+      - lat
+      - long
     PublicUser:
       type: object
       properties:
@@ -470,6 +510,13 @@ components:
       - id
       - last_name
       - username
+    UpdateLastKnownLocation:
+      type: object
+      properties:
+        last_known_location:
+          $ref: '#/components/schemas/Point'
+      required:
+      - last_known_location
     User:
       type: object
       properties:

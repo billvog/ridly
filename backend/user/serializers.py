@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from ridly.serializers import PointSerializer
+
 User = get_user_model()
 
 
@@ -46,3 +48,11 @@ class CompleteSignupSerializer(serializers.ModelSerializer):
   class Meta:
     model = User
     fields = ["username", "did_complete_signup"]
+
+
+class UpdateLastKnownLocationSerializer(serializers.ModelSerializer):
+  last_known_location = PointSerializer()
+
+  class Meta:
+    model = User
+    fields = ["last_known_location"]

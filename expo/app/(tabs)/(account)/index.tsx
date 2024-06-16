@@ -1,4 +1,4 @@
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import Button from "@/modules/ui/Button";
 import { useUserLogout, userMeQueryKey } from "@/types/gen";
 import { clearAuthTokens } from "@/utils/authTokens";

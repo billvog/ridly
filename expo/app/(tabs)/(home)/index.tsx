@@ -1,33 +1,49 @@
 import { useIsRefreshing } from "@/hooks/useIsRefreshing";
+import { useAuth } from "@/modules/authentication/AuthContext";
 import ErrorMessage from "@/modules/ui/ErrorMessage";
-import EventScrollFeed from "@/modules/ui/EventScrollFeed";
+import EventScrollFeed, { EventFeedFilters } from "@/modules/ui/EventScrollFeed";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
-import { useEvents } from "@/types/gen";
-import React from "react";
-import { RefreshControl, ScrollView } from "react-native";
+import { useUpcomingEvents } from "@/types/gen";
+import { useState } from "react";
+import { View } from "react-native";
 
 export default function Page() {
-  const eventsQuery = useEvents();
+  const auth = useAuth();
+
+  const [feedFilters, setFeedFilters] = useState<EventFeedFilters>({
+    distance: 10,
+  });
+
+  const eventsQuery = useUpcomingEvents(
+    feedFilters,
+    // Wait for user's location update to finish, as we want to show events nearby, if possible.
+    { query: { enabled: typeof auth.didUpdateLocation === "boolean" } }
+  );
 
   const [refreshEvents, areEventsRefreshing] = useIsRefreshing(eventsQuery.refetch);
 
-  if (eventsQuery.isLoading) {
+  if (eventsQuery.isPending) {
     return <FullscreenSpinner />;
   }
 
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={areEventsRefreshing} onRefresh={refreshEvents} />
-      }
-    >
-      {eventsQuery.isSuccess ? (
-        <EventScrollFeed title="Upcoming Events" events={eventsQuery.data} />
-      ) : (
+    <View className="flex-1">
+      {eventsQuery.isSuccess && (
+        <EventScrollFeed
+          title="Upcoming Events"
+          events={eventsQuery.data}
+          filters={feedFilters}
+          onUpdateFilters={setFeedFilters}
+          isRefreshing={areEventsRefreshing}
+          refresh={refreshEvents}
+        />
+      )}
+
+      {eventsQuery.isError && (
         <ErrorMessage viewStyle="p-10 w-full" textStyle="text-lg text-center">
           Something went wrong loading upcoming events.
         </ErrorMessage>
       )}
-    </ScrollView>
+    </View>
   );
 }

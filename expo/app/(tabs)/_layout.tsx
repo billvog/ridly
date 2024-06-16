@@ -1,5 +1,5 @@
 import { useShouldHideTabBar } from "@/hooks/useShouldHideTabBar";
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import { Feather } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 

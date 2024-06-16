@@ -10,6 +10,7 @@ import { useSegments } from "expo-router";
 import React, { useEffect } from "react";
 import Toast from "react-native-toast-message";
 import { Provider as ReduxProvider } from "react-redux";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const queryClient = new QueryClient();
 
@@ -37,13 +38,15 @@ export const Providers: React.FC<ProvidersProps> = ({ children }) => {
 
   return (
     <>
-      <QueryClientProvider client={queryClient}>
-        <ReduxProvider store={Store}>
-          <AuthProvider>
-            <ModalProvider>{children}</ModalProvider>
-          </AuthProvider>
-        </ReduxProvider>
-      </QueryClientProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <QueryClientProvider client={queryClient}>
+          <ReduxProvider store={Store}>
+            <AuthProvider>
+              <ModalProvider>{children}</ModalProvider>
+            </AuthProvider>
+          </ReduxProvider>
+        </QueryClientProvider>
+      </GestureHandlerRootView>
       <Toast position="bottom" bottomOffset={isInTabs ? 90 : 60} />
     </>
   );
