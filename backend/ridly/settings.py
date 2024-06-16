@@ -45,6 +45,7 @@ INSTALLED_APPS = [
   "rest_framework",
   "ridly",
   "user",
+  "user.avatar",
   "oauth",
   "creator",
   "event",
@@ -193,3 +194,7 @@ SPECTACULAR_SETTINGS = {
   "VERSION": "1.0.0",
   "SERVE_INCLUDE_SCHEMA": False,
 }
+
+
+# Google Cloud Storage
+GS_BUCKET_NAME = config("GS_BUCKET_NAME", cast=str)

@@ -3,11 +3,14 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from ridly.serializers import PointSerializer
+from user.avatar.serializers import UserAvatarSerializer
 
 User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+  avatar_url = UserAvatarSerializer()
+
   class Meta:
     model = User
     fields = [
@@ -23,6 +26,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
+  avatar_url = UserAvatarSerializer()
+
   class Meta:
     model = User
     fields = [
