@@ -29,15 +29,3 @@ def download_and_upload_avatar(oauth_avatar, gcs_file_name):
 
   # Upload the image to GCS
   upload_to_gcs(file_stream, settings.GS_BUCKET_NAME, gcs_file_name)
-
-
-def update_avatar_from_oauth(user, oauth_avatar, should_save=True):
-  """
-  Updates user's avatar from OAuth provided avatar URL.
-  """
-
-  avatar_path = f"user/avatar/{user.id}"
-  download_and_upload_avatar(oauth_avatar, avatar_path)
-  user.avatar_url = avatar_path
-  if should_save:
-    user.save()

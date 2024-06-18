@@ -35,7 +35,7 @@ class EventSerializer(serializers.ModelSerializer):
     request = self.context.get("request")
     user = request.user
 
-    participants = obj.participants.exclude(id=user.id).exclude(avatar_url="").all()[:3]
+    participants = obj.participants.exclude(id=user.id).all()[:3]
     return [participant.avatar_url for participant in participants]
 
   def get_has_joined(self, obj) -> bool:
