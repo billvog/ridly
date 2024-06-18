@@ -18,6 +18,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
   did_complete_signup = models.BooleanField(default=False)
 
+  has_avatar = models.BooleanField(default=False)
+
   last_known_location = models.PointField(null=True, blank=True)
 
   is_active = models.BooleanField(default=True)
@@ -46,4 +48,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
   @property
   def avatar_url(self):
-    return f"user/avatar/{self.id}"
+    if self.has_avatar:
+      return f"user/avatar/{self.id}"
+    return None

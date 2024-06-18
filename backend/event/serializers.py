@@ -31,12 +31,15 @@ class EventSerializer(serializers.ModelSerializer):
   @extend_schema_field(list[str])
   def get_participant_avatars(self, obj):
     """
-    Get the first 3 participants' avatars, excluding the logged in user.
+    Get the first 3 participants' avatars, excluding the logged in user and users without avatars.
     """
+
     request = self.context.get("request")
     user = request.user
 
-    participants = obj.participants.exclude(id=user.id).all()[:3]
+    participants = (
+      obj.participants.exclude(id=user.id).exclude(has_avatar=False).all()[:3]
+    )
     participants_avatars = [participant.avatar_url for participant in participants]
 
     serializer = ImageSerializer(

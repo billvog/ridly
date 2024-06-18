@@ -28,3 +28,7 @@ def update_avatar_from_oauth(user_pk: uuid.UUID, oauth_avatar: str):
   except Exception as e:
     print(f"Error updating avatar for user {user.id}: {e}")
     return
+
+  # Update user on successfuly upload
+  user.has_avatar = True
+  user.save()

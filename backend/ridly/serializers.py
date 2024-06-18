@@ -47,4 +47,7 @@ class ImageSerializer(serializers.Serializer):
     super().__init__(*args, **kwargs)
 
   def to_representation(self, value):
+    if value is None:
+      return None
+
     return ImageSerializer.builder.create_url(value, self.params)
