@@ -2,14 +2,13 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from ridly.serializers import PointSerializer
-from user.avatar.serializers import UserAvatarSerializer
+from ridly.serializers import PointSerializer, ImageSerializer
 
 User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
-  avatar_url = UserAvatarSerializer()
+  avatar_url = ImageSerializer(params={"w": 500, "h": 500})
 
   class Meta:
     model = User
@@ -26,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
-  avatar_url = UserAvatarSerializer()
+  avatar_url = ImageSerializer(params={"w": 500, "h": 500})
 
   class Meta:
     model = User

@@ -206,3 +206,6 @@ SPECTACULAR_SETTINGS = {
 
 # Google Cloud Storage
 GS_BUCKET_NAME = config("GS_BUCKET_NAME", cast=str)
+
+# Imgix
+IMGIX_SOURCE = config("IMGIX_SOURCE", cast=str)

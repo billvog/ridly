@@ -34,6 +34,7 @@ google-resumable-media==2.7.1
 googleapis-common-protos==1.63.1
 hyperlink==21.0.0
 idna==3.7
+imgix==4.0.0
 incremental==22.10.0
 inflection==0.5.1
 jsonschema==4.22.0
