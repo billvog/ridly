@@ -33,7 +33,7 @@ class ValidationErrorSerializer(serializers.Serializer):
   )
 
 
-class ImageSerializer(serializers.Field):
+class ImageSerializer(serializers.Serializer):
   """
   Serializer that creates an Imgix URL for an image, with optional parameters.
   """
