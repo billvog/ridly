@@ -15,10 +15,10 @@ import {
   Platform,
   RefreshControl,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  StyleSheet,
 } from "react-native";
 
 const EventCardWidth = Dimensions.get("window").width * 0.8;
@@ -66,31 +66,41 @@ export default function EventScrollFeed({
             <Feather name="filter" size={16} color="orange" />
           </TouchableOpacity>
         </View>
-        <ScrollView
-          style={{ height: 380 }}
-          horizontal
-          pagingEnabled
-          decelerationRate={0}
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={EventCardWidth + 24}
-          snapToAlignment="center"
-          contentInset={{
-            // iOS ONLY
-            left: EventCardSpacingInset,
-            right: EventCardSpacingInset,
-          }}
-          contentContainerStyle={{
-            paddingHorizontal: Platform.OS === "android" ? EventCardSpacingInset : 0,
-          }}
-        >
-          {events.map((e) => (
-            <EventCard
-              key={e.id}
-              event={e}
-              style={{ width: EventCardWidth, marginHorizontal: 12 }}
-            />
-          ))}
-        </ScrollView>
+
+        {events.length === 0 ? (
+          <View className="flex-1 items-center justify-center" style={{ height: 200 }}>
+            <Text className="font-bold text-xl text-gray-700 mb-2">No events found</Text>
+            <Text className="font-medium text-xs text-gray-700">
+              Try adjusting the filters or refreshing the feed.
+            </Text>
+          </View>
+        ) : (
+          <ScrollView
+            style={{ height: 380 }}
+            horizontal
+            pagingEnabled
+            decelerationRate={0}
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={EventCardWidth + 24}
+            snapToAlignment="center"
+            contentInset={{
+              // iOS ONLY
+              left: EventCardSpacingInset,
+              right: EventCardSpacingInset,
+            }}
+            contentContainerStyle={{
+              paddingHorizontal: Platform.OS === "android" ? EventCardSpacingInset : 0,
+            }}
+          >
+            {events.map((e) => (
+              <EventCard
+                key={e.id}
+                event={e}
+                style={{ width: EventCardWidth, marginHorizontal: 12 }}
+              />
+            ))}
+          </ScrollView>
+        )}
       </ScrollView>
 
       <FiltersBottomSheet
@@ -102,6 +112,10 @@ export default function EventScrollFeed({
   );
 }
 
+type FiltersForm = {
+  distance: string;
+};
+
 function FiltersBottomSheet({
   sheetRef,
   filters,
@@ -112,14 +126,17 @@ function FiltersBottomSheet({
   onUpdate: UpdateEventFiltersFn;
 }) {
   const snapPoints = useMemo(() => ["40%"], []);
-  const formMethods = useForm<EventFeedFilters>({
+  const formMethods = useForm<FiltersForm>({
     defaultValues: {
-      distance: String(filters.distance) as any,
+      distance: String(filters.distance ?? ""),
     },
   });
 
   const submitForm = formMethods.handleSubmit((data) => {
-    onUpdate(data);
+    onUpdate({
+      distance: data.distance.length > 0 ? parseInt(data.distance) : undefined,
+    });
+
     sheetRef.current?.close();
   });
 

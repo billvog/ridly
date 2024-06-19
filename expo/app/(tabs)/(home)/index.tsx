@@ -11,7 +11,7 @@ export default function Page() {
   const auth = useAuth();
 
   const [feedFilters, setFeedFilters] = useState<EventFeedFilters>({
-    distance: 10,
+    distance: undefined,
   });
 
   const eventsQuery = useUpcomingEvents(

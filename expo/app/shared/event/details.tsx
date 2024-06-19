@@ -10,6 +10,7 @@ import { Image } from "expo-image";
 import { useLocalSearchParams, useNavigation, useRouter, useSegments } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
 
 export default function EventDetails() {
   const { id: eventId } = useLocalSearchParams();
@@ -41,6 +42,10 @@ export default function EventDetails() {
       pathname: `/(tabs)/${segments[1]}/hunt/[id]`,
       params: { id: event.hunt_id },
     });
+  }
+
+  if (eventQuery.isLoading) {
+    return <FullscreenSpinner />;
   }
 
   if (!eventId || !event) {
