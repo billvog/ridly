@@ -1,4 +1,8 @@
+import imgix
+
+from django.conf import settings
 from django.contrib.gis.geos import Point
+
 from rest_framework import serializers
 
 
@@ -27,3 +31,23 @@ class ValidationErrorSerializer(serializers.Serializer):
   errors = serializers.DictField(
     child=serializers.ListSerializer(child=serializers.CharField())
   )
+
+
+class ImageSerializer(serializers.Serializer):
+  """
+  Serializer that creates an Imgix URL for an image, with optional parameters.
+  """
+
+  builder = imgix.UrlBuilder(
+    domain=settings.IMGIX_SOURCE, use_https=True, include_library_param=False
+  )
+
+  def __init__(self, *args, **kwargs):
+    self.params = kwargs.pop("params", None)
+    super().__init__(*args, **kwargs)
+
+  def to_representation(self, value):
+    if value is None:
+      return None
+
+    return ImageSerializer.builder.create_url(value, self.params)

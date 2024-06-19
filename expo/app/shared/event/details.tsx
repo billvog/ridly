@@ -8,7 +8,7 @@ import classNames from "classnames";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useNavigation, useRouter, useSegments } from "expo-router";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function EventDetails() {
@@ -133,6 +133,8 @@ export default function EventDetails() {
 }
 
 function EventParticipantsAvatars({ avatars }: { avatars: string[] }) {
+  // Used to know which avatars failed to load
+  const [errorMap, setErrorMap] = useState<{ [key: number]: boolean }>({});
   return (
     <View
       className={classNames([
@@ -143,7 +145,9 @@ function EventParticipantsAvatars({ avatars }: { avatars: string[] }) {
       {avatars.map((avatar, index) => (
         <Image
           key={index}
-          source={avatar || "https://placehold.co/20/000/FFF"}
+          // Use fallback if the avatar fails to load
+          source={errorMap[index] ? "https://placehold.co/20/000/FFF" : avatar}
+          onError={() => setErrorMap((prev) => ({ ...prev, [index]: true }))}
           className="rounded-full border border-white"
           style={{
             width: 20,

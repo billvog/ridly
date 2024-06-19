@@ -45,6 +45,7 @@ INSTALLED_APPS = [
   "rest_framework",
   "ridly",
   "user",
+  "user.avatar",
   "oauth",
   "creator",
   "event",
@@ -103,21 +104,29 @@ DATABASES = {
   }
 }
 
+# Redis
+
+REDIS = {
+  "default": {
+    "HOST": config("REDIS_HOST", default="redis"),
+    "PORT": config("REDIS_PORT", default=6379),
+  }
+}
+
 # Channels Redis setup
 
 CHANNEL_LAYERS = {
   "default": {
     "BACKEND": "channels_redis.core.RedisChannelLayer",
     "CONFIG": {
-      "hosts": [
-        (
-          config("REDIS_HOST", default="redis"),
-          config("REDIS_PORT", default=6379),
-        )
-      ],
+      "hosts": [(REDIS["default"]["HOST"], REDIS["default"]["PORT"])],
     },
   },
 }
+
+# Celery
+
+CELERY_BROKER_URL = f"redis://{REDIS['default']['HOST']}:{REDIS['default']['PORT']}/0"
 
 
 # Password validation
@@ -193,3 +202,10 @@ SPECTACULAR_SETTINGS = {
   "VERSION": "1.0.0",
   "SERVE_INCLUDE_SCHEMA": False,
 }
+
+
+# Google Cloud Storage
+GS_BUCKET_NAME = config("GS_BUCKET_NAME", cast=str)
+
+# Imgix
+IMGIX_SOURCE = config("IMGIX_SOURCE", cast=str)

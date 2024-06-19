@@ -3,13 +3,14 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from .serializers import LoginSerializer
-from .exceptions import BadOAuthToken
-from .providers.google import GoogleOAuthProvider
 from ridly.serializers import DetailedErrorSerializer
+from oauth.serializers import LoginSerializer
+from oauth.exceptions import BadOAuthToken
+from oauth.providers.google import GoogleOAuthProvider
 from user.models import User
 from user.serializers import UserSerializer
 from user.auth_tokens import generate_tokens_for_user, set_refresh_token_cookie
+from user.avatar.tasks import update_avatar_from_oauth
 
 
 @extend_schema_view(
@@ -28,9 +29,7 @@ class OAuthLoginAPIView(GenericAPIView):
       email=raw_user.get("email"),
       first_name=raw_user.get("first_name"),
       last_name=raw_user.get("last_name"),
-      avatar_url=raw_user.get("avatar"),
     )
-    user.save()
     return user
 
   def post(self, request):
@@ -46,10 +45,12 @@ class OAuthLoginAPIView(GenericAPIView):
     user = None
     try:
       user = User.objects.get(email=raw_user.get("email"))
-      user.avatar_url = raw_user.get("avatar")
-      user.save()
     except User.DoesNotExist:
+      # Create user from OAuth information
       user = self.create_user_from_raw_user(raw_user)
+
+      # Update user's avatar from OAuth, asynchronously
+      update_avatar_from_oauth.delay(user.id, raw_user.get("avatar"))
 
     (access_token, refresh_token) = generate_tokens_for_user(user)
 

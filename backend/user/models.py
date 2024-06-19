@@ -16,9 +16,9 @@ class User(AbstractBaseUser, PermissionsMixin):
   first_name = models.CharField(max_length=50)
   last_name = models.CharField(max_length=50)
 
-  avatar_url = models.URLField(blank=True)
-
   did_complete_signup = models.BooleanField(default=False)
+
+  has_avatar = models.BooleanField(default=False)
 
   last_known_location = models.PointField(null=True, blank=True)
 
@@ -45,3 +45,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
   def get_short_name(self):
     return self.first_name
+
+  @property
+  def avatar_url(self):
+    if self.has_avatar:
+      return f"user/avatar/{self.id}"
+    return None
