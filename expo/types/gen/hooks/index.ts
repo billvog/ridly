@@ -3,7 +3,7 @@ export * from "./useHunt";
 export * from "./useHuntClue";
 export * from "./useJoinEvent";
 export * from "./useJoinedEvents";
-export * from "./useOauthGoogleLogin";
+export * from "./useOauthLogin";
 export * from "./useUpcomingEvents";
 export * from "./useUserCompleteSignup";
 export * from "./useUserLogout";

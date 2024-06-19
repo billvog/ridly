@@ -1,5 +1,6 @@
 import Button from "@/modules/ui/Button";
-import { useOauthGoogleLogin, userMeQueryKey } from "@/types/gen";
+import { useOauthLogin, userMeQueryKey } from "@/types/gen";
+import { handleMutationError } from "@/utils/mutationError";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Google from "expo-auth-session/providers/google";
 import { useRouter } from "expo-router";
@@ -14,7 +15,7 @@ export default function Page() {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  const loginMutation = useOauthGoogleLogin();
+  const loginMutation = useOauthLogin("google");
 
   const [_, response, promptAsync] = Google.useAuthRequest({
     iosClientId: process.env.EXPO_PUBLIC_OAUTH_GOOGLE_IOS_CLIENT_ID,
@@ -53,13 +54,7 @@ export default function Page() {
 
           router.push({ pathname: "/" });
         },
-        onError: (error) => {
-          if (error.detail) {
-            Toast.show({ type: "error", text1: error.detail });
-          } else {
-            Toast.show({ type: "error", text1: "Something went wrong." });
-          }
-        },
+        onError: (error) => handleMutationError(error as any),
       }
     );
   }

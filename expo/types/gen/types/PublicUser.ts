@@ -16,7 +16,7 @@ export type PublicUser = {
     */
     username: string;
     /**
-     * @type string | undefined, uri
+     * @type string, uri
     */
-    avatar_url?: string;
+    avatar_url: string;
 };

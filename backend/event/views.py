@@ -35,10 +35,15 @@ class ListUpcomingEventsAPIVIew(ListAPIView):
     """
 
     user = self.request.user
-    distance = self.request.GET.get("distance", 10)  # in km
     qs = Event.objects.filter(happening_at__gte=timezone.now())
 
-    if user.is_authenticated:
+    distance = 0
+    try:
+      distance = int(self.request.GET.get("distance", 0))  # in km
+    except ValueError:
+      pass
+
+    if user.is_authenticated and distance > 0:
       qs = qs.filter(
         location_coordinates__distance_lt=(user.last_known_location, D(km=distance))
       )

@@ -99,6 +99,7 @@ function LogoutButton() {
         // Reset "user/me" cached query that
         // stores logged in user.
         queryClient.resetQueries({ queryKey: userMeQueryKey() });
+        queryClient.clear();
 
         // Clear memory stored auth tokens
         clearAuthTokens();

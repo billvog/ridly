@@ -177,9 +177,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/DetailedError'
           description: ''
-  /oauth/google/login/:
+  /oauth/{provider}/login/:
     post:
-      operationId: oauth_google_login
+      operationId: oauth_login
+      parameters:
+      - in: path
+        name: provider
+        schema:
+          type: string
+          enum:
+          - google
+        description: OAuth provider name
+        required: true
       tags:
       - oauth
       requestBody:
@@ -371,8 +380,8 @@ components:
           type: array
           items:
             type: string
-          description: Get the first 3 participants who have an avatar_url set and
-            are not the current user.
+          description: Get the first 3 participants' avatars, excluding the logged
+            in user and users without avatars.
           readOnly: true
         participant_count:
           type: integer
@@ -504,8 +513,8 @@ components:
         avatar_url:
           type: string
           format: uri
-          maxLength: 200
       required:
+      - avatar_url
       - first_name
       - id
       - last_name
@@ -540,7 +549,6 @@ components:
         avatar_url:
           type: string
           format: uri
-          maxLength: 200
         did_complete_signup:
           type: boolean
         created_at:
@@ -548,6 +556,7 @@ components:
           format: date-time
           readOnly: true
       required:
+      - avatar_url
       - created_at
       - email
       - first_name

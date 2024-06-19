@@ -1,10 +1,8 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from ridly.serializers import PointSerializer, ImageSerializer
-
-User = get_user_model()
+from user.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):

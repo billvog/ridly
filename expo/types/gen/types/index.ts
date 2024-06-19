@@ -9,7 +9,7 @@ export * from "./HuntEvent";
 export * from "./JoinEvent";
 export * from "./JoinedEvents";
 export * from "./Login";
-export * from "./OauthGoogleLogin";
+export * from "./OauthLogin";
 export * from "./Point";
 export * from "./PublicUser";
 export * from "./UpcomingEvents";
