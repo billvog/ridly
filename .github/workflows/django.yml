@@ -63,5 +63,7 @@ jobs:
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
           JWT_ACCESS_TOKEN_SECRET: ${{ secrets.JWT_ACCESS_TOKEN_SECRET }}
           JWT_REFRESH_TOKEN_SECRET: ${{ secrets.JWT_REFRESH_TOKEN_SECRET }}
+          GS_BUCKET_NAME: ${{ secrets.GS_BUCKET_NAME }}
+          IMGIX_SOURCE: ${{ vars.IMGIX_SOURCE }}
         run: |
           python manage.py test
