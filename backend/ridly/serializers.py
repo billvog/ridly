@@ -4,6 +4,8 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 
 
 class PointSerializer(serializers.Serializer):
@@ -33,6 +35,7 @@ class ValidationErrorSerializer(serializers.Serializer):
   )
 
 
+@extend_schema_field(field=OpenApiTypes.URI)
 class ImageSerializer(serializers.Serializer):
   """
   Serializer that creates an Imgix URL for an image, with optional parameters.

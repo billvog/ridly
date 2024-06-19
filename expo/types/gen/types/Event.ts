@@ -16,7 +16,7 @@ import { DetailedError } from "./DetailedError";
     description: string;
     creator: Creator;
     /**
-     * @description Get the first 3 participants who have an avatar_url set and are not the current user.
+     * @description Get the first 3 participants\' avatars, excluding the logged in user and users without avatars.
      * @type array
     */
     readonly participant_avatars: string[];

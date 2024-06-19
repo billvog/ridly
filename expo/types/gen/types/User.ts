@@ -20,9 +20,9 @@ export type User = {
     */
     email: string;
     /**
-     * @type string | undefined, uri
+     * @type string, uri
     */
-    avatar_url?: string;
+    avatar_url: string;
     /**
      * @type boolean | undefined
     */
