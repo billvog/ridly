@@ -2747,14 +2747,24 @@
   resolved "https://registry.yarnpkg.com/@jsdevtools/ono/-/ono-7.1.3.tgz#9df03bbd7c696a5c58885c34aa06da41c8543796"
   integrity sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==
 
-"@kubb/cli@^2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/cli/-/cli-2.19.5.tgz#3dd619b37dbf393d1b3f013159a1f61f1074e94e"
-  integrity sha512-Oeb+ikmTZb78XQjXv9o2L5LAU9ir5sw3wxg6jCZBoyFyHpw0sALc4Z+ck+JtXi6eoS+ujT3SAQ69aJb6TC+mtQ==
+"@jsep-plugin/assignment@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@jsep-plugin/assignment/-/assignment-1.2.1.tgz#07277bdd7862451a865d391e2142efba33f46c9b"
+  integrity sha512-gaHqbubTi29aZpVbBlECRpmdia+L5/lh2BwtIJTmtxdbecEyyX/ejAOg7eQDGNvGOUmPY7Z2Yxdy9ioyH/VJeA==
+
+"@jsep-plugin/regex@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@jsep-plugin/regex/-/regex-1.0.3.tgz#3aeaa2e5fa45d89de116aeafbfa41c95935b7f6d"
+  integrity sha512-XfZgry4DwEZvSFtS/6Y+R48D7qJYJK6R9/yJFyUFHCIUMEEHuJ4X95TDgJp5QkmzfLYvapMPzskV5HpIDrREug==
+
+"@kubb/cli@^2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/cli/-/cli-2.19.6.tgz#e61ace08958a8135818469a7be3ae4b897fc87f5"
+  integrity sha512-xVhuhfnzEjeYvEsPXxsfbFiKW8JOWEOiq3jYBMQIXr8MPND2rJgp5OvGG3IPCG5YILk50R2Un3QqPPCom8hOpw==
   dependencies:
-    "@kubb/core" "2.19.5"
-    "@kubb/fs" "2.19.5"
-    bundle-require "^4.1.0"
+    "@kubb/core" "2.19.6"
+    "@kubb/fs" "2.19.6"
+    bundle-require "^4.2.1"
     chokidar "^3.6.0"
     citty "^0.1.6"
     consola "^3.2.3"
@@ -2768,143 +2778,143 @@
     string-argv "^0.3.2"
     tinyrainbow "^1.1.1"
 
-"@kubb/core@2.19.5", "@kubb/core@^2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/core/-/core-2.19.5.tgz#117511b4a5934bf90cbb646892b893687c74c7b4"
-  integrity sha512-s/kf6fAf3fszcOvG3w/mOWQDqgr0yOhXyM0zMiYlJK43ZZ9ZbM7gy0LhFmabzOFP3geuyU3I3YySE0OKG4ldSQ==
+"@kubb/core@2.19.6", "@kubb/core@^2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/core/-/core-2.19.6.tgz#aed2b20b20d7151456eed9a04494207f2d9d9cad"
+  integrity sha512-U/aYbtujOoH0fHBGUgTCvlbwlc4L1y7qYGY2js1xAsXQ360zk1gcaf2B7yD6JyX9JMdDIiz7uahPjVAqj6qeEw==
   dependencies:
-    "@kubb/fs" "2.19.5"
-    "@kubb/parser-ts" "2.19.5"
-    "@kubb/types" "2.19.5"
+    "@kubb/fs" "2.19.6"
+    "@kubb/parser-ts" "2.19.6"
+    "@kubb/types" "2.19.6"
     change-case "^5.4.4"
     directory-tree "^3.5.1"
     find-up "^7.0.0"
     natural-orderby "^3.0.2"
     p-queue "^8.0.1"
-    remeda "^2.0.0"
+    remeda "^2.0.10"
     seedrandom "^3.0.5"
     semver "^7.6.2"
     unraw "^3.0.0"
 
-"@kubb/fs@2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/fs/-/fs-2.19.5.tgz#89e5ccdaaa8aad61087aa22fafae9c1f6b94170b"
-  integrity sha512-cJ+eNh1fzFXpMSsdLTcmHV50d2wso6gkKRnz3vqyF9Xus1kpcVkQCruEs8RmsAW7mHEtcfWEI+tMfzqTDxpTjA==
+"@kubb/fs@2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/fs/-/fs-2.19.6.tgz#6d410fdd3b5500077d2eaadd580eeb08e1a06538"
+  integrity sha512-x7FT/k7mHoqhDTbew6aGezOJ1GgwOyjepE8GRRpPf6eZY+7MeBncIn3HRZXLJibFgsYEEfnNch56dI7EcA7sZA==
   dependencies:
     fs-extra "^11.2.0"
     js-runtime "^0.0.8"
 
-"@kubb/oas@2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/oas/-/oas-2.19.5.tgz#484a1110f08ecbd132739b762e7e5dbefeab0e52"
-  integrity sha512-Da7R3oPsL61H6LU1zxBFrhI40jKHZpeyHmvkVlIOwSEVNH20a85Qq6OrNM0QaG0/vm7aro9sapg4ZIk5GvNqxg==
+"@kubb/oas@2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/oas/-/oas-2.19.6.tgz#104a47346357cd6332cd8e64debe17718548b2e7"
+  integrity sha512-VHSqHYcSpsWbDVD4EGaZMngQHk3XCqhff01ztrJllJ3gMWvd+xlam1wb/0v3XsOzfmu3UDDNmIIJ4h6YuQK8yw==
   dependencies:
-    "@redocly/openapi-core" "^1.14.0"
+    "@redocly/openapi-core" "^1.15.0"
     hotscript "^1.0.13"
     json-schema-to-ts "^3.1.0"
-    oas "^24.3.6"
-    oas-normalize "^11.1.0"
-    openapi-format "^1.17.1"
+    oas "^24.4.1"
+    oas-normalize "^11.1.1"
+    openapi-format "^1.19.0"
     openapi-types "^12.1.3"
-    remeda "^2.0.0"
+    remeda "^2.0.10"
     swagger2openapi "^7.0.8"
     ts-toolbelt "^9.6.0"
 
-"@kubb/parser-ts@2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/parser-ts/-/parser-ts-2.19.5.tgz#6bc6e2ab72d8d93babd7cde786bd526f49a569f7"
-  integrity sha512-22xrxzQC9GScFa7W+Y0dNkiN8DPcgi9q4jszS3vHaz4zXsst31tNyzAnBe73KFdsW7JecELS+3/qQmd3PbB1NA==
+"@kubb/parser-ts@2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/parser-ts/-/parser-ts-2.19.6.tgz#d5e090c7dc2d5ec49b5a84faaa3bf91aa8b7ab64"
+  integrity sha512-Ci962Akm6VeuIo0Uj69Cs/+lWsBr/grEVKzAF+62oG5yUoif3Tcvkw/F5IYHIow7gQTRsySj9KB8QL863OuCHA==
   dependencies:
-    remeda "^2.0.0"
+    remeda "^2.0.10"
     typescript "^5.4.5"
 
-"@kubb/plugin-oas@2.19.5", "@kubb/plugin-oas@^2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/plugin-oas/-/plugin-oas-2.19.5.tgz#8ad2a10e3c02cafc97e8fe9811cf7995ef435a73"
-  integrity sha512-DkdrGFJpUxVOBdwXLWpB7GUq4zhqRFwb3btzWeU3wPG2QX4UjiZ49ZzT/rvGsbH3yl3blYXCn1sXIKRmOFqVyw==
+"@kubb/plugin-oas@2.19.6", "@kubb/plugin-oas@^2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/plugin-oas/-/plugin-oas-2.19.6.tgz#848fe20c43bf3f3d611fcb804e919f677b90ba3a"
+  integrity sha512-Jvr6EStCBC0XEKcQtCBRKJDiRtXNQmuVNR9h9lIXsvYVThXoSVZx0fo3LOO46BrQVFo7FGTSYZTTJGVW/bTFsg==
   dependencies:
-    "@kubb/core" "2.19.5"
-    "@kubb/fs" "2.19.5"
-    "@kubb/oas" "2.19.5"
-    "@kubb/react" "2.19.5"
+    "@kubb/core" "2.19.6"
+    "@kubb/fs" "2.19.6"
+    "@kubb/oas" "2.19.6"
+    "@kubb/react" "2.19.6"
     "@stoplight/yaml" "^4.3.0"
-    remeda "^2.0.0"
+    remeda "^2.0.10"
 
-"@kubb/react@2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/react/-/react-2.19.5.tgz#b3ff3dea8c3b2ba8d612e226d161c69dc6556a4d"
-  integrity sha512-9reIEq0fyyAeCIUknhyjYTJGxRtnO2a70i5wBd80X3GHyT9dRA5eLDasd5m1NFGI8EsG+T77343IRg90z+YCag==
+"@kubb/react@2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/react/-/react-2.19.6.tgz#923edcd18dfbb13886e4662e531eae456c005116"
+  integrity sha512-Nu3bQcvONXyQuN62L9g9C9qOhfiK1di4qqE90wX0SUEhbYuOETlcrYtxy6gbD1AZHq9gwML76N01JlxtlINNxQ==
   dependencies:
-    "@kubb/core" "2.19.5"
-    "@kubb/fs" "2.19.5"
-    "@kubb/parser-ts" "2.19.5"
+    "@kubb/core" "2.19.6"
+    "@kubb/fs" "2.19.6"
+    "@kubb/parser-ts" "2.19.6"
     natural-orderby "^3.0.2"
 
-"@kubb/swagger-client@2.19.5", "@kubb/swagger-client@^2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/swagger-client/-/swagger-client-2.19.5.tgz#d4b5a7459e912af821ee2368fe82dfe73573714a"
-  integrity sha512-9TSoH1YfbBplim92MMsqNi2XLhLjXyOe3OXmb7MrtztvhafcsPhbUMC0lmy7pzl3OfAhOa537QSCyp6gv2r5rA==
+"@kubb/swagger-client@2.19.6", "@kubb/swagger-client@^2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/swagger-client/-/swagger-client-2.19.6.tgz#cfe5fba7033efab5d6959123079d62710acd785c"
+  integrity sha512-1Xq08THnfc2SmbCVUPTxOActHlpTCalP2ixWvxJ8HUWUzH2DslFkyji9Yv5rHr2wUh/H1w1MoToHfYfRFqDVJg==
   dependencies:
-    "@kubb/core" "2.19.5"
-    "@kubb/fs" "2.19.5"
-    "@kubb/oas" "2.19.5"
-    "@kubb/parser-ts" "2.19.5"
-    "@kubb/plugin-oas" "2.19.5"
-    "@kubb/react" "2.19.5"
-    "@kubb/swagger-ts" "2.19.5"
+    "@kubb/core" "2.19.6"
+    "@kubb/fs" "2.19.6"
+    "@kubb/oas" "2.19.6"
+    "@kubb/parser-ts" "2.19.6"
+    "@kubb/plugin-oas" "2.19.6"
+    "@kubb/react" "2.19.6"
+    "@kubb/swagger-ts" "2.19.6"
 
-"@kubb/swagger-tanstack-query@^2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/swagger-tanstack-query/-/swagger-tanstack-query-2.19.5.tgz#1c6408a47967c131e87f33389d3fb12e02a8d7eb"
-  integrity sha512-i/hcfXbAUQZToS6yQ0zCNoeumVQaggIOx3TgPI+N7+KAqkzKCYXjoJHG/jliYImg+tBQhp4jOFtqhBqoTDY9oA==
+"@kubb/swagger-tanstack-query@^2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/swagger-tanstack-query/-/swagger-tanstack-query-2.19.6.tgz#8636f95234ea11d4eadbab4a6e1719d081007ec5"
+  integrity sha512-7bh91f/ZLkTuVxhdUG/0EYyf3C7fKOpUcOR3mgvQ/S3m0Q08jpa6Hh7GuUmhdbtl2zsLTOx3o3myy7zbBgaAKQ==
   dependencies:
-    "@kubb/core" "2.19.5"
-    "@kubb/fs" "2.19.5"
-    "@kubb/oas" "2.19.5"
-    "@kubb/parser-ts" "2.19.5"
-    "@kubb/plugin-oas" "2.19.5"
-    "@kubb/react" "2.19.5"
-    "@kubb/swagger-client" "2.19.5"
-    "@kubb/swagger-ts" "2.19.5"
-    "@kubb/swagger-zod" "2.19.5"
+    "@kubb/core" "2.19.6"
+    "@kubb/fs" "2.19.6"
+    "@kubb/oas" "2.19.6"
+    "@kubb/parser-ts" "2.19.6"
+    "@kubb/plugin-oas" "2.19.6"
+    "@kubb/react" "2.19.6"
+    "@kubb/swagger-client" "2.19.6"
+    "@kubb/swagger-ts" "2.19.6"
+    "@kubb/swagger-zod" "2.19.6"
 
-"@kubb/swagger-ts@2.19.5", "@kubb/swagger-ts@^2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/swagger-ts/-/swagger-ts-2.19.5.tgz#3eeb7b140eafba1496bf28b2a6f9c2d640bf4ae0"
-  integrity sha512-POjCRSPX4fKzZ+Ln0XEMeo6i7RM4RGm+n7nHo3iXP5ZxrD28fFgzWML7T7Eo6JT+2nNp+vG94NSkGDUo4PLpjQ==
+"@kubb/swagger-ts@2.19.6", "@kubb/swagger-ts@^2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/swagger-ts/-/swagger-ts-2.19.6.tgz#54cb77dbcaf847ec37200eb9cfc13800c6e1388a"
+  integrity sha512-tDFVagy5+dKSHeXippmqgZy+2AfPSjQ8HGD8jqXvY1yd+zPRsigBX9MYW7VZVhHJ2viVlkyorj7Y0Voq1AwDpw==
   dependencies:
-    "@kubb/core" "2.19.5"
-    "@kubb/fs" "2.19.5"
-    "@kubb/oas" "2.19.5"
-    "@kubb/parser-ts" "2.19.5"
-    "@kubb/plugin-oas" "2.19.5"
-    "@kubb/react" "2.19.5"
-    "@kubb/types" "2.19.5"
+    "@kubb/core" "2.19.6"
+    "@kubb/fs" "2.19.6"
+    "@kubb/oas" "2.19.6"
+    "@kubb/parser-ts" "2.19.6"
+    "@kubb/plugin-oas" "2.19.6"
+    "@kubb/react" "2.19.6"
+    "@kubb/types" "2.19.6"
 
-"@kubb/swagger-zod@2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/swagger-zod/-/swagger-zod-2.19.5.tgz#5cd8e41915a3be8fb799e6836245184f8a193476"
-  integrity sha512-tP/3HhopVHHbctR928vPGg4vWXlLfJmEKo948xD/CvLiq3G9G2K6b5VtiivwB20CjFvnofxWhYx6rYdJFWBC2g==
+"@kubb/swagger-zod@2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/swagger-zod/-/swagger-zod-2.19.6.tgz#f39790ba1e1178d2259b5b9164159b47b165b3cd"
+  integrity sha512-EmXS3lC/tlco49BZzTGeqgrHUGtByknn9fXb7c3fV+gpvMdvYza2cKtzoeTahK6uDPBFT6bJQHP5H/k7+saA1A==
   dependencies:
-    "@kubb/core" "2.19.5"
-    "@kubb/fs" "2.19.5"
-    "@kubb/oas" "2.19.5"
-    "@kubb/parser-ts" "2.19.5"
-    "@kubb/plugin-oas" "2.19.5"
-    "@kubb/react" "2.19.5"
-    "@kubb/swagger-ts" "2.19.5"
+    "@kubb/core" "2.19.6"
+    "@kubb/fs" "2.19.6"
+    "@kubb/oas" "2.19.6"
+    "@kubb/parser-ts" "2.19.6"
+    "@kubb/plugin-oas" "2.19.6"
+    "@kubb/react" "2.19.6"
+    "@kubb/swagger-ts" "2.19.6"
 
-"@kubb/swagger@^2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/swagger/-/swagger-2.19.5.tgz#b070c97a543de48bf38c0f9bfdd2e41ad1aa7913"
-  integrity sha512-bqLwMT72T9VHr7b3/BXVQgJ5iVd3EffTb9P808/elyYxTMvH0EG9uDUMe4utaVQhI1gLca5+IKQovSwZ7NooDw==
+"@kubb/swagger@^2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/swagger/-/swagger-2.19.6.tgz#2a45ca6735b4bf4a8a46aea39d0e47d08d621224"
+  integrity sha512-m5GoT6JeRN36uZa/hRaGFfLDsX+BYKhh5g1bt0kwdWjuar9F1lCadlzb/3UsW7GKRVwOVliCmZWk2BoOkGp8sA==
   dependencies:
-    "@kubb/plugin-oas" "2.19.5"
+    "@kubb/plugin-oas" "2.19.6"
 
-"@kubb/types@2.19.5":
-  version "2.19.5"
-  resolved "https://registry.yarnpkg.com/@kubb/types/-/types-2.19.5.tgz#c5186619173f21b3ee311334be0239d583fea48e"
-  integrity sha512-YxWMGAzGXOcw+RC3++lXIk0CO7dA2iqTVbQ9lxyVKOI89iUbTeydA7cSaC1M2iAx/6C2xoBHYrLa6nnKukc8Tw==
+"@kubb/types@2.19.6":
+  version "2.19.6"
+  resolved "https://registry.yarnpkg.com/@kubb/types/-/types-2.19.6.tgz#bd6dfc087aed67b49560c567c436c7d0f7a46ba7"
+  integrity sha512-RJEzKmebt0IFIhSLl13X+uaQnX5W32JqzpjI/fLmwJpNEYndZL+dHbJgxPKVFWvN8LaGXurnIXjaEbsJk7OB3g==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -3489,19 +3499,20 @@
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
-"@redocly/config@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@redocly/config/-/config-0.5.0.tgz#3ba2585f10d7039b85d7604d0e17f4d091d424c2"
-  integrity sha512-oA1ezWPT2tSV9CLk0FtZlViaFKtp+id3iAVeKBme1DdP4xUCdxEdP8umB21iLKdc6leRd5uGa+T5Ox4nHBAXWg==
+"@redocly/config@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@redocly/config/-/config-0.6.0.tgz#dbee2d5b181791b16b847565657f85092ff4c975"
+  integrity sha512-hNVN3eTxFj2nHYX0gGzZxxXwdE0DXWeWou1TIK3HYf0S9VKVxTxjO9EZbMB7iVUqaHkeqy4PSjlBQcEgD0Ftjg==
 
-"@redocly/openapi-core@^1.14.0":
-  version "1.14.0"
-  resolved "https://registry.yarnpkg.com/@redocly/openapi-core/-/openapi-core-1.14.0.tgz#74f9daf95f835563d458ce02644f0ad0cd519211"
-  integrity sha512-sraF4PGVcc6t6CaYw5raO/GWeOaa6UjcEvH/+Qm7zp+q/fbWAMwbj+1QzaNvpMspCwF+xW6TddDcnXrCDmqYVA==
+"@redocly/openapi-core@^1.15.0":
+  version "1.16.0"
+  resolved "https://registry.yarnpkg.com/@redocly/openapi-core/-/openapi-core-1.16.0.tgz#95afcf822890af3fe8f1bde97018370b5cadb8ca"
+  integrity sha512-z06h+svyqbUcdAaePq8LPSwTPlm6Ig7j2VlL8skPBYnJvyaQ2IN7x/JkOvRL4ta+wcOCBdAex5JWnZbKaNktJg==
   dependencies:
     "@redocly/ajv" "^8.11.0"
-    "@redocly/config" "^0.5.0"
+    "@redocly/config" "^0.6.0"
     colorette "^1.2.0"
+    https-proxy-agent "^7.0.4"
     js-levenshtein "^1.1.6"
     js-yaml "^4.1.0"
     lodash.isequal "^4.5.0"
@@ -3844,6 +3855,13 @@ agent-base@6:
   integrity sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==
   dependencies:
     debug "4"
+
+agent-base@^7.0.2:
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-7.1.1.tgz#bdbded7dfb096b751a2a087eeeb9664725b2e317"
+  integrity sha512-H0TSyFNDMomMNJQBn8wFV5YC/2eJ+VXECwOadZJT554xP6cODZHPX3H9QMQECxvrgiSOP1pHjy1sMWQVYJOUOA==
+  dependencies:
+    debug "^4.3.4"
 
 aggregate-error@^3.0.0:
   version "3.1.0"
@@ -4334,7 +4352,7 @@ builtins@^1.0.3:
   resolved "https://registry.yarnpkg.com/builtins/-/builtins-1.0.3.tgz#cb94faeb61c8696451db36534e1422f94f0aee88"
   integrity sha512-uYBjakWipfaO/bXI7E8rq6kpwHRZK5cNYrUv2OzZSI/FvmdMyXJ2tG9dKcjEC5YHmHpUAwsargWIZNWdxb/bnQ==
 
-bundle-require@^4.1.0:
+bundle-require@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/bundle-require/-/bundle-require-4.2.1.tgz#4c450a5807381d20ade987bde8ac391544257919"
   integrity sha512-7Q/6vkyYAwOmQNRw75x+4yRtZCZJXUDmHHlFdkiV0wgv/reNjtJwpu1jPJ0w2kbEpIM0uoKI3S4/f39dU7AjSA==
@@ -6345,6 +6363,14 @@ https-proxy-agent@^5.0.1:
     agent-base "6"
     debug "4"
 
+https-proxy-agent@^7.0.4:
+  version "7.0.4"
+  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-7.0.4.tgz#8e97b841a029ad8ddc8731f26595bad868cb4168"
+  integrity sha512-wlwpilI7YdjSkWaQ/7omYBMTliDcmCN8OLihO6I9B86g06lMyAoqgoDpV0XqoaPOKj+0DIdAvnsWfyAAhmimcg==
+  dependencies:
+    agent-base "^7.0.2"
+    debug "4"
+
 human-signals@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
@@ -6951,6 +6977,11 @@ jscodeshift@^0.14.0:
     temp "^0.8.4"
     write-file-atomic "^2.3.0"
 
+jsep@^1.3.8:
+  version "1.3.8"
+  resolved "https://registry.yarnpkg.com/jsep/-/jsep-1.3.8.tgz#facb6eb908d085d71d950bd2b24b757c7b8a46d7"
+  integrity sha512-qofGylTGgYj9gZFsHuyWAN4jr35eJ66qJCK4eKDnldohuUoQFbU3iZn2zjvEbd9wOAhP9Wx5DsAAduTyE1PSWQ==
+
 jsesc@^2.5.1:
   version "2.5.2"
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-2.5.2.tgz#80564d2e483dacf6e8ef209650a67df3f0c283a4"
@@ -7048,10 +7079,14 @@ jsonfile@^6.0.1:
   optionalDependencies:
     graceful-fs "^4.1.6"
 
-jsonpath-plus@^8.0.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/jsonpath-plus/-/jsonpath-plus-8.1.0.tgz#68c92281215672d1d6c785b3c1bdc8acc097ba3f"
-  integrity sha512-qVTiuKztFGw0dGhYi3WNqvddx3/SHtyDT0xJaeyz4uP0d1tkpG+0y5uYQ4OcIo1TLAz3PE/qDOW9F0uDt3+CTw==
+jsonpath-plus@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/jsonpath-plus/-/jsonpath-plus-9.0.0.tgz#bb8703ee481531142bca8dee9a42fe72b8358a7f"
+  integrity sha512-bqE77VIDStrOTV/czspZhTn+o27Xx9ZJRGVkdVShEtPoqsIx5yALv3lWVU6y+PqYvWPJNWE7ORCQheQkEe0DDA==
+  dependencies:
+    "@jsep-plugin/assignment" "^1.2.1"
+    "@jsep-plugin/regex" "^1.0.3"
+    jsep "^1.3.8"
 
 jsonpointer@^5.0.0:
   version "5.0.1"
@@ -7928,10 +7963,10 @@ oas-linter@^3.2.2:
     should "^13.2.1"
     yaml "^1.10.0"
 
-oas-normalize@^11.1.0:
-  version "11.1.0"
-  resolved "https://registry.yarnpkg.com/oas-normalize/-/oas-normalize-11.1.0.tgz#531c6c688ba4a4a2d039b141c68e3fd1f4026157"
-  integrity sha512-J6bOG0wCm/OG/qkuVmp8Q6J4kft0Z6y/E/UDZp2NsJW1ZR8gcECXLKBdbFGRvTzJBmpTSRbLVu7yWdHllQhuIQ==
+oas-normalize@^11.1.1:
+  version "11.1.1"
+  resolved "https://registry.yarnpkg.com/oas-normalize/-/oas-normalize-11.1.1.tgz#113c0e641bc1433edd27d963f65ac457c6ee7727"
+  integrity sha512-qwIYTl34cdheBmHzHmc60frAcMD02USrMuZONWUdSjlBTr9En7ZC1q0vFaNqNmKiOMs7eNQbzmBkyhU6sL04pQ==
   dependencies:
     "@readme/openapi-parser" "^2.6.0"
     "@readme/postman-to-openapi" "^4.1.0"
@@ -7969,18 +8004,18 @@ oas-validator@^5.0.8:
     should "^13.2.1"
     yaml "^1.10.0"
 
-oas@^24.3.6:
-  version "24.3.6"
-  resolved "https://registry.yarnpkg.com/oas/-/oas-24.3.6.tgz#aa9d1c6af418582f4a917cd02ed2e8603cd89aa3"
-  integrity sha512-KgtJPEksGGAhQFuIY0JezU48sW+3jbYcexc7TlfOfBaNCQHlGMt3aWVjKC/soYn18E0okkyQemDhLnG1yy2MzA==
+oas@^24.4.1:
+  version "24.4.1"
+  resolved "https://registry.yarnpkg.com/oas/-/oas-24.4.1.tgz#8c606a657052f6aa85fb08b1c2e9f92128dc9130"
+  integrity sha512-G/bxacN1Prmfvc52cXsV4w8/8qr59yLKPC5VbO4eZDF/Kc+Bb5Vyx/lMRoLCqB3QACliVLfRiLtn88+mZE+KwQ==
   dependencies:
     "@readme/json-schema-ref-parser" "^1.2.0"
     "@types/json-schema" "^7.0.11"
     json-schema-merge-allof "^0.8.1"
-    jsonpath-plus "^8.0.0"
+    jsonpath-plus "^9.0.0"
     jsonpointer "^5.0.0"
     memoizee "^0.4.16"
-    oas-normalize "^11.1.0"
+    oas-normalize "^11.1.1"
     openapi-types "^12.1.1"
     path-to-regexp "^6.2.2"
     remove-undefined-objects "^5.0.0"
@@ -8099,10 +8134,10 @@ open@^8.0.4, open@^8.3.0:
     is-docker "^2.1.1"
     is-wsl "^2.2.0"
 
-openapi-format@^1.17.1:
-  version "1.17.1"
-  resolved "https://registry.yarnpkg.com/openapi-format/-/openapi-format-1.17.1.tgz#313a108974061dd666e8de5324b961bd5578eb91"
-  integrity sha512-R+0soaxQF4OY8xPlqqdvwK6x010e86Gh672JK1bxMmYkqVpUcceJ5VV2B6lHbhlPDEvmcDyRGSA01TqaxMz+Jw==
+openapi-format@^1.19.0:
+  version "1.20.0"
+  resolved "https://registry.yarnpkg.com/openapi-format/-/openapi-format-1.20.0.tgz#a26855b732454d0da4d55b40221cf50d5e16b827"
+  integrity sha512-wBmienYScWlZmWRk34Kq7APyuzNxAqV3WVGIvH1pIAnxHBGfr8Z0wcU9MlHdUBXZzidtk9hzhXe33IkKI1q5mg==
   dependencies:
     "@stoplight/yaml" "^4.3.0"
     case-anything "2.1.10"
@@ -9026,12 +9061,12 @@ regjsparser@^0.9.1:
   dependencies:
     jsesc "~0.5.0"
 
-remeda@^2.0.0:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/remeda/-/remeda-2.0.3.tgz#98e98f541a938716800be63b757e0b1b70b7625f"
-  integrity sha512-3OtBvbFnhPJPNDxrP4dQ+Y7ghIErMeTy7KQ2vkC6XzrQHbFdlD0tT6mYaJ2S96lUu3umNnhkqni2lhVOdL9UOQ==
+remeda@^2.0.10:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/remeda/-/remeda-2.2.0.tgz#d137809c9012b5ecd388ede8968409167b4d844b"
+  integrity sha512-qHV/yLbFKT6qX4OlqTizatGNfCPJNRgtL3HaFCM/3vaOWgblLw+uj/ji+Q3GNS0By/yZPlYuQr37WLBWOgCjvg==
   dependencies:
-    type-fest "^4.18.2"
+    type-fest "^4.20.0"
 
 remove-trailing-slash@^0.1.0:
   version "0.1.1"
@@ -10088,10 +10123,10 @@ type-fest@^0.7.1:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.7.1.tgz#8dda65feaf03ed78f0a3f9678f1869147f7c5c48"
   integrity sha512-Ne2YiiGN8bmrmJJEuTWTLJR32nh/JdL1+PSicowtNb0WFpn59GK8/lfD61bVtzguz7b3PBt74nxpv/Pw5po5Rg==
 
-type-fest@^4.18.2:
-  version "4.19.0"
-  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-4.19.0.tgz#f7d3d5f55a7a118b5fe3d2eef53059cf8e516dcd"
-  integrity sha512-CN2l+hWACRiejlnr68vY0/7734Kzu+9+TOslUXbSCQ1ruY9XIHDBSceVXCcHm/oXrdzhtLMMdJEKfemf1yXiZQ==
+type-fest@^4.20.0:
+  version "4.20.1"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-4.20.1.tgz#d97bb1e923bf524e5b4b43421d586760fb2ee8be"
+  integrity sha512-R6wDsVsoS9xYOpy8vgeBlqpdOyzJ12HNfQhC/aAKWM3YoCV9TtunJzh/QpkMgeDhkoynDcw5f1y+qF9yc/HHyg==
 
 type@^2.7.2:
   version "2.7.3"
