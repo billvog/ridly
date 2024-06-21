@@ -6,7 +6,7 @@ from event.models import Event
 from creator.serializers import CreatorSerializer
 
 
-class EventParticipantMixinSerializer:
+class EventParticipantAvatarsMixinSerializer:
   """
   Mixin to add participant avatars to the EventSerializer.
   """
@@ -49,8 +49,25 @@ class EventHasJoinedMixinSerializer:
       return obj.participants.contains(user)
 
 
+class MiniEventSerializer(
+  EventHasJoinedMixinSerializer,
+  serializers.ModelSerializer,
+):
+  has_joined = serializers.SerializerMethodField()
+
+  class Meta:
+    model = Event
+    fields = [
+      "id",
+      "name",
+      "has_joined",
+      "location_name",
+      "happening_at",
+    ]
+
+
 class EventSerializer(
-  EventParticipantMixinSerializer,
+  EventParticipantAvatarsMixinSerializer,
   EventHasJoinedMixinSerializer,
   serializers.ModelSerializer,
 ):
