@@ -12,6 +12,11 @@ import { useLocalSearchParams, useNavigation, useRouter, useSegments } from "exp
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
+export const EventDetailsNavigationOptions: NativeStackNavigationOptions = {
+  title: "Event",
+  headerBackTitleVisible: false,
+};
+
 export default function EventDetails() {
   const { id: eventId } = useLocalSearchParams();
   const navigation = useNavigation();
@@ -28,10 +33,11 @@ export default function EventDetails() {
 
   // Set event's name as our header title.
   useEffect(() => {
-    navigation.setOptions({
-      title: event ? event.name : "Event",
-      headerBackTitleVisible: false,
-    } satisfies NativeStackNavigationOptions);
+    if (event) {
+      navigation.setOptions({
+        title: event.name,
+      });
+    }
   }, [navigation, event]);
 
   // Handle join event game

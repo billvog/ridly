@@ -24,6 +24,8 @@ type EventScrollFeedProps = {
   title?: string;
   events: Event[] | MiniEvent[];
 
+  noEventsMessage?: string;
+
   filters?: EventFeedFilters;
   onUpdateFilters?: UpdateEventFiltersFn;
 
@@ -33,6 +35,7 @@ type EventScrollFeedProps = {
 export default function EventScrollFeed({
   title,
   events,
+  noEventsMessage,
   filters,
   onUpdateFilters,
   cardHeight = 380,
@@ -63,10 +66,12 @@ export default function EventScrollFeed({
         </View>
 
         {events.length === 0 ? (
-          <View className="flex-1 items-center justify-center" style={{ height: 200 }}>
-            <Text className="font-bold text-xl text-gray-700 mb-2">No events found</Text>
+          <View className="items-center justify-center" style={{ height: cardHeight }}>
+            <Text className="font-bold text-xl text-gray-700">
+              {noEventsMessage ?? "No events found."}
+            </Text>
             {isUsingFilters && (
-              <Text className="font-medium text-xs text-gray-700">
+              <Text className="font-medium text-xs text-gray-700 mt-2">
                 Try adjusting the filters or refreshing the feed.
               </Text>
             )}

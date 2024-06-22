@@ -9,6 +9,11 @@ import { useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useEffect, useMemo } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 
+export const ProfileShowNavigationOptions: NativeStackNavigationOptions = {
+  title: "Profile",
+  headerBackTitleVisible: false,
+};
+
 export default function ProfileShow() {
   const { id: userId } = useLocalSearchParams();
   const navigation = useNavigation();
@@ -27,11 +32,13 @@ export default function ProfileShow() {
     [userProfileQuery]
   );
 
+  // Set the title of the screen to the user's username
   useEffect(() => {
-    navigation.setOptions({
-      title: user?.username ?? "User Profile",
-      headerBackTitleVisible: false,
-    } satisfies NativeStackNavigationOptions);
+    if (user) {
+      navigation.setOptions({
+        title: user.username,
+      });
+    }
   }, [navigation, user]);
 
   if (userProfileQuery.isLoading) {
@@ -69,7 +76,12 @@ export default function ProfileShow() {
         </View>
       </View>
       <View>
-        <EventScrollFeed title="Joined" events={joinedEvents} cardHeight={300} />
+        <EventScrollFeed
+          title="Joined"
+          events={joinedEvents}
+          cardHeight={300}
+          noEventsMessage="No joined events."
+        />
       </View>
     </ScrollView>
   );
