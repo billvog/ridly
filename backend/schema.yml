@@ -394,6 +394,7 @@ components:
           type: string
     Event:
       type: object
+      description: Full event serializer.
       properties:
         id:
           type: string
@@ -525,6 +526,7 @@ components:
       - token
     MiniEvent:
       type: object
+      description: Event serializer, but with only the necessary fields.
       properties:
         id:
           type: string

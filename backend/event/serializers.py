@@ -53,6 +53,10 @@ class MiniEventSerializer(
   EventHasJoinedMixinSerializer,
   serializers.ModelSerializer,
 ):
+  """
+  Event serializer, but with only the necessary fields.
+  """
+
   has_joined = serializers.SerializerMethodField()
 
   class Meta:
@@ -71,6 +75,10 @@ class EventSerializer(
   EventHasJoinedMixinSerializer,
   serializers.ModelSerializer,
 ):
+  """
+  Full event serializer.
+  """
+
   creator = CreatorSerializer()
   participant_avatars = serializers.SerializerMethodField()
   has_joined = serializers.SerializerMethodField()
