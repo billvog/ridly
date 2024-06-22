@@ -2,5 +2,8 @@ from django.apps import AppConfig
 
 
 class CreatorConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'creator'
+  default_auto_field = "django.db.models.BigAutoField"
+  name = "creator"
+
+  def ready(self):
+    import creator.signals  # noqa: F401

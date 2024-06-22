@@ -32,6 +32,7 @@ class PublicUserSerializer(serializers.ModelSerializer):
       "first_name",
       "last_name",
       "username",
+      "is_creator",
       "avatar_url",
     ]
 
