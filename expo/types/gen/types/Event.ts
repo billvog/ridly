@@ -1,7 +1,10 @@
 import { Creator } from "./Creator";
 import { DetailedError } from "./DetailedError";
 
- export type Event = {
+ /**
+ * @description Full event serializer.
+*/
+export type Event = {
     /**
      * @type string, uuid
     */

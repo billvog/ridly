@@ -1,4 +1,6 @@
-export type PublicUser = {
+import { UserProfile } from "./UserProfile";
+
+ export type UserWithProfile = {
     /**
      * @type string, uuid
     */
@@ -23,4 +25,5 @@ export type PublicUser = {
      * @type string, uri
     */
     avatar_url: string;
+    profile: UserProfile;
 };

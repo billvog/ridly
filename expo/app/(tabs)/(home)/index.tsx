@@ -1,11 +1,11 @@
 import { useIsRefreshing } from "@/hooks/useIsRefreshing";
 import { useAuth } from "@/modules/authentication/AuthContext";
 import ErrorMessage from "@/modules/ui/ErrorMessage";
-import EventScrollFeed, { EventFeedFilters } from "@/modules/ui/EventScrollFeed";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
+import EventScrollFeed, { EventFeedFilters } from "@/modules/ui/event/scroll-feed";
 import { useUpcomingEvents } from "@/types/gen";
 import { useState } from "react";
-import { View } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 
 export default function Page() {
   const auth = useAuth();
@@ -28,22 +28,27 @@ export default function Page() {
 
   return (
     <View className="flex-1">
-      {eventsQuery.isSuccess && (
-        <EventScrollFeed
-          title="Upcoming Events"
-          events={eventsQuery.data}
-          filters={feedFilters}
-          onUpdateFilters={setFeedFilters}
-          isRefreshing={areEventsRefreshing}
-          refresh={refreshEvents}
-        />
-      )}
+      <ScrollView
+        contentContainerStyle={{ flex: 1 }}
+        refreshControl={
+          <RefreshControl refreshing={areEventsRefreshing} onRefresh={refreshEvents} />
+        }
+      >
+        {eventsQuery.isSuccess && (
+          <EventScrollFeed
+            title="Upcoming Events"
+            events={eventsQuery.data}
+            filters={feedFilters}
+            onUpdateFilters={setFeedFilters}
+          />
+        )}
 
-      {eventsQuery.isError && (
-        <ErrorMessage viewStyle="p-10 w-full" textStyle="text-lg text-center">
-          Something went wrong loading upcoming events.
-        </ErrorMessage>
-      )}
+        {eventsQuery.isError && (
+          <ErrorMessage viewStyle="p-10 w-full" textStyle="text-lg text-center">
+            Something went wrong loading upcoming events.
+          </ErrorMessage>
+        )}
+      </ScrollView>
     </View>
   );
 }

@@ -1,5 +1,6 @@
 import { useIsRefreshing } from "@/hooks/useIsRefreshing";
 import FullscreenError from "@/modules/ui/FullscreenError";
+import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
 import JoinEventButton from "@/modules/ui/event/JoinEventButton";
 import { useEvent } from "@/types/gen";
 import { AntDesign, Feather } from "@expo/vector-icons";
@@ -8,9 +9,8 @@ import classNames from "classnames";
 import dayjs from "dayjs";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useNavigation, useRouter, useSegments } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
 
 export default function EventDetails() {
   const { id: eventId } = useLocalSearchParams();
@@ -35,14 +35,24 @@ export default function EventDetails() {
   }, [navigation, event]);
 
   // Handle join event game
-  function JoinHunt() {
-    if (!event || !event.hunt_id) return;
+  const JoinHunt = useCallback(() => {
+    if (event && event.hunt_id) {
+      router.push({
+        pathname: `/(tabs)/${segments[1]}/hunt/[id]`,
+        params: { id: event.hunt_id },
+      });
+    }
+  }, [event]);
 
-    router.push({
-      pathname: `/(tabs)/${segments[1]}/hunt/[id]`,
-      params: { id: event.hunt_id },
-    });
-  }
+  // Handle creator's handle pressed
+  const CreatorHandlePressed = useCallback(() => {
+    if (event && event.creator.user.id) {
+      router.push({
+        pathname: `/(tabs)/${segments[1]}/profile/[id]`,
+        params: { id: event.creator.user.id },
+      });
+    }
+  }, [event]);
 
   if (eventQuery.isLoading) {
     return <FullscreenSpinner />;
@@ -73,7 +83,7 @@ export default function EventDetails() {
           <Text className="font-extrabold text-3xl">{event.name}</Text>
           <View className="flex flex-row items-center">
             <Text className="text-lg">{"by "}</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={CreatorHandlePressed}>
               <Text className="font-bold text-lg text-orange-500">
                 @{event.creator.user.username}
               </Text>

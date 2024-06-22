@@ -1,4 +1,5 @@
 export * from "./useEvent";
+export * from "./useGetUserProfile";
 export * from "./useHunt";
 export * from "./useHuntClue";
 export * from "./useJoinEvent";
