@@ -66,6 +66,7 @@ class MiniEventSerializer(
       "name",
       "has_joined",
       "location_name",
+      "participant_count",
       "happening_at",
     ]
 

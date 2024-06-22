@@ -541,6 +541,10 @@ components:
         location_name:
           type: string
           maxLength: 100
+        participant_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
         happening_at:
           type: string
           format: date-time
