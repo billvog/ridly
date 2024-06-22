@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from event.serializers import MiniEventSerializer
 from user.serializers import PublicUserSerializer
 from user.profile.models import UserProfile
 
@@ -17,3 +18,8 @@ class UserWithProfileSerializer(PublicUserSerializer):
     fields = PublicUserSerializer.Meta.fields + [
       "profile",
     ]
+
+
+class GetUserProfileSerializer(serializers.Serializer):
+  user = UserWithProfileSerializer()
+  joined_events = MiniEventSerializer(many=True)

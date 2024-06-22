@@ -297,6 +297,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/DetailedError'
           description: ''
+  /user/profile/{id}/:
+    get:
+      operationId: getUserProfile
+      description: Get user's profile along with their 5 first joined events
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - user
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserProfile'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedError'
+          description: ''
   /user/update/location/:
     put:
       operationId: user_update_last_known_location
@@ -424,6 +454,18 @@ components:
       required:
       - has_joined
       - participant_count
+    GetUserProfile:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserWithProfile'
+        joined_events:
+          type: array
+          items:
+            $ref: '#/components/schemas/MiniEvent'
+      required:
+      - joined_events
+      - user
     Hunt:
       type: object
       properties:
@@ -481,6 +523,31 @@ components:
           type: string
       required:
       - token
+    MiniEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        has_joined:
+          type: boolean
+          readOnly: true
+        location_name:
+          type: string
+          maxLength: 100
+        happening_at:
+          type: string
+          format: date-time
+      required:
+      - happening_at
+      - has_joined
+      - id
+      - location_name
+      - name
     Point:
       type: object
       description: Serializer for django.contrib.gis.geos.Point
@@ -510,6 +577,8 @@ components:
         username:
           type: string
           maxLength: 50
+        is_creator:
+          type: boolean
         avatar_url:
           type: string
           format: uri
@@ -562,6 +631,41 @@ components:
       - first_name
       - id
       - last_name
+      - username
+    UserProfile:
+      type: object
+      properties:
+        bio:
+          type: string
+    UserWithProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 50
+        last_name:
+          type: string
+          maxLength: 50
+        username:
+          type: string
+          maxLength: 50
+        is_creator:
+          type: boolean
+        avatar_url:
+          type: string
+          format: uri
+        profile:
+          $ref: '#/components/schemas/UserProfile'
+      required:
+      - avatar_url
+      - first_name
+      - id
+      - last_name
+      - profile
       - username
     ValidationError:
       type: object

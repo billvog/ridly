@@ -1,17 +1,22 @@
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from event.serializers import MiniEventSerializer
+from ridly.serializers import DetailedErrorSerializer
 from user.models import User
-from user.profile.serializers import UserWithProfileSerializer
+from user.profile.serializers import GetUserProfileSerializer
 
 
+@extend_schema_view(
+  get=extend_schema(
+    operation_id="getUserProfile",
+    description="Get user's profile along with their 5 first joined events",
+    responses={200: GetUserProfileSerializer, 404: DetailedErrorSerializer},
+  )
+)
 class UserProfileAPIView(RetrieveAPIView):
-  serializer_class = UserWithProfileSerializer
+  serializer_class = GetUserProfileSerializer
   queryset = User.objects.filter(is_active=True)
-
-  # Serializer class for joined events.
-  joined_events_serializer_class = MiniEventSerializer
 
   def get_joined_event_objects(self, user):
     """
@@ -19,27 +24,13 @@ class UserProfileAPIView(RetrieveAPIView):
     """
     return user.joined_events.all()[:5]
 
-  def get_joined_events_serializer(self, user):
-    """
-    Get user's joined events and return them serialized.
-    """
-    joined_events = self.get_joined_event_objects(user)
-    return self.joined_events_serializer_class(
-      joined_events, context=self.get_serializer_context(), many=True
-    )
-
   def retrieve(self, request, *args, **kwargs):
-    # Get user and serialiaze
     user = self.get_object()
-    user_serializer = self.get_serializer(user)
-
-    # Get user's joined events serializer
-    joined_events_serializer = self.get_joined_events_serializer(user)
-
-    # Return response
-    return Response(
+    joined_events = self.get_joined_event_objects(user)
+    response_serializer = self.get_serializer(
       {
-        "user": user_serializer.data,
-        "joined_events": joined_events_serializer.data,
+        "user": user,
+        "joined_events": joined_events,
       }
     )
+    return Response(response_serializer.data)
