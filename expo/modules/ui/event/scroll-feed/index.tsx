@@ -71,7 +71,7 @@ export default function EventScrollFeed({
             <ActivityIndicator className="flex-1" size="large" />
           ) : events.length === 0 ? (
             // No events //
-            <View className="items-center justify-center">
+            <View className="flex-1 items-center justify-center">
               <Text className="font-bold text-xl text-gray-700">
                 {noEventsMessage ?? "No events found."}
               </Text>
