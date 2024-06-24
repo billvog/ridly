@@ -1,9 +1,9 @@
-import { UserWithProfile } from "./UserWithProfile";
+import { PublicUser } from "./PublicUser";
 import { MiniEvent } from "./MiniEvent";
 import { DetailedError } from "./DetailedError";
 
  export type GetUserProfile = {
-    user: UserWithProfile;
+    user: PublicUser;
     /**
      * @type array
     */

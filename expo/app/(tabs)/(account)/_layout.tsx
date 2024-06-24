@@ -16,10 +16,8 @@ export default function Layout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: "My Account" }} />
-      <Stack.Screen
-        name="accountInfo"
-        options={{ title: "Account Information" }}
-      />
+      <Stack.Screen name="accountInfo" options={{ title: "Account Information" }} />
+      <Stack.Screen name="editProfile" options={{ title: "Edit Profile" }} />
     </Stack>
   );
 }

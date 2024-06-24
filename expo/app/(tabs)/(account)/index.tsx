@@ -1,14 +1,28 @@
 import { useUser } from "@/hooks/user/useUser";
-import Button from "@/modules/ui/Button";
-import { useUserLogout, userMeQueryKey } from "@/types/gen";
-import { clearAuthTokens } from "@/utils/authTokens";
+import LogoutButton from "@/modules/ui/account/LogoutButton";
 import { Feather } from "@expo/vector-icons";
-import { useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Href } from "expo-router/build/link/href";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import Toast from "react-native-toast-message";
+
+const Settings: OptionGroup[] = [
+  {
+    name: "General",
+    options: [
+      {
+        name: "Account Information",
+        href: "/(account)/accountInfo",
+        icon: <Feather name="user" size={20} color="black" />,
+      },
+      {
+        name: "Edit Profile",
+        href: "/(account)/editProfile",
+        icon: <Feather name="edit-3" size={20} color="black" />,
+      },
+    ],
+  },
+];
 
 export default function Page() {
   const user = useUser();
@@ -32,20 +46,7 @@ export default function Page() {
           </Text>
         </View>
       </View>
-      <PreferencesList
-        options={[
-          {
-            name: "General",
-            options: [
-              {
-                name: "Account Information",
-                href: "/(account)/accountInfo",
-                icon: <Feather name="user" size={20} color="black" />,
-              },
-            ],
-          },
-        ]}
-      />
+      <PreferencesList options={Settings} />
     </ScrollView>
   );
 }
@@ -66,11 +67,11 @@ function PreferencesList({ options }: { options: OptionGroup[] }) {
       {options.map((group) => (
         <View key={group.name}>
           <Text className="px-4 py-4 text-xl font-extrabold">{group.name}</Text>
-          <View>
+          <View className="divide-y-2 divide-gray-300 border-t-2 border-b-2 border-gray-300">
             {group.options.map((option) => (
               <TouchableOpacity
                 key={option.name}
-                className="flex flex-row items-center bg-gray-200 border-t-2 border-b-2 border-gray-300 p-4"
+                className="flex flex-row items-center bg-gray-200 p-4"
                 onPress={() => router.push(option.href)}
               >
                 {option.icon}
@@ -83,52 +84,5 @@ function PreferencesList({ options }: { options: OptionGroup[] }) {
 
       <LogoutButton />
     </View>
-  );
-}
-
-// Handles all the logout functionality.
-function LogoutButton() {
-  const router = useRouter();
-
-  const queryClient = useQueryClient();
-  const logoutMutation = useUserLogout();
-
-  function logout() {
-    logoutMutation.mutate(null as never, {
-      onSuccess() {
-        // Reset "user/me" cached query that
-        // stores logged in user.
-        queryClient.resetQueries({ queryKey: userMeQueryKey() });
-        queryClient.clear();
-
-        // Clear memory stored auth tokens
-        clearAuthTokens();
-
-        // Show success toast
-        Toast.show({
-          type: "success",
-          text1: "Logged out",
-        });
-
-        router.push({ pathname: "/guest" });
-      },
-      onError(error) {
-        console.error(error);
-        Toast.show({
-          type: "error",
-          text1: "Failed to logout",
-        });
-      },
-    });
-  }
-
-  return (
-    <Button
-      onPress={logout}
-      loading={logoutMutation.isPending}
-      buttonStyle="mt-10 bg-red-500 mx-auto"
-    >
-      Logout
-    </Button>
   );
 }
