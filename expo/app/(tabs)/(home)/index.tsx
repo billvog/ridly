@@ -22,10 +22,6 @@ export default function Page() {
 
   const [refreshEvents, areEventsRefreshing] = useIsRefreshing(eventsQuery.refetch);
 
-  if (eventsQuery.isPending) {
-    return <FullscreenSpinner />;
-  }
-
   return (
     <View className="flex-1">
       <ScrollView
@@ -34,19 +30,18 @@ export default function Page() {
           <RefreshControl refreshing={areEventsRefreshing} onRefresh={refreshEvents} />
         }
       >
-        {eventsQuery.isSuccess && (
-          <EventScrollFeed
-            title="Upcoming Events"
-            events={eventsQuery.data}
-            filters={feedFilters}
-            onUpdateFilters={setFeedFilters}
-          />
-        )}
-
-        {eventsQuery.isError && (
+        {eventsQuery.isError ? (
           <ErrorMessage viewStyle="p-10 w-full" textStyle="text-lg text-center">
             Something went wrong loading upcoming events.
           </ErrorMessage>
+        ) : (
+          <EventScrollFeed
+            title="Upcoming Events"
+            events={eventsQuery.data}
+            isLoading={eventsQuery.isPending}
+            filters={feedFilters}
+            onUpdateFilters={setFeedFilters}
+          />
         )}
       </ScrollView>
     </View>
