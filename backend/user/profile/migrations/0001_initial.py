@@ -35,6 +35,7 @@ class Migration(migrations.Migration):
             related_name="profile",
             primary_key=True,
             serialize=False,
+            editable=False,
             to=settings.AUTH_USER_MODEL,
           ),
         ),

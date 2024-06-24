@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
         (
           "participants",
           models.ManyToManyField(
-            to=settings.AUTH_USER_MODEL, related_name="joined_events"
+            blank=True, related_name="joined_events", to=settings.AUTH_USER_MODEL
           ),
         ),
       ],
