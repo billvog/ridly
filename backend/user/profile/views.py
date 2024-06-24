@@ -1,10 +1,16 @@
+from django.shortcuts import get_object_or_404
+from rest_framework import permissions
 from rest_framework.response import Response
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from ridly.serializers import DetailedErrorSerializer
 from user.models import User
-from user.profile.serializers import GetUserProfileSerializer
+from user.profile.serializers.requests import (
+  UpdateUserProfileSerializer,
+  GetUserProfileSerializer,
+)
+from user.profile.models import UserProfile
 
 
 @extend_schema_view(
@@ -34,3 +40,27 @@ class UserProfileAPIView(RetrieveAPIView):
       }
     )
     return Response(response_serializer.data)
+
+
+@extend_schema_view(
+  patch=extend_schema(
+    operation_id="updateUserProfile",
+    responses={200: UpdateUserProfileSerializer, 403: DetailedErrorSerializer},
+  )
+)
+class UpdateUserProfileAPIView(UpdateAPIView):
+  permission_classes = [permissions.IsAuthenticated]
+  serializer_class = UpdateUserProfileSerializer
+  queryset = UserProfile.objects.all()
+
+  http_method_names = ["patch"]
+
+  def get_object(self):
+    # Get object from database
+    queryset = self.filter_queryset(self.get_queryset())
+    obj = get_object_or_404(queryset, user=self.request.user)
+
+    # Check permissions
+    self.check_object_permissions(self.request, obj)
+
+    return obj

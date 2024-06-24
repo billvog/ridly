@@ -327,6 +327,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/DetailedError'
           description: ''
+  /user/profile/edit/:
+    patch:
+      operationId: updateUserProfile
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateUserProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateUserProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateUserProfile'
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateUserProfile'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedError'
+          description: ''
   /user/update/location/:
     put:
       operationId: user_update_last_known_location
@@ -459,7 +491,7 @@ components:
       type: object
       properties:
         user:
-          $ref: '#/components/schemas/UserWithProfile'
+          $ref: '#/components/schemas/PublicUser'
         joined_events:
           type: array
           items:
@@ -554,6 +586,11 @@ components:
       - id
       - location_name
       - name
+    PatchedUpdateUserProfile:
+      type: object
+      properties:
+        bio:
+          type: string
     Point:
       type: object
       description: Serializer for django.contrib.gis.geos.Point
@@ -569,82 +606,7 @@ components:
       - long
     PublicUser:
       type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        first_name:
-          type: string
-          maxLength: 50
-        last_name:
-          type: string
-          maxLength: 50
-        username:
-          type: string
-          maxLength: 50
-        is_creator:
-          type: boolean
-        avatar_url:
-          type: string
-          format: uri
-      required:
-      - avatar_url
-      - first_name
-      - id
-      - last_name
-      - username
-    UpdateLastKnownLocation:
-      type: object
-      properties:
-        last_known_location:
-          $ref: '#/components/schemas/Point'
-      required:
-      - last_known_location
-    User:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        first_name:
-          type: string
-          maxLength: 50
-        last_name:
-          type: string
-          maxLength: 50
-        username:
-          type: string
-          maxLength: 50
-        email:
-          type: string
-          format: email
-          maxLength: 254
-        avatar_url:
-          type: string
-          format: uri
-        did_complete_signup:
-          type: boolean
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-      required:
-      - avatar_url
-      - created_at
-      - email
-      - first_name
-      - id
-      - last_name
-      - username
-    UserProfile:
-      type: object
-      properties:
-        bio:
-          type: string
-    UserWithProfile:
-      type: object
+      description: User serializer that is available to the public.
       properties:
         id:
           type: string
@@ -673,6 +635,67 @@ components:
       - last_name
       - profile
       - username
+    UpdateLastKnownLocation:
+      type: object
+      properties:
+        last_known_location:
+          $ref: '#/components/schemas/Point'
+      required:
+      - last_known_location
+    UpdateUserProfile:
+      type: object
+      properties:
+        bio:
+          type: string
+    User:
+      type: object
+      description: Inherits `PublicUserSerializer` and adds fields that are only available
+        to the user themselves.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 50
+        last_name:
+          type: string
+          maxLength: 50
+        username:
+          type: string
+          maxLength: 50
+        is_creator:
+          type: boolean
+        avatar_url:
+          type: string
+          format: uri
+        profile:
+          $ref: '#/components/schemas/UserProfile'
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        did_complete_signup:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - avatar_url
+      - created_at
+      - email
+      - first_name
+      - id
+      - last_name
+      - profile
+      - username
+    UserProfile:
+      type: object
+      properties:
+        bio:
+          type: string
     ValidationError:
       type: object
       properties:
