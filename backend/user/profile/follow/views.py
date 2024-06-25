@@ -67,11 +67,20 @@ class FollowUserAPIView(GenericAPIView):
       follower=user, following=user_to_follow
     )
 
+    follow_status = created
+
     # If it wasn't created, it means that the user
     # is already following the other user and wants to unfollow.
     if not created:
       user_follow.delete()
 
     # Serialize response and return it
-    serializer = self.get_serializer(user_to_follow.profile)
+    serializer = self.get_serializer(
+      {
+        "follower_count": user_to_follow.profile.follower_count,
+        "following_count": user_to_follow.profile.following_count,
+        "follow_status": follow_status,
+      }
+    )
+
     return Response(serializer.data, status=status.HTTP_200_OK)

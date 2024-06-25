@@ -534,6 +534,10 @@ components:
           type: integer
           maximum: 2147483647
           minimum: 0
+        follow_status:
+          type: boolean
+      required:
+      - follow_status
     GetUserProfile:
       type: object
       properties:
@@ -751,6 +755,11 @@ components:
           type: integer
           maximum: 2147483647
           minimum: 0
+        follow_status:
+          type: boolean
+          readOnly: true
+      required:
+      - follow_status
     ValidationError:
       type: object
       properties:
