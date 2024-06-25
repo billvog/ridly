@@ -4,7 +4,9 @@ from user.models import User
 
 
 class Creator(models.Model):
-  user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+  user = models.OneToOneField(
+    User, on_delete=models.CASCADE, primary_key=True, editable=False
+  )
 
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)

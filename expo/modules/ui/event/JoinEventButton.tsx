@@ -10,11 +10,6 @@ type JoinEventButtonProps = {
   event: Event;
 };
 
-type JoinEventResponse = {
-  has_joined: boolean;
-  participant_count: number;
-};
-
 export default function JoinEventButton({ event }: JoinEventButtonProps) {
   const queryClient = useQueryClient();
 

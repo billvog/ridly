@@ -1,13 +1,14 @@
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 
 from . import views
 
 urlpatterns = [
-  path("logout/", view=views.LogoutAPIView.as_view()),
   path("me/", view=views.MeAPIView.as_view()),
+  path("logout/", view=views.LogoutAPIView.as_view()),
   path("complete-signup/", view=views.CompleteSignupAPIView.as_view()),
   path("update/location/", view=views.UpdateLastKnownLocationAPIView.as_view()),
+  path("profile/", include("user.profile.urls")),
 ]
 
 # Only for testing!!!

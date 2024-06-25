@@ -6,20 +6,25 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
+  dependencies = [
+    ("creator", "0001_initial"),
+    migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+  ]
 
-    dependencies = [
-        ('creator', '0001_initial'),
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    ]
-
-    operations = [
-        migrations.RemoveField(
-            model_name='creator',
-            name='id',
-        ),
-        migrations.AlterField(
-            model_name='creator',
-            name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL),
-        ),
-    ]
+  operations = [
+    migrations.RemoveField(
+      model_name="creator",
+      name="id",
+    ),
+    migrations.AlterField(
+      model_name="creator",
+      name="user",
+      field=models.OneToOneField(
+        on_delete=django.db.models.deletion.CASCADE,
+        primary_key=True,
+        serialize=False,
+        editable=False,
+        to=settings.AUTH_USER_MODEL,
+      ),
+    ),
+  ]

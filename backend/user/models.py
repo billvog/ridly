@@ -22,6 +22,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
   last_known_location = models.PointField(null=True, blank=True)
 
+  is_creator = models.BooleanField(default=False)
+
   is_active = models.BooleanField(default=True)
   is_staff = models.BooleanField(default=False)
 

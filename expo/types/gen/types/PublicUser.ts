@@ -1,3 +1,8 @@
+import { UserProfile } from "./UserProfile";
+
+ /**
+ * @description User serializer that is available to the public.
+*/
 export type PublicUser = {
     /**
      * @type string, uuid
@@ -16,7 +21,12 @@ export type PublicUser = {
     */
     username: string;
     /**
+     * @type boolean | undefined
+    */
+    is_creator?: boolean;
+    /**
      * @type string, uri
     */
     avatar_url: string;
+    profile: UserProfile;
 };

@@ -1,6 +1,5 @@
-import { Event, eventQueryKey } from "@/types/gen";
+import { Event, MiniEvent } from "@/types/gen";
 import { Feather } from "@expo/vector-icons";
-import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
@@ -9,17 +8,15 @@ import React from "react";
 import { ViewProps as RNViewProps, Text, TouchableOpacity, View } from "react-native";
 
 export type EventCardProps = {
-  event: Event;
+  event: Event | MiniEvent;
   style?: RNViewProps["style"];
 };
 
 export default function EventCard({ event, style }: EventCardProps) {
   const router = useRouter();
   const segments = useSegments();
-  const queryClient = useQueryClient();
 
   function onPress() {
-    queryClient.setQueryData(eventQueryKey(event.id), event);
     router.push({
       pathname: `/(tabs)/${segments[1]}/event/[id]`,
       params: { id: event.id },

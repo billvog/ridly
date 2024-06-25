@@ -46,6 +46,7 @@ INSTALLED_APPS = [
   "ridly",
   "user",
   "user.avatar",
+  "user.profile",
   "oauth",
   "creator",
   "event",

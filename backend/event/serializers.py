@@ -6,27 +6,10 @@ from event.models import Event
 from creator.serializers import CreatorSerializer
 
 
-class EventSerializer(serializers.ModelSerializer):
-  creator = CreatorSerializer()
-  participant_avatars = serializers.SerializerMethodField()
-  has_joined = serializers.SerializerMethodField()
-  hunt_id = serializers.UUIDField(source="hunt.id")
-
-  class Meta:
-    model = Event
-    fields = [
-      "id",
-      "name",
-      "description",
-      "creator",
-      "participant_avatars",
-      "participant_count",
-      "has_joined",
-      "location_name",
-      "happening_at",
-      "hunt_id",
-      "created_at",
-    ]
+class EventParticipantAvatarsMixinSerializer:
+  """
+  Mixin to add participant avatars to the EventSerializer.
+  """
 
   @extend_schema_field(list[str])
   def get_participant_avatars(self, obj):
@@ -51,6 +34,12 @@ class EventSerializer(serializers.ModelSerializer):
     serializer.is_valid()
     return serializer.data
 
+
+class EventHasJoinedMixinSerializer:
+  """
+  Mixin to add "has joined" status to the EventSerializer.
+  """
+
   def get_has_joined(self, obj) -> bool:
     request = self.context.get("request")
     user = request.user
@@ -58,6 +47,59 @@ class EventSerializer(serializers.ModelSerializer):
       return False
     else:
       return obj.participants.contains(user)
+
+
+class MiniEventSerializer(
+  EventHasJoinedMixinSerializer,
+  serializers.ModelSerializer,
+):
+  """
+  Event serializer, but with only the necessary fields.
+  """
+
+  has_joined = serializers.SerializerMethodField()
+
+  class Meta:
+    model = Event
+    fields = [
+      "id",
+      "name",
+      "has_joined",
+      "location_name",
+      "participant_count",
+      "happening_at",
+    ]
+
+
+class EventSerializer(
+  EventParticipantAvatarsMixinSerializer,
+  EventHasJoinedMixinSerializer,
+  serializers.ModelSerializer,
+):
+  """
+  Full event serializer.
+  """
+
+  creator = CreatorSerializer()
+  participant_avatars = serializers.SerializerMethodField()
+  has_joined = serializers.SerializerMethodField()
+  hunt_id = serializers.UUIDField(source="hunt.id")
+
+  class Meta:
+    model = Event
+    fields = [
+      "id",
+      "name",
+      "description",
+      "creator",
+      "participant_avatars",
+      "participant_count",
+      "has_joined",
+      "location_name",
+      "happening_at",
+      "hunt_id",
+      "created_at",
+    ]
 
 
 class EventJoinSerializer(serializers.Serializer):

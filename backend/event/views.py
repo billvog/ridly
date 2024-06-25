@@ -72,7 +72,7 @@ class ListJoinedEventsAPIView(ListAPIView):
   permission_classes = [permissions.IsAuthenticated]
 
   def get_queryset(self):
-    return self.request.user.event_set.all()
+    return self.request.user.joined_events.all()
 
 
 @extend_schema_view(

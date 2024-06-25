@@ -1,3 +1,8 @@
+import { UserProfile } from "./UserProfile";
+
+ /**
+ * @description Inherits `PublicUserSerializer` and adds fields that are only available to the user themselves.
+*/
 export type User = {
     /**
      * @type string, uuid
@@ -16,13 +21,18 @@ export type User = {
     */
     username: string;
     /**
-     * @type string, email
+     * @type boolean | undefined
     */
-    email: string;
+    is_creator?: boolean;
     /**
      * @type string, uri
     */
     avatar_url: string;
+    profile: UserProfile;
+    /**
+     * @type string, email
+    */
+    email: string;
     /**
      * @type boolean | undefined
     */
