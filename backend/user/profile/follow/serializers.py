@@ -3,7 +3,7 @@ from rest_framework import serializers
 from user.profile.models import UserProfile
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class FollowUserSerializer(serializers.ModelSerializer):
   class Meta:
     model = UserProfile
-    fields = ["bio", "follower_count", "following_count"]
+    fields = ["follower_count", "following_count"]

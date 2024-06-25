@@ -11,7 +11,11 @@ class UserProfile(models.Model):
     primary_key=True,
     editable=False,
   )
+
   bio = models.TextField(blank=True)
+
+  follower_count = models.PositiveIntegerField(default=0)
+  following_count = models.PositiveIntegerField(default=0)
 
   def __str__(self) -> str:
     return f"Profile of {self.user.username}"

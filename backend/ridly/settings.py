@@ -47,6 +47,7 @@ INSTALLED_APPS = [
   "user",
   "user.avatar",
   "user.profile",
+  "user.profile.follow",
   "oauth",
   "creator",
   "event",

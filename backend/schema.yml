@@ -327,6 +327,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/DetailedError'
           description: ''
+  /user/profile/{id}/follow/:
+    post:
+      operationId: followUser
+      description: Follow or unfollow a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: User Id to follow or unfollow
+        required: true
+      tags:
+      - user
+      security:
+      - cookieAuth: []
+      - JWTAuthentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowUser'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedError'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedError'
+          description: ''
   /user/profile/edit/:
     patch:
       operationId: updateUserProfile
@@ -487,6 +523,17 @@ components:
       required:
       - has_joined
       - participant_count
+    FollowUser:
+      type: object
+      properties:
+        follower_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        following_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
     GetUserProfile:
       type: object
       properties:
@@ -696,6 +743,14 @@ components:
       properties:
         bio:
           type: string
+        follower_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        following_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
     ValidationError:
       type: object
       properties:
