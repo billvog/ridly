@@ -1,3 +1,4 @@
+import { ProfileShowNavigationOptions } from "@/app/shared/profile/show";
 import { Stack } from "expo-router";
 import React from "react";
 
@@ -18,6 +19,8 @@ export default function Layout() {
       <Stack.Screen name="index" options={{ title: "My Account" }} />
       <Stack.Screen name="accountInfo" options={{ title: "Account Information" }} />
       <Stack.Screen name="editProfile" options={{ title: "Edit Profile" }} />
+
+      <Stack.Screen name="profile/[id]" options={ProfileShowNavigationOptions} />
     </Stack>
   );
 }
