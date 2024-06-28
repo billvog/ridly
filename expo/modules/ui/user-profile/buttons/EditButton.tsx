@@ -16,7 +16,7 @@ export default function EditButton() {
       onPress={editPressed}
       buttonStyle={ButtonStyles.button}
       textStyle={ButtonStyles.text}
-      icon={<Feather name="edit-3" size={14} color="white" />}
+      icon={<Feather name="edit-3" size={ButtonStyles.iconWidth} color="white" />}
     >
       Edit
     </Button>

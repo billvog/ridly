@@ -2,6 +2,7 @@ import Button from "@/modules/ui/Button";
 import ButtonStyles from "@/modules/ui/user-profile/buttons/ButtonStyles";
 import { GetUserProfileQuery, getUserProfileQueryKey, useFollowUser } from "@/types/gen";
 import { handleMutationError } from "@/utils/mutationError";
+import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import classNames from "classnames";
 import React, { useCallback, useMemo } from "react";
@@ -29,6 +30,11 @@ export default function FollowButton({ user }: FollowButtonProps) {
     [user]
   );
 
+  const buttonIconName = useMemo(
+    () => (user.profile.follow_status ? "user-minus" : "user-plus"),
+    [user]
+  );
+
   const followPressed = useCallback(() => {
     followUserMutation.mutate(undefined as never, {
       onSuccess(data) {
@@ -53,9 +59,10 @@ export default function FollowButton({ user }: FollowButtonProps) {
   return (
     <Button
       onPress={followPressed}
+      loading={followUserMutation.isPending}
       buttonStyle={classNames(ButtonStyles.button, buttonBackgroundColor)}
       textStyle={ButtonStyles.text}
-      loading={followUserMutation.isPending}
+      icon={<Feather name={buttonIconName} size={ButtonStyles.iconWidth} color="white" />}
     >
       {buttonText}
     </Button>

@@ -2,4 +2,5 @@
 export default {
   button: "mr-auto px-4 py-2",
   text: "text-sm",
+  iconWidth: 14,
 };
