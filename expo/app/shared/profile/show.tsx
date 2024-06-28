@@ -1,8 +1,10 @@
 import { useIsRefreshing } from "@/hooks/useIsRefreshing";
+import { useUser } from "@/hooks/user/useUser";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
 import EventScrollFeed from "@/modules/ui/event/scroll-feed";
-import FollowButton from "@/modules/ui/user-profile/FollowButton";
+import EditButton from "@/modules/ui/user-profile/buttons/EditButton";
+import FollowButton from "@/modules/ui/user-profile/buttons/FollowButton";
 import { useGetUserProfile } from "@/types/gen";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { Image } from "expo-image";
@@ -16,6 +18,8 @@ export const ProfileShowNavigationOptions: NativeStackNavigationOptions = {
 };
 
 export default function ProfileShow() {
+  const currentUser = useUser();
+
   const { id: userId } = useLocalSearchParams();
   const navigation = useNavigation();
 
@@ -32,6 +36,8 @@ export default function ProfileShow() {
     () => userProfileQuery.data?.joined_events ?? [],
     [userProfileQuery]
   );
+
+  const isMyProfile = useMemo(() => currentUser?.id === userId, [currentUser, userId]);
 
   // Set the title of the screen to the user's username
   useEffect(() => {
@@ -83,7 +89,15 @@ export default function ProfileShow() {
         </View>
 
         <View>
-          <FollowButton user={user} />
+          {isMyProfile ? (
+            <>
+              <EditButton />
+            </>
+          ) : (
+            <>
+              <FollowButton user={user} />
+            </>
+          )}
         </View>
       </View>
       <View>

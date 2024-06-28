@@ -1,4 +1,5 @@
 import Button from "@/modules/ui/Button";
+import ButtonStyles from "@/modules/ui/user-profile/buttons/ButtonStyles";
 import { GetUserProfileQuery, getUserProfileQueryKey, useFollowUser } from "@/types/gen";
 import { handleMutationError } from "@/utils/mutationError";
 import { useQueryClient } from "@tanstack/react-query";
@@ -52,8 +53,8 @@ export default function FollowButton({ user }: FollowButtonProps) {
   return (
     <Button
       onPress={followPressed}
-      buttonStyle={classNames("mr-auto px-4 py-2", buttonBackgroundColor)}
-      textStyle="text-sm"
+      buttonStyle={classNames(ButtonStyles.button, buttonBackgroundColor)}
+      textStyle={ButtonStyles.text}
       loading={followUserMutation.isPending}
     >
       {buttonText}
