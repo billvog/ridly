@@ -54,7 +54,7 @@ export default function EventDetails() {
   const CreatorHandlePressed = useCallback(() => {
     if (event && event.creator.user.id) {
       router.push({
-        pathname: `/(tabs)/${segments[1]}/profile/[id]`,
+        pathname: `/(tabs)/${segments[1]}/profile/[id]/show`,
         params: { id: event.creator.user.id },
       });
     }

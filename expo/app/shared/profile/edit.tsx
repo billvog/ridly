@@ -11,6 +11,7 @@ import {
 import { setFormErrors } from "@/utils/formErrors";
 import { handleMutationError } from "@/utils/mutationError";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { useQueryClient } from "@tanstack/react-query";
 import React, { useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -23,13 +24,18 @@ import {
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 
+export const ProfileEditNavigationOptions: NativeStackNavigationOptions = {
+  title: "Edit Profile",
+  headerBackTitleVisible: false,
+};
+
 const ZodValidationSchema = z.object({
   bio: z.string().min(0).max(500, "Must be less than 500 characters"),
 });
 
 type FormSchema = z.infer<typeof ZodValidationSchema>;
 
-export default function Page() {
+export default function ProfileEdit() {
   const queryClient = useQueryClient();
   const user = useUser();
 

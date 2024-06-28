@@ -4,6 +4,7 @@ import LogoutButton from "@/modules/ui/account/LogoutButton";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Href } from "expo-router/build/link/href";
+import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 const Settings: OptionGroup[] = [
@@ -17,7 +18,7 @@ const Settings: OptionGroup[] = [
       },
       {
         name: "Edit Profile",
-        href: "/(account)/editProfile",
+        href: "/(account)/profile/edit",
         icon: <Feather name="edit-3" size={20} color="black" />,
       },
     ],

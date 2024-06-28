@@ -16,7 +16,7 @@ export default function AccountAvatar({ user }: AccountAvatarProps) {
 
   const onAvatarPress = React.useCallback(() => {
     router.push({
-      pathname: `/(tabs)/${segments[1]}/profile/[id]`,
+      pathname: `/(tabs)/${segments[1]}/profile/[id]/show`,
       params: { id: user.id },
     });
   }, [user.id, router]);
