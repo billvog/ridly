@@ -3,6 +3,7 @@ import { useUser } from "@/hooks/user/useUser";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
 import EventScrollFeed from "@/modules/ui/event/scroll-feed";
+import CreatorBadge from "@/modules/ui/user-profile/CreatorBadge";
 import EditButton from "@/modules/ui/user-profile/buttons/EditButton";
 import FollowButton from "@/modules/ui/user-profile/buttons/FollowButton";
 import { useGetUserProfile } from "@/types/gen";
@@ -99,6 +100,8 @@ export default function ProfileShow() {
             </>
           )}
         </View>
+
+        {user.is_creator && <CreatorBadge />}
       </View>
       <View>
         <EventScrollFeed
