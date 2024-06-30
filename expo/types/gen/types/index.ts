@@ -21,7 +21,6 @@ export * from "./UpdateLastKnownLocation";
 export * from "./UpdateUserProfile";
 export * from "./User";
 export * from "./UserCompleteSignup";
-export * from "./UserLogout";
 export * from "./UserMe";
 export * from "./UserProfile";
 export * from "./UserUpdateLastKnownLocation";

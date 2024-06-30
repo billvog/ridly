@@ -9,6 +9,5 @@ export * from "./useOauthLogin";
 export * from "./useUpcomingEvents";
 export * from "./useUpdateUserProfile";
 export * from "./useUserCompleteSignup";
-export * from "./useUserLogout";
 export * from "./useUserMe";
 export * from "./useUserUpdateLastKnownLocation";

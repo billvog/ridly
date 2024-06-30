@@ -259,23 +259,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/DetailedError'
           description: ''
-  /user/logout/:
-    delete:
-      operationId: user_logout
-      tags:
-      - user
-      security:
-      - cookieAuth: []
-      - JWTAuthentication: []
-      responses:
-        '204':
-          description: No response body
-        '403':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DetailedError'
-          description: ''
   /user/me/:
     get:
       operationId: user_me
@@ -757,6 +740,8 @@ components:
           minimum: 0
         follow_status:
           type: boolean
+          description: Indicated whether the logged in user, if any, is following
+            the requested user.
           readOnly: true
       required:
       - follow_status

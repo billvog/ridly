@@ -182,10 +182,12 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
   "x-access-token",
+  "x-refresh-token",
 ]
 
 CORS_EXPOSE_HEADERS = [
   "x-access-token",
+  "x-refresh-token",
 ]
 
 # Django Rest Framework

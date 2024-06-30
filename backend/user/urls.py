@@ -5,7 +5,6 @@ from . import views
 
 urlpatterns = [
   path("me/", view=views.MeAPIView.as_view()),
-  path("logout/", view=views.LogoutAPIView.as_view()),
   path("complete-signup/", view=views.CompleteSignupAPIView.as_view()),
   path("update/location/", view=views.UpdateLastKnownLocationAPIView.as_view()),
   path("profile/", include("user.profile.urls")),

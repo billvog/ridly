@@ -14,7 +14,6 @@ from user.serializers import (
   CompleteSignupSerializer,
 )
 from user.auth_tokens import (
-  clear_refresh_token_cookie,
   generate_tokens_for_user,
 )
 
@@ -27,30 +26,14 @@ class TestAuthTokenAPIView(APIView):
       return Response(None, status=status.HTTP_404_NOT_FOUND)
 
     user = User.objects.first()
-    (access_token, _) = generate_tokens_for_user(user)
+    access_token, refresh_token = generate_tokens_for_user(user)
 
     headers = {
       "x-access-token": access_token,
+      "x-refresh-token": refresh_token,
     }
 
     response = Response(None, headers=headers, status=status.HTTP_200_OK)
-    return response
-
-
-@extend_schema_view(
-  delete=extend_schema(
-    operation_id="user_logout",
-    methods=["DELETE"],
-    request=None,
-    responses={204: None, 403: DetailedErrorSerializer},
-  )
-)
-class LogoutAPIView(APIView):
-  permission_classes = [permissions.IsAuthenticated]
-
-  def delete(self, _):
-    response = Response(None, status=status.HTTP_204_NO_CONTENT)
-    clear_refresh_token_cookie(response)
     return response
 
 

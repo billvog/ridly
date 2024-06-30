@@ -1,7 +1,6 @@
 import jwt
 
 from django.conf import settings
-from rest_framework.response import Response
 from datetime import datetime, timezone, timedelta
 
 
@@ -28,19 +27,6 @@ def generate_tokens_for_user(user):
   )
 
   return (access_token, refresh_token)
-
-
-def set_refresh_token_cookie(response: Response, refresh_token: str):
-  response.set_cookie(
-    "refresh_token",
-    refresh_token,
-    expires=datetime.now(tz=timezone.utc) + timedelta(days=7),
-    httponly=True,
-  )
-
-
-def clear_refresh_token_cookie(response: Response):
-  response.delete_cookie("refresh_token")
 
 
 def decode_token(token, secret):

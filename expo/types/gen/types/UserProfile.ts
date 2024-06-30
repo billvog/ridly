@@ -12,6 +12,7 @@ export type UserProfile = {
     */
     following_count?: number;
     /**
+     * @description Indicated whether the logged in user, if any, is following the requested user.
      * @type boolean
     */
     readonly follow_status: boolean;
