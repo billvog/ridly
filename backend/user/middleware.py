@@ -1,11 +1,10 @@
 from django.http import HttpRequest
 from django.contrib.auth import get_user_model
 
-from .auth_tokens import (
+
+from user.auth_tokens import (
   decode_refresh_token,
   generate_tokens_for_user,
-  set_refresh_token_cookie,
-  clear_refresh_token_cookie,
   is_access_token_expired,
 )
 
@@ -22,26 +21,17 @@ class RefreshJWTMiddleware:
   def __init__(self, get_response):
     self.get_response = get_response
 
-  def get_cleared_response(self, request: HttpRequest):
-    """
-    Returns a response with cleared refresh token cookie.
-    If the refresh token is invalid, we clear it, so we don't
-    have to check again for the next request.
-    """
-    response = self.get_response(request)
-    clear_refresh_token_cookie(response)
-    return response
-
   def __call__(self, request: HttpRequest):
-    # if access or refresh token is not provided skip
+    # if access or refresh token is not provided, skip
     if (
-      "x-access-token" not in request.headers or "refresh_token" not in request.COOKIES
+      "x-access-token" not in request.headers
+      or "x-refresh-token" not in request.headers
     ):
       return self.get_response(request)
 
     # get tokens from headers and cookies
     access_token = request.headers["x-access-token"]
-    refresh_token = request.COOKIES["refresh_token"]
+    refresh_token = request.headers["x-refresh-token"]
 
     # this will later be retrived from the JWTAuthentication custom auth class
     request.META["HTTP_ACCESS_TOKEN"] = access_token
@@ -62,11 +52,11 @@ class RefreshJWTMiddleware:
     try:
       user = User.objects.get(pk=refresh_payload["user_id"])
     except User.DoesNotExist:
-      return self.get_cleared_response(request)
+      return self.get_response(request)
 
     # if token has invalid token_version clear response
     if user.token_version != refresh_payload["token_version"]:
-      return self.get_cleared_response(request)
+      return self.get_response(request)
 
     # generate new tokens
     (new_access_token, new_refresh_token) = generate_tokens_for_user(user)
@@ -74,9 +64,9 @@ class RefreshJWTMiddleware:
     # update access token for JWTAuthentication
     request.META["HTTP_ACCESS_TOKEN"] = new_access_token
 
-    # send access token as respone header and refresh token as cookie
+    # send access and refresh token as respone header
     response = self.get_response(request)
     response.headers["x-access-token"] = new_access_token
-    set_refresh_token_cookie(response, new_refresh_token)
+    response.headers["x-refresh-token"] = new_refresh_token
 
     return response

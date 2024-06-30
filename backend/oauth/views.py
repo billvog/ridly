@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from ridly.serializers import DetailedErrorSerializer
 from user.models import User
 from user.serializers import UserSerializer
-from user.auth_tokens import generate_tokens_for_user, set_refresh_token_cookie
+from user.auth_tokens import generate_tokens_for_user
 from user.avatar.tasks import update_avatar_from_oauth
 from oauth.serializers import LoginSerializer
 from oauth.exceptions import UnsupportedOAuthProvider, BadOAuthToken
@@ -71,16 +71,11 @@ class OAuthLoginAPIView(GenericAPIView):
     # Serializer user for response
     body = UserSerializer(user, context=self.get_serializer_context()).data
 
-    # Set access token in response headers
+    # Set jwt token in response headers
     headers = {
       "x-access-token": access_token,
+      "x-refresh-token": refresh_token,
     }
 
-    # Create response with 200
     response = Response(body, headers=headers, status=status.HTTP_200_OK)
-
-    # Set refresh token in response cookies
-    set_refresh_token_cookie(response, refresh_token)
-
-    # Send response
     return response
