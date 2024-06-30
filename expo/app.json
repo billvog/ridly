@@ -55,7 +55,8 @@
         {
           "launchMode": "most-recent"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "scheme": "ridly"
   }
