@@ -15,6 +15,7 @@ type ButtonProps = {
   loading?: boolean;
   buttonStyle?: RNTextProps["style"];
   textStyle?: RNTextProps["style"];
+  icon?: React.ReactNode;
   children: React.ReactNode | string;
 };
 
@@ -24,6 +25,7 @@ function Button({
   loading = false,
   buttonStyle,
   textStyle,
+  icon,
   children,
 }: ButtonProps) {
   return (
@@ -43,7 +45,13 @@ function Button({
           <ActivityIndicator size={18} />
         </View>
       )}
-      <View className={classNames({ "opacity-0": loading })}>
+      <View
+        className={classNames("flex-row items-center", {
+          "opacity-0": loading,
+        })}
+      >
+        {icon && <View className="mr-2">{icon}</View>}
+
         {typeof children === "string" ? (
           <Text className="text-center text-white font-bold" style={textStyle}>
             {children}

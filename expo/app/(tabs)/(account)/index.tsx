@@ -1,9 +1,10 @@
 import { useUser } from "@/hooks/user/useUser";
+import AccountAvatar from "@/modules/ui/account/AccountAvatar";
 import LogoutButton from "@/modules/ui/account/LogoutButton";
 import { Feather } from "@expo/vector-icons";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Href } from "expo-router/build/link/href";
+import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 const Settings: OptionGroup[] = [
@@ -17,7 +18,7 @@ const Settings: OptionGroup[] = [
       },
       {
         name: "Edit Profile",
-        href: "/(account)/editProfile",
+        href: "/(account)/profile/edit",
         icon: <Feather name="edit-3" size={20} color="black" />,
       },
     ],
@@ -34,11 +35,7 @@ export default function Page() {
   return (
     <ScrollView>
       <View className="flex items-center py-14">
-        <Image
-          source={user.avatar_url}
-          className="rounded-full"
-          style={{ width: 100, height: 100 }}
-        />
+        <AccountAvatar user={user} />
         <View className="mt-8 flex items-center">
           <Text className="text-sm">Welcome back,</Text>
           <Text className="font-extrabold text-2xl">

@@ -3,6 +3,7 @@ export * from "./Creator";
 export * from "./DetailedError";
 export * from "./Event";
 export * from "./EventJoin";
+export * from "./FollowUser";
 export * from "./GetUserProfile";
 export * from "./Hunt";
 export * from "./HuntClue";

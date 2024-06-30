@@ -1,0 +1,1 @@
+{"type":"object","properties":{"follower_count":{"type":"integer","maximum":2147483647,"minimum":0},"following_count":{"type":"integer","maximum":2147483647,"minimum":0},"follow_status":{"type":"boolean"}},"required":["follow_status"],"x-readme-ref-name":"FollowUser"}

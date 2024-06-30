@@ -1,7 +1,11 @@
 import { useIsRefreshing } from "@/hooks/useIsRefreshing";
+import { useUser } from "@/hooks/user/useUser";
 import FullscreenError from "@/modules/ui/FullscreenError";
 import FullscreenSpinner from "@/modules/ui/FullscreenSpinner";
 import EventScrollFeed from "@/modules/ui/event/scroll-feed";
+import CreatorBadge from "@/modules/ui/user-profile/CreatorBadge";
+import EditButton from "@/modules/ui/user-profile/buttons/EditButton";
+import FollowButton from "@/modules/ui/user-profile/buttons/FollowButton";
 import { useGetUserProfile } from "@/types/gen";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { Image } from "expo-image";
@@ -15,6 +19,8 @@ export const ProfileShowNavigationOptions: NativeStackNavigationOptions = {
 };
 
 export default function ProfileShow() {
+  const currentUser = useUser();
+
   const { id: userId } = useLocalSearchParams();
   const navigation = useNavigation();
 
@@ -31,6 +37,8 @@ export default function ProfileShow() {
     () => userProfileQuery.data?.joined_events ?? [],
     [userProfileQuery]
   );
+
+  const isMyProfile = useMemo(() => currentUser?.id === userId, [currentUser, userId]);
 
   // Set the title of the screen to the user's username
   useEffect(() => {
@@ -60,13 +68,19 @@ export default function ProfileShow() {
       }
     >
       <View className="p-8 pb-6">
-        <View className="mb-4">
+        <View className="mb-4 flex-row align-middle">
           <Image
             source={{ uri: user.avatar_url ?? "https://placehold.co/20/000/FFF" }}
-            className="w-24 h-24 rounded-full"
+            className="w-24 h-24 rounded-full mr-8"
           />
+
+          <View className="flex-1 flex-row justify-evenly">
+            <ProfileCounter label="Followers" count={user.profile.follower_count ?? 0} />
+            <ProfileCounter label="Following" count={user.profile.following_count ?? 0} />
+          </View>
         </View>
-        <View>
+
+        <View className="mb-4">
           <Text className="font-bold text-xl">
             {user.first_name + " " + user.last_name}
           </Text>
@@ -74,6 +88,20 @@ export default function ProfileShow() {
             <Text className="mt-1 text-xs text-gray-600">{user.profile.bio}</Text>
           )}
         </View>
+
+        <View>
+          {isMyProfile ? (
+            <>
+              <EditButton />
+            </>
+          ) : (
+            <>
+              <FollowButton user={user} />
+            </>
+          )}
+        </View>
+
+        {user.is_creator && <CreatorBadge />}
       </View>
       <View>
         <EventScrollFeed
@@ -84,5 +112,14 @@ export default function ProfileShow() {
         />
       </View>
     </ScrollView>
+  );
+}
+
+function ProfileCounter({ count, label }: { count: number; label: string }) {
+  return (
+    <View className="justify-center">
+      <Text className="text-center font-medium text-3xl">{count}</Text>
+      <Text className="text-center text-xs">{label}</Text>
+    </View>
   );
 }
