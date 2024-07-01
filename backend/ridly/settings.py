@@ -213,3 +213,7 @@ GS_BUCKET_NAME = config("GS_BUCKET_NAME", cast=str)
 
 # Imgix
 IMGIX_SOURCE = config("IMGIX_SOURCE", cast=str)
+
+# Recombee
+RECOMBEE_DB = config("RECOMBEE_DB", cast=str)
+RECOMBEE_SECRET = config("RECOMBEE_SECRET", cast=str)
